@@ -1,4 +1,4 @@
-import { BottomNavigation, BottomNavigationAction, Box, Paper } from '@mui/material';
+import { BottomNavigation, BottomNavigationAction, Box, Paper, Switch } from '@mui/material';
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import DownloadIcon from '@mui/icons-material/Download';
 import { useState } from 'react';
@@ -111,6 +111,7 @@ const NavbarBottom = () => {
                             icon={<AddBoxIcon color="primary" sx={{ fontSize: 40 }} />}
                         />
                     )}
+                    {/* <Switch /> */}
                 </Box>
             </BottomNavigation>
         </Paper>

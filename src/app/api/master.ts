@@ -23,9 +23,9 @@ export const updateMasterItem = (masterItem: IMaster) => {
     return axios.patch(`${baseUrl}/master/${masterItem.id}/update`, masterItem);
 };
 
-export const assignMasterItem = (params: { id: number; department: string }) => {
-    return axios.patch(`${baseUrl}/master-department/${params.department}/${params.id}/assign`);
-};
+// export const assignMasterItem = (params: { id: number; department: string }) => {
+//     return axios.patch(`${baseUrl}/master-department/${params.department}/${params.id}/assign`);
+// };
 
 export const getMasterDepartmentItems = (params: { state: string; page: number }) => {
     return axios.get(`${baseUrl}/master-department/${params.state}/list?page=${params.page}`);

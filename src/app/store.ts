@@ -30,7 +30,6 @@ import departmentMasterItemsReducer from './slice/department/departmentMasterIte
 import departmentItemUpdateReducer from './slice/department/departmentItemUpdateSlice';
 import departmentItemReducer from './slice/department/departmentItemSlice';
 import masterItemCreateReducer from './slice/master/masterItemCreateSlice';
-import masterItemAssignReducer from './slice/master/masterItemAssignSlice';
 import totalAmountReducer from './slice/totalAmount';
 import masterItemsFilterReducer from './slice/master/masterItemsFilterSlice';
 import grandTotalReducer from './slice/grandTotalSlice';
@@ -41,7 +40,6 @@ import departmentMasterItemAssignReducer from './slice/department/departmentMast
 
 export const store = configureStore({
     reducer: {
-        masterItemAssignStore: masterItemAssignReducer,
         masterItemsStore: masterReducer,
         masterItemCreateStore: masterItemCreateReducer,
         masterDepartmentItemStore: masterDepartmentItemReducer,
