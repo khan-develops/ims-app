@@ -59,7 +59,7 @@ const router = createBrowserRouter(
 
 const App = () => {
     return (
-        <Box>
+        <Box sx={{height: '100%'}}>
             <UnauthenticatedTemplate>
                 <Auth />
             </UnauthenticatedTemplate>

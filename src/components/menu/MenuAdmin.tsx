@@ -8,7 +8,7 @@ const MenuAdmin = () => {
     const location = useLocation();
 
     return (
-        <AppBar position="static" elevation={5} sx={{ backgroundColor: '#1347a4' }}>
+        <AppBar position="static" elevation={5} color="primary">
             <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Box>
                     <img src={logo} alt={'USDTL IMS'} style={{ height: 40 }} />
