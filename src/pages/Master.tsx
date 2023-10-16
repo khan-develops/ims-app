@@ -247,19 +247,19 @@ const MasterCardItem = ({
     // };
 
     return (
-        <Card>
+        <Card sx={{ marginBottom: 2 }}>
             <CardHeader
-                sx={{ backgroundColor: '#ececec' }}
+                sx={{ backgroundColor: '#ececec', paddingTop: 1, paddingBottom: 1 }}
                 title={masterItem.item}
-                titleTypographyProps={{ variant: 'body1', marginLeft: 1 }}
+                titleTypographyProps={{ variant: 'button', marginLeft: 1 }}
                 subheader={masterItem.comment}
-                subheaderTypographyProps={{ variant: 'body2', marginLeft: 1 }}
+                subheaderTypographyProps={{ variant: 'caption', marginLeft: 1 }}
             />
             <CardContent>
                 <TableContainer>
                     <Table>
-                        <TableHead>
-                            <TableRow>
+                        <TableHead sx={{ height: 30 }}>
+                            <TableRow sx={{ height: 30 }}>
                                 {headerCell.map((headCell) => (
                                     <StyledTableCell>{headCell.label}</StyledTableCell>
                                 ))}
@@ -468,7 +468,7 @@ const Master = (): JSX.Element => {
                     </Toolbar>
                 </AppBar>
             </Grid>
-            <Grid item padding={1} sx={{ height: '80vh', overflowY: 'auto' }}>
+            <Grid item sx={{ height: 800, overflowY: 'auto', paddingLeft: 2, paddingRight: 2 }}>
                 {masterItemsSelector.response.content.length > 0 &&
                     masterItemsSelector.response.content.map((masterItem, index) => (
                         <MasterCardItem

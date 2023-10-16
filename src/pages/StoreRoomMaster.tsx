@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { Fragment, useRef, useState } from 'react';
 import { useEffect, MouseEvent, KeyboardEvent, ChangeEvent } from 'react';
 import { useAppSelector, useAppDispatch } from '../app/hooks';
 
@@ -22,7 +22,12 @@ import {
     AppBar,
     Toolbar,
     alpha,
-    InputBase
+    InputBase,
+    Card,
+    CardHeader,
+    Typography,
+    ButtonGroup,
+    Button
 } from '@mui/material';
 import { useLocation } from 'react-router-dom';
 import {
@@ -90,12 +95,21 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
-        fontSize: 11,
+        fontSize: 12,
         fontWeight: 700,
-        color: theme.palette.common.black
+        color: theme.palette.common.black,
+        backgroundColor: '#c6c6c6'
     },
     [`&.${tableCellClasses.body}`]: {
-        fontSize: 11
+        backgroundColor: '#f1f1f1',
+        fontSize: 12
+    }
+}));
+
+const StyledTableItemCell = styled(TableCell)(({ theme }) => ({
+    [`&.${tableCellClasses.body}`]: {
+        backgroundColor: '#f4f4f4',
+        fontSize: 12
     }
 }));
 
@@ -105,7 +119,6 @@ const columns: {
     headerName: string | JSX.Element;
     align: 'left' | 'center' | 'right';
 }[] = [
-    { field: 'item', tooltipName: 'Item', headerName: 'Item', align: 'left' },
     {
         field: 'purchaseUnit',
         tooltipName: 'Purchase Unit',
@@ -178,20 +191,190 @@ const columns: {
         tooltipName: 'Total Price',
         headerName: 'TP',
         align: 'left'
-    },
-    {
-        field: 'comments',
-        tooltipName: 'Comment',
-        headerName: 'Comment',
-        align: 'left'
-    },
-    {
-        field: 'action',
-        tooltipName: 'Edit | Delete',
-        headerName: 'Edit | Delete',
-        align: 'right'
     }
 ];
+
+const StoreRoomMasterRow = ({
+    storeRoomMasterItem,
+    index
+}: {
+    storeRoomMasterItem: IStoreRoomMaster;
+    index: number;
+}) => {
+    const storeRoomMasterItemsSelector = useAppSelector(selectStoreRoomMasterItems);
+    const dispatch = useAppDispatch();
+    const inputRef = useRef<HTMLDivElement | null>(null);
+
+    const handleDeleteClick = (event: MouseEvent<HTMLElement>, storeRoomMasterItem: IStoreRoomMaster) => {};
+
+    const updateStoreRoomItem = (event: KeyboardEvent, id: number) => {
+        const storeRoomMasterItem = storeRoomMasterItemsSelector.response?.content.find((item) => item.id === id);
+        if (storeRoomMasterItem) {
+            if (event.key === 'Enter') {
+                dispatch(
+                    updateStoreRoomItemThunk({
+                        id: storeRoomMasterItem.id,
+                        location: storeRoomMasterItem.location,
+                        quantity: storeRoomMasterItem.quantity,
+                        minimumQuantity: storeRoomMasterItem.minimumQuantity,
+                        maximumQuantity: storeRoomMasterItem.maximumQuantity,
+                        usageLevel: storeRoomMasterItem.usageLevel,
+                        lotNumber: storeRoomMasterItem.lotNumber,
+                        expirationDate: storeRoomMasterItem.expirationDate,
+                        receivedDate: storeRoomMasterItem.receivedDate
+                    })
+                )
+                    .then(() => {
+                        if (inputRef.current) {
+                            inputRef.current.style.backgroundColor = '#98FB98';
+                            inputRef.current.style.transition = '1s background ease-in, 500ms transform ease-out 1s';
+                            setTimeout(() => {
+                                if (inputRef.current) {
+                                    inputRef.current.style.backgroundColor = '#FAFAFA';
+                                    inputRef.current.blur();
+                                }
+                            }, 700);
+                        }
+                    })
+                    .catch((error: Error) => {
+                        if (inputRef.current) {
+                            inputRef.current.style.backgroundColor = '#FF0000';
+                            inputRef.current.style.transition = '1s background ease-in, 500ms transform ease-out 1s';
+                            setTimeout(() => {
+                                if (inputRef.current) {
+                                    inputRef.current.style.backgroundColor = '#FAFAFA';
+                                }
+                            }, 700);
+                        }
+                        console.error(error.message);
+                    });
+            }
+        }
+    };
+
+    const handleChangeQty = (id: number, event: React.ChangeEvent<HTMLInputElement>) => {
+        dispatch(
+            changeStoreRoomMasterItems(
+                storeRoomMasterItemsSelector.response.content.map((storeRoomMasterItem) => ({
+                    ...storeRoomMasterItem,
+                    quantity:
+                        storeRoomMasterItem.id === id ? parseInt(event.target.value) : storeRoomMasterItem.quantity
+                }))
+            )
+        );
+    };
+
+    const getTotalPrice = (unitPrice: number, quantity: number) => {
+        return unitPrice * quantity;
+    };
+
+    const handleEditClick = (event: MouseEvent<HTMLElement>, storeRoomMasterItem: IStoreRoomMaster) => {
+        if (storeRoomMasterItem) {
+            dispatch(
+                toggleDrawer({
+                    type: DRAWER_TOGGLE_TYPE.UPDATE_STORE_ROOM_ITEM,
+                    storeRoomItem: {
+                        id: storeRoomMasterItem.id,
+                        location: storeRoomMasterItem.location,
+                        quantity: storeRoomMasterItem.quantity,
+                        minimumQuantity: storeRoomMasterItem.minimumQuantity,
+                        maximumQuantity: storeRoomMasterItem.maximumQuantity,
+                        usageLevel: storeRoomMasterItem.usageLevel,
+                        lotNumber: storeRoomMasterItem.lotNumber,
+                        expirationDate: storeRoomMasterItem.expirationDate,
+                        receivedDate: storeRoomMasterItem.receivedDate
+                    }
+                })
+            );
+        }
+    };
+
+    return (
+        <Fragment>
+            <TableRow>
+                <StyledTableItemCell
+                    colSpan={columns.length + 2}
+                    sx={{ paddingLeft: 2, paddingRight: 2, paddingTop: 1, paddingBottom: 1, borderBottom: 'none' }}>
+                    <Box sx={{ width: '100%' }}>
+                        <Typography variant="body2" sx={{ color: 'GrayText' }}>
+                            {storeRoomMasterItem.masterItem.item}
+                        </Typography>
+                        <Typography variant="caption" sx={{ color: 'GrayText' }}>
+                            {storeRoomMasterItem.masterItem.comment}
+                        </Typography>
+                    </Box>
+                </StyledTableItemCell>
+            </TableRow>
+            <TableRow key={index} hover>
+                <StyledTableCell>{storeRoomMasterItem.masterItem.purchaseUnit}</StyledTableCell>
+                <StyledTableCell>{storeRoomMasterItem.masterItem.partNumber}</StyledTableCell>
+                <StyledTableCell>{storeRoomMasterItem.masterItem.recentCN}</StyledTableCell>
+                <StyledTableCell>{storeRoomMasterItem.location}</StyledTableCell>
+                <StyledTableCell width={50}>
+                    <TextField
+                        ref={inputRef}
+                        size="small"
+                        type="number"
+                        InputProps={{
+                            inputProps: { min: 0 }
+                        }}
+                        sx={{
+                            '.MuiInputBase-input': {
+                                padding: 1,
+                                fontSize: 12
+                            }
+                        }}
+                        id={storeRoomMasterItem.id?.toString()}
+                        value={storeRoomMasterItem.quantity}
+                        onKeyDown={(event: KeyboardEvent) => updateStoreRoomItem(event, storeRoomMasterItem.id)}
+                        onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                            handleChangeQty(storeRoomMasterItem.id, event)
+                        }
+                    />
+                </StyledTableCell>
+                <StyledTableCell>{storeRoomMasterItem.usageLevel}</StyledTableCell>
+                <StyledTableCell>{storeRoomMasterItem.minimumQuantity}</StyledTableCell>
+                <StyledTableCell>{storeRoomMasterItem.maximumQuantity}</StyledTableCell>
+                <StyledTableCell>order quantity</StyledTableCell>
+                <StyledTableCell>${storeRoomMasterItem.masterItem.unitPrice}</StyledTableCell>
+                <StyledTableCell>issued</StyledTableCell>
+                <StyledTableCell>received</StyledTableCell>
+                <StyledTableCell>
+                    ${getTotalPrice(storeRoomMasterItem.masterItem.unitPrice, storeRoomMasterItem.quantity)}
+                </StyledTableCell>
+                <StyledTableCell width={20} align="center" padding="none">
+                    <IconButton
+                        onClick={(event: MouseEvent<HTMLElement>) => handleEditClick(event, storeRoomMasterItem)}>
+                        <ModeEditIcon color="primary" fontSize="small" />
+                    </IconButton>
+                </StyledTableCell>
+                <StyledTableCell width={20} align="center" padding="none">
+                    <IconButton
+                        onClick={(event: MouseEvent<HTMLElement>) => handleDeleteClick(event, storeRoomMasterItem)}>
+                        <DeleteIcon color="primary" fontSize="small" />
+                    </IconButton>
+                </StyledTableCell>
+                {/* <StyledTableCell width={50} align="right">
+                    <ButtonGroup variant="outlined" sx={{ fontSize: 5 }}>
+                        <Button sx={{ fontSize: 10 }}>edit</Button>
+                        <Button sx={{ fontSize: 10 }}>delete</Button>
+                    </ButtonGroup>
+                    <Box sx={{ display: 'flex' }}>
+                        <IconButton
+                            sx={{ marginLeft: '0.7rem', marginRight: '0.7rem' }}
+                            onClick={(event: MouseEvent<HTMLElement>) => handleEditClick(event, storeRoomMasterItem)}>
+                            <ModeEditIcon color="primary" fontSize="small" />
+                        </IconButton>
+                        <IconButton
+                            onClick={(event: MouseEvent<HTMLElement>) => handleDeleteClick(event, storeRoomMasterItem)}>
+                            <DeleteIcon color="primary" fontSize="small" />
+                        </IconButton>
+                    </Box>
+                </StyledTableCell> */}
+            </TableRow>
+        </Fragment>
+    );
+};
 
 const StoreRoomMaster = () => {
     const storeRoomMasterItemsSelector = useAppSelector(selectStoreRoomMasterItems);
@@ -290,28 +473,32 @@ const StoreRoomMaster = () => {
                     </Toolbar>
                 </AppBar>
             </Grid>
-            <Grid item padding={2} flexGrow={1}>
-                <TableContainer sx={{ height: '100%', overflowY: 'auto' }} component={Paper} elevation={2}>
-                    <Table stickyHeader>
-                        <TableHead sx={{ height: 45, whiteSpace: 'nowrap' }}>
-                            <TableRow>
-                                {columns.length > 0 &&
-                                    columns.map((column) => (
-                                        <StyledTableCell key={column.field} align={column.align}>
-                                            <Box>{column.tooltipName}</Box>
-                                        </StyledTableCell>
+            <Grid item padding={2}>
+                <Paper elevation={2} sx={{ padding: 0.5 }}>
+                    <TableContainer sx={{ height: 800, overflowY: 'auto' }}>
+                        <Table stickyHeader>
+                            <TableHead sx={{ height: 45, whiteSpace: 'nowrap' }}>
+                                <TableRow>
+                                    {columns.length > 0 &&
+                                        columns.map((column) => (
+                                            <StyledTableCell key={column.field} align={column.align}>
+                                                <Box>{column.tooltipName}</Box>
+                                            </StyledTableCell>
+                                        ))}
+                                    <StyledTableCell align="center">Edit</StyledTableCell>
+                                    <StyledTableCell align="center">Delete</StyledTableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {storeRoomMasterItemsSelector.response &&
+                                    storeRoomMasterItemsSelector.response.content.length > 0 &&
+                                    storeRoomMasterItemsSelector.response.content.map((storeRoomMasterItem, index) => (
+                                        <StoreRoomMasterRow storeRoomMasterItem={storeRoomMasterItem} index={index} />
                                     ))}
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {storeRoomMasterItemsSelector.response &&
-                                storeRoomMasterItemsSelector.response.content.length > 0 &&
-                                storeRoomMasterItemsSelector.response.content.map((storeRoomMasterItem, index) => (
-                                    <Row storeRoomMasterItem={storeRoomMasterItem} index={index} />
-                                ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                </Paper>
             </Grid>
             <Grid item>
                 <Paper variant="elevation" elevation={5} sx={{ height: 80 }}>
@@ -403,151 +590,6 @@ const StoreRoomMaster = () => {
                 </Paper>
             </Grid>
         </Grid>
-    );
-};
-
-const Row = ({ storeRoomMasterItem, index }: { storeRoomMasterItem: IStoreRoomMaster; index: number }) => {
-    const storeRoomMasterItemsSelector = useAppSelector(selectStoreRoomMasterItems);
-    const dispatch = useAppDispatch();
-    const inputRef = useRef<HTMLDivElement | null>(null);
-
-    const handleDeleteClick = (event: MouseEvent<HTMLElement>, storeRoomMasterItem: IStoreRoomMaster) => {};
-
-    const updateStoreRoomItem = (event: KeyboardEvent, id: number) => {
-        const storeRoomMasterItem = storeRoomMasterItemsSelector.response?.content.find((item) => item.id === id);
-        if (storeRoomMasterItem) {
-            if (event.key === 'Enter') {
-                dispatch(
-                    updateStoreRoomItemThunk({
-                        id: storeRoomMasterItem.id,
-                        location: storeRoomMasterItem.location,
-                        quantity: storeRoomMasterItem.quantity,
-                        minimumQuantity: storeRoomMasterItem.minimumQuantity,
-                        maximumQuantity: storeRoomMasterItem.maximumQuantity,
-                        usageLevel: storeRoomMasterItem.usageLevel,
-                        lotNumber: storeRoomMasterItem.lotNumber,
-                        expirationDate: storeRoomMasterItem.expirationDate,
-                        receivedDate: storeRoomMasterItem.receivedDate
-                    })
-                )
-                    .then(() => {
-                        if (inputRef.current) {
-                            inputRef.current.style.backgroundColor = '#98FB98';
-                            inputRef.current.style.transition = '1s background ease-in, 500ms transform ease-out 1s';
-                            setTimeout(() => {
-                                if (inputRef.current) {
-                                    inputRef.current.style.backgroundColor = '#FAFAFA';
-                                    inputRef.current.blur();
-                                }
-                            }, 700);
-                        }
-                    })
-                    .catch((error: Error) => {
-                        if (inputRef.current) {
-                            inputRef.current.style.backgroundColor = '#FF0000';
-                            inputRef.current.style.transition = '1s background ease-in, 500ms transform ease-out 1s';
-                            setTimeout(() => {
-                                if (inputRef.current) {
-                                    inputRef.current.style.backgroundColor = '#FAFAFA';
-                                }
-                            }, 700);
-                        }
-                        console.error(error.message);
-                    });
-            }
-        }
-    };
-
-    const handleChangeQty = (id: number, event: React.ChangeEvent<HTMLInputElement>) => {
-        dispatch(
-            changeStoreRoomMasterItems(
-                storeRoomMasterItemsSelector.response.content.map((storeRoomMasterItem) => ({
-                    ...storeRoomMasterItem,
-                    quantity:
-                        storeRoomMasterItem.id === id ? parseInt(event.target.value) : storeRoomMasterItem.quantity
-                }))
-            )
-        );
-    };
-
-    const getTotalPrice = (unitPrice: number, quantity: number) => {
-        return unitPrice * quantity;
-    };
-
-    const handleEditClick = (event: MouseEvent<HTMLElement>, storeRoomMasterItem: IStoreRoomMaster) => {
-        if (storeRoomMasterItem) {
-            dispatch(
-                toggleDrawer({
-                    type: DRAWER_TOGGLE_TYPE.UPDATE_STORE_ROOM_ITEM,
-                    storeRoomItem: {
-                        id: storeRoomMasterItem.id,
-                        location: storeRoomMasterItem.location,
-                        quantity: storeRoomMasterItem.quantity,
-                        minimumQuantity: storeRoomMasterItem.minimumQuantity,
-                        maximumQuantity: storeRoomMasterItem.maximumQuantity,
-                        usageLevel: storeRoomMasterItem.usageLevel,
-                        lotNumber: storeRoomMasterItem.lotNumber,
-                        expirationDate: storeRoomMasterItem.expirationDate,
-                        receivedDate: storeRoomMasterItem.receivedDate
-                    }
-                })
-            );
-        }
-    };
-
-    return (
-        <TableRow key={index} hover>
-            <StyledTableCell>{storeRoomMasterItem.masterItem.item}</StyledTableCell>
-            <StyledTableCell>{storeRoomMasterItem.masterItem.purchaseUnit}</StyledTableCell>
-            <StyledTableCell>{storeRoomMasterItem.masterItem.partNumber}</StyledTableCell>
-            <StyledTableCell>{storeRoomMasterItem.masterItem.recentCN}</StyledTableCell>
-            <StyledTableCell>{storeRoomMasterItem.location}</StyledTableCell>
-            <StyledTableCell width={100}>
-                <TextField
-                    ref={inputRef}
-                    fullWidth
-                    size="small"
-                    type="number"
-                    InputProps={{
-                        inputProps: { min: 0 }
-                    }}
-                    sx={{
-                        '.MuiInputBase-input': {
-                            padding: 1,
-                            fontSize: 11
-                        }
-                    }}
-                    id={storeRoomMasterItem.id?.toString()}
-                    value={storeRoomMasterItem.quantity}
-                    onKeyDown={(event: KeyboardEvent) => updateStoreRoomItem(event, storeRoomMasterItem.id)}
-                    onChange={(event: ChangeEvent<HTMLInputElement>) => handleChangeQty(storeRoomMasterItem.id, event)}
-                />
-            </StyledTableCell>
-            <StyledTableCell>{storeRoomMasterItem.usageLevel}</StyledTableCell>
-            <StyledTableCell>{storeRoomMasterItem.minimumQuantity}</StyledTableCell>
-            <StyledTableCell>{storeRoomMasterItem.maximumQuantity}</StyledTableCell>
-            <StyledTableCell>order quantity</StyledTableCell>
-            <StyledTableCell>${storeRoomMasterItem.masterItem.unitPrice}</StyledTableCell>
-            <StyledTableCell>issued</StyledTableCell>
-            <StyledTableCell>received</StyledTableCell>
-            <StyledTableCell>
-                ${getTotalPrice(storeRoomMasterItem.masterItem.unitPrice, storeRoomMasterItem.quantity)}
-            </StyledTableCell>
-            <StyledTableCell width={200}>{storeRoomMasterItem.masterItem.comment}</StyledTableCell>
-            <StyledTableCell>
-                <Box sx={{ display: 'flex' }}>
-                    <IconButton
-                        sx={{ marginLeft: '0.7rem', marginRight: '0.7rem' }}
-                        onClick={(event: MouseEvent<HTMLElement>) => handleEditClick(event, storeRoomMasterItem)}>
-                        <ModeEditIcon color="primary" fontSize="small" />
-                    </IconButton>
-                    <IconButton
-                        onClick={(event: MouseEvent<HTMLElement>) => handleDeleteClick(event, storeRoomMasterItem)}>
-                        <DeleteIcon color="primary" fontSize="small" />
-                    </IconButton>
-                </Box>
-            </StyledTableCell>
-        </TableRow>
     );
 };
 
