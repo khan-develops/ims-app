@@ -52,84 +52,98 @@ import { useLocation } from 'react-router-dom';
 import { getGrandTotalThunk, selectGrandTotal } from '../app/slice/grandTotalSlice';
 import { filterMasterDepartmentItemsThunk } from '../app/slice/master/masterDepartmentItemsSlice';
 import { getSearchValue } from '../app/search';
+import { deleteMasterItemThunk } from '../app/slice/master/masterItemDeleteSlice';
 
 const headerCell: {
     id: keyof IMaster;
     numeric: boolean;
     label: string;
     align: 'left' | 'right' | 'center';
+    padding: 'checkbox' | 'normal' | 'none';
 }[] = [
     {
         id: 'purchaseUnit',
         numeric: false,
         label: 'Purchase Unit',
-        align: 'left'
+        align: 'left',
+        padding: 'normal'
     },
     {
         id: 'manufacturer',
         numeric: false,
         label: 'Manufacturer',
-        align: 'left'
+        align: 'left',
+        padding: 'normal'
     },
     {
         id: 'recentVendor',
         numeric: false,
         label: 'Recent Vendor',
-        align: 'left'
+        align: 'left',
+        padding: 'normal'
     },
     {
         id: 'recentCN',
         numeric: false,
         label: 'Recent CN',
-        align: 'left'
+        align: 'left',
+        padding: 'normal'
     },
     {
         id: 'partNumber',
         numeric: false,
         label: 'Part Number',
-        align: 'left'
+        align: 'left',
+        padding: 'normal'
     },
     {
         id: 'fisherCN',
         numeric: false,
         label: 'Fisher CN',
-        align: 'left'
+        align: 'left',
+        padding: 'normal'
     },
     {
         id: 'vwrCN',
         numeric: false,
         label: 'VWR CN',
-        align: 'left'
+        align: 'left',
+        padding: 'normal'
     },
     {
         id: 'labSourceCN',
         numeric: false,
         label: 'Lab Source CN',
-        align: 'left'
+        align: 'left',
+        padding: 'normal'
     },
     {
         id: 'otherCN',
         numeric: false,
         label: 'Other CN',
-        align: 'left'
+        align: 'left',
+        padding: 'normal'
     },
     {
         id: 'unitPrice',
         numeric: false,
         label: 'Unit Price',
-        align: 'left'
+        align: 'left',
+        padding: 'normal'
     },
     {
         id: 'category',
         numeric: false,
         label: 'Category',
-        align: 'left'
+        align: 'left',
+        padding: 'normal'
     },
     {
         id: 'drugClass',
         numeric: false,
         label: 'Drug Class',
-        align: 'left'
+        align: 'left',
+        padding: 'normal'
     }
 ];
 
@@ -175,10 +189,14 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
         backgroundColor: '#f9f9f9',
         fontSize: 12,
         fontWeight: 700,
-        color: theme.palette.common.black
+        color: theme.palette.common.black,
+        paddingTop: 1,
+        paddingBottom: 1
     },
     [`&.${tableCellClasses.body}`]: {
-        fontSize: 12
+        fontSize: 12,
+        paddingTop: 10,
+        paddingBottom: 10
     }
 }));
 
@@ -247,7 +265,7 @@ const MasterCardItem = ({
     // };
 
     return (
-        <Card sx={{ marginBottom: 2 }}>
+        <Card sx={{ marginBottom: 1, padding: 0.5 }}>
             <CardHeader
                 sx={{ backgroundColor: '#ececec', paddingTop: 1, paddingBottom: 1 }}
                 title={masterItem.item}
@@ -255,11 +273,11 @@ const MasterCardItem = ({
                 subheader={masterItem.comment}
                 subheaderTypographyProps={{ variant: 'caption', marginLeft: 1 }}
             />
-            <CardContent>
+            <CardContent sx={{ padding: 0.5 }}>
                 <TableContainer>
                     <Table>
-                        <TableHead sx={{ height: 30 }}>
-                            <TableRow sx={{ height: 30 }}>
+                        <TableHead>
+                            <TableRow>
                                 {headerCell.map((headCell) => (
                                     <StyledTableCell>{headCell.label}</StyledTableCell>
                                 ))}
@@ -284,7 +302,7 @@ const MasterCardItem = ({
                     </Table>
                 </TableContainer>
             </CardContent>
-            <CardActions sx={{ justifyContent: 'flex-end' }}>
+            <CardActions sx={{ justifyContent: 'flex-end', paddingBottom: 0, paddingTop: 0, paddingRight: 4 }}>
                 <Button
                     size="small"
                     onClick={(event: MouseEvent<HTMLElement>) => handleActionClick(event, masterItem, 'ASSIGN')}>
@@ -307,17 +325,13 @@ const Master = (): JSX.Element => {
     const searchValueSelector = useAppSelector(selectSearchValue);
     const masterItemsSelector = useAppSelector(selectMasterItems);
     const departmentNamesSelector = useAppSelector(selectDepartmentNames);
-    const [selectedItems, setSelectedItems] = useState<IMaster[]>([]);
     const dispatch = useAppDispatch();
     const [page, setPage] = useState<number>(0);
     const [anchorElAssign, setAnchorElAssign] = useState<{ anchorEl: null | HTMLElement; masterItem: IMaster | null }>({
         anchorEl: null,
         masterItem: null
     });
-    const [anchorElEdit, setAnchorElEdit] = useState<{ anchorEl: null | HTMLElement; masterItem: IMaster | null }>({
-        anchorEl: null,
-        masterItem: null
-    });
+
     const [anchorElDelete, setAnchorElDelete] = useState<{ anchorEl: null | HTMLElement; masterItem: IMaster | null }>({
         anchorEl: null,
         masterItem: null
@@ -393,8 +407,6 @@ const Master = (): JSX.Element => {
     ) => {
         if (action === 'ASSIGN') {
             setAnchorElAssign({ anchorEl: event.currentTarget, masterItem: masterItem });
-        } else if (action === 'EDIT') {
-            setAnchorElEdit({ anchorEl: event.currentTarget, masterItem: masterItem });
         }
         if (action === 'DELETE') {
             setAnchorElDelete({ anchorEl: event.currentTarget, masterItem: masterItem });
@@ -403,17 +415,18 @@ const Master = (): JSX.Element => {
 
     const handleCloseMenu = () => {
         setAnchorElAssign({ anchorEl: null, masterItem: null });
-        setAnchorElEdit({ anchorEl: null, masterItem: null });
         setAnchorElDelete({ anchorEl: null, masterItem: null });
     };
 
-    const handleDeleteConfirm = (event: MouseEvent<HTMLElement>) => {
-        // dispatch(deleteMasterItemThunk(anchorElDelete.masterItem.id))
-        //     .then((response) => {
-        //         setAnchorElDelete({ anchorEl: null, masterItem: null });
-        //         dispatch(getMasterItemsThunk(page));
-        //     })
-        //     .catch((error: Error) => console.error(error.message));
+    const handleDeleteConfirm = () => {
+        if (anchorElDelete && anchorElDelete.masterItem && anchorElDelete.masterItem.id) {
+            dispatch(deleteMasterItemThunk(anchorElDelete.masterItem.id))
+                .then(() => {
+                    setAnchorElDelete({ anchorEl: null, masterItem: null });
+                    dispatch(getMasterItemsThunk(page));
+                })
+                .catch((error: Error) => console.error(error.message));
+        }
     };
 
     const handleDeleteCancel = () => {
@@ -431,19 +444,6 @@ const Master = (): JSX.Element => {
         } else {
             dispatch(filterMasterDepartmentItemsThunk({ state: state, keyword: event.target.value, page: 0 }));
         }
-        // if (
-        //     state === 'extractions' ||
-        //     state === 'mass-spec' ||
-        //     state === 'rd' ||
-        //     state === 'screening' ||
-        //     state === 'shipping' ||
-        //     state === 'processing_lab' ||
-        //     state === 'qc-internal-standards' ||
-        //     state === 'qc-qa' ||
-        //     state === 'store-room'
-        // ) {
-        //     dispatch(filterMasterItemsThunk({ keyword: event.target.value, page: 0 }));
-        // }
     };
 
     return (
@@ -468,7 +468,7 @@ const Master = (): JSX.Element => {
                     </Toolbar>
                 </AppBar>
             </Grid>
-            <Grid item sx={{ height: 800, overflowY: 'auto', paddingLeft: 2, paddingRight: 2 }}>
+            <Grid item sx={{ height: 700, overflowY: 'auto', paddingLeft: 2, paddingRight: 2 }}>
                 {masterItemsSelector.response.content.length > 0 &&
                     masterItemsSelector.response.content.map((masterItem, index) => (
                         <MasterCardItem
@@ -480,7 +480,7 @@ const Master = (): JSX.Element => {
                     ))}
             </Grid>
             <Grid item>
-                <Paper variant="elevation" elevation={5} sx={{ height: 80 }}>
+                <Paper variant="elevation" elevation={5} sx={{ height: 70 }}>
                     <BottomNavigation
                         sx={{ display: 'flex', justifyContent: 'space-around', width: '100%' }}
                         showLabels

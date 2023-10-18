@@ -23,11 +23,8 @@ import {
     Toolbar,
     alpha,
     InputBase,
-    Card,
-    CardHeader,
     Typography,
-    ButtonGroup,
-    Button
+    TableSortLabel
 } from '@mui/material';
 import { useLocation } from 'react-router-dom';
 import {
@@ -39,7 +36,7 @@ import ModeEditIcon from '@mui/icons-material/ModeEdit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { DRAWER_TOGGLE_TYPE } from '../common/constants';
 import { toggleDrawer } from '../app/slice/drawerToggle/drawerToggleTypeSlice';
-import { IStoreRoomMaster } from '../app/api/properties/IStoreRoom';
+import { IStoreRoom, IStoreRoomMaster } from '../app/api/properties/IStoreRoom';
 import { getTotalAmount } from '../app/slice/totalAmount';
 import { updateStoreRoomItemThunk } from '../app/slice/storeRoom/storeRoomUpdateSlice';
 import { selectRequestMasterItemsChecked } from '../app/slice/request/requestMasterItemsCheckedSlice';
@@ -55,6 +52,95 @@ import SearchIcon from '@mui/icons-material/Search';
 import { filterMasterItemsThunk } from '../app/slice/master/masterItemsSlice';
 import { filterMasterDepartmentItemsThunk } from '../app/slice/master/masterDepartmentItemsSlice';
 import { getSearchValue } from '../app/search';
+import { IOrderDetail } from '../app/api/properties/IOrderDetail';
+import { IMaster } from '../app/api/properties/IMaster';
+import { visuallyHidden } from '@mui/utils';
+
+const columns: {
+    id: keyof IStoreRoom | keyof IMaster | keyof IOrderDetail;
+    numeric: boolean;
+    label: string;
+    align: 'left' | 'right' | 'center';
+    padding: 'checkbox' | 'normal' | 'none';
+}[] = [
+    {
+        id: 'purchaseUnit',
+        numeric: false,
+        label: 'Purchase Unit',
+        align: 'left',
+        padding: 'normal'
+    },
+    {
+        id: 'partNumber',
+        numeric: false,
+        label: 'Part Number',
+        align: 'left',
+        padding: 'normal'
+    },
+    {
+        id: 'recentCN',
+        numeric: false,
+        label: 'Recent CN',
+        align: 'left',
+        padding: 'normal'
+    },
+    {
+        id: 'location',
+        numeric: false,
+        label: 'Location',
+        align: 'left',
+        padding: 'normal'
+    },
+    {
+        id: 'totalQuantity',
+        numeric: false,
+        label: 'Total Qty',
+        align: 'left',
+        padding: 'normal'
+    },
+    {
+        id: 'usageLevel',
+        numeric: false,
+        label: 'Usage Level',
+        align: 'left',
+        padding: 'normal'
+    },
+    {
+        id: 'minimumQuantity',
+        numeric: false,
+        label: 'Min Qty',
+        align: 'left',
+        padding: 'normal'
+    },
+    {
+        id: 'maximumQuantity',
+        numeric: false,
+        label: 'Max Qty',
+        align: 'left',
+        padding: 'normal'
+    },
+    {
+        id: 'orderQuantity',
+        numeric: false,
+        label: 'Order Quantity',
+        align: 'left',
+        padding: 'normal'
+    },
+    {
+        id: 'unitPrice',
+        numeric: false,
+        label: 'Unit Price',
+        align: 'left',
+        padding: 'normal'
+    },
+    {
+        id: 'totalPrice',
+        numeric: false,
+        label: 'Total Price',
+        align: 'left',
+        padding: 'normal'
+    }
+];
 
 const Search = styled('div')(({ theme }) => ({
     borderRadius: theme.shape.borderRadius,
@@ -98,101 +184,81 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
         fontSize: 12,
         fontWeight: 700,
         color: theme.palette.common.black,
-        backgroundColor: '#c6c6c6'
+        backgroundColor: '#c6c6c6',
+        paddingTop: 12,
+        paddingBottom: 12
     },
     [`&.${tableCellClasses.body}`]: {
         backgroundColor: '#f1f1f1',
-        fontSize: 12
+        fontSize: 12,
+        paddingTop: 8,
+        paddingBottom: 8
     }
 }));
 
 const StyledTableItemCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.body}`]: {
         backgroundColor: '#f4f4f4',
-        fontSize: 12
+        fontSize: 12,
+        paddingLeft: 16,
+        paddingRight: 16,
+        paddingTop: 8,
+        paddingBottom: 8,
+        borderBottom: 'none'
     }
 }));
 
-const columns: {
-    field: string;
-    tooltipName: string;
-    headerName: string | JSX.Element;
-    align: 'left' | 'center' | 'right';
-}[] = [
-    {
-        field: 'purchaseUnit',
-        tooltipName: 'Purchase Unit',
-        headerName: 'PU',
-        align: 'left'
-    },
-    {
-        field: 'partNumber',
-        tooltipName: 'Part Number',
-        headerName: 'PN',
-        align: 'left'
-    },
-    {
-        field: 'recentCN',
-        tooltipName: 'Recent CN',
-        headerName: 'RCN',
-        align: 'left'
-    },
-    {
-        field: 'location',
-        tooltipName: 'Location',
-        headerName: 'L',
-        align: 'left'
-    },
-    {
-        field: 'totalQuantity',
-        tooltipName: 'Total Quantity',
-        headerName: 'TQ',
-        align: 'left'
-    },
-    {
-        field: 'usageLevel',
-        tooltipName: 'Usage Level',
-        headerName: 'UL',
-        align: 'left'
-    },
-    {
-        field: 'minimumQuantity',
-        tooltipName: 'Min Qty',
-        headerName: 'MinQ',
-        align: 'left'
-    },
-    {
-        field: 'maximumQuantity',
-        tooltipName: 'Max Qty',
-        headerName: 'MaxQ',
-        align: 'left'
-    },
-    {
-        field: 'orderQuantity',
-        tooltipName: 'Order Qty',
-        headerName: 'OQ',
-        align: 'left'
-    },
-    {
-        field: 'unitPrice',
-        tooltipName: 'Unit Price',
-        headerName: 'UP',
-        align: 'left'
-    },
-    { field: 'issued', tooltipName: 'Issued', headerName: 'Iss', align: 'left' },
-    {
-        field: 'received',
-        tooltipName: 'Received',
-        headerName: 'Rec',
-        align: 'left'
-    },
-    {
-        field: 'totalQrice',
-        tooltipName: 'Total Price',
-        headerName: 'TP',
-        align: 'left'
-    }
-];
+type Order = 'asc' | 'desc';
+
+interface EnhancedTableProps {
+    onRequestSort: (
+        event: MouseEvent<unknown>,
+        property: keyof IStoreRoom | keyof IMaster | keyof IOrderDetail
+    ) => void;
+    order: Order;
+    orderBy: string;
+}
+
+const EnhancedTableHead = (props: EnhancedTableProps) => {
+    const { order, orderBy, onRequestSort } = props;
+    const createSortHandler =
+        (property: keyof IStoreRoom | keyof IMaster | keyof IOrderDetail) => (event: MouseEvent<unknown>) => {
+            onRequestSort(event, property);
+        };
+
+    return (
+        <TableHead sx={{ whiteSpace: 'nowrap' }}>
+            <TableRow>
+                {columns.map((headCell) => (
+                    <StyledTableCell
+                        key={headCell.id}
+                        align={headCell.align}
+                        sortDirection={orderBy === headCell.id ? order : false}>
+                        <TableSortLabel
+                            active={orderBy === headCell.id}
+                            direction={orderBy === headCell.id ? order : 'asc'}
+                            onClick={createSortHandler(headCell.id)}>
+                            {headCell.label}
+                            {orderBy === headCell.id ? (
+                                <Box component="span" sx={visuallyHidden}>
+                                    {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                                </Box>
+                            ) : null}
+                        </TableSortLabel>
+                    </StyledTableCell>
+                ))}
+                <StyledTableCell align="center">Received</StyledTableCell>
+                <StyledTableCell align="center">Issued</StyledTableCell>
+                <StyledTableCell align="center" sx={{ paddingLeft: 1, paddingRight: 1 }}>
+                    Edit
+                </StyledTableCell>
+                <StyledTableCell align="center" sx={{ paddingLeft: 1, paddingRight: 2 }}>
+                    Delete
+                </StyledTableCell>
+            </TableRow>
+        </TableHead>
+    );
+};
 
 const StoreRoomMasterRow = ({
     storeRoomMasterItem,
@@ -292,9 +358,7 @@ const StoreRoomMasterRow = ({
     return (
         <Fragment>
             <TableRow>
-                <StyledTableItemCell
-                    colSpan={columns.length + 2}
-                    sx={{ paddingLeft: 2, paddingRight: 2, paddingTop: 1, paddingBottom: 1, borderBottom: 'none' }}>
+                <StyledTableItemCell colSpan={columns.length + 4}>
                     <Box sx={{ width: '100%' }}>
                         <Typography variant="body2" sx={{ color: 'GrayText' }}>
                             {storeRoomMasterItem.masterItem.item}
@@ -310,7 +374,7 @@ const StoreRoomMasterRow = ({
                 <StyledTableCell>{storeRoomMasterItem.masterItem.partNumber}</StyledTableCell>
                 <StyledTableCell>{storeRoomMasterItem.masterItem.recentCN}</StyledTableCell>
                 <StyledTableCell>{storeRoomMasterItem.location}</StyledTableCell>
-                <StyledTableCell width={50}>
+                <StyledTableCell width={60}>
                     <TextField
                         ref={inputRef}
                         size="small"
@@ -337,10 +401,30 @@ const StoreRoomMasterRow = ({
                 <StyledTableCell>{storeRoomMasterItem.maximumQuantity}</StyledTableCell>
                 <StyledTableCell>order quantity</StyledTableCell>
                 <StyledTableCell>${storeRoomMasterItem.masterItem.unitPrice}</StyledTableCell>
-                <StyledTableCell>issued</StyledTableCell>
-                <StyledTableCell>received</StyledTableCell>
                 <StyledTableCell>
                     ${getTotalPrice(storeRoomMasterItem.masterItem.unitPrice, storeRoomMasterItem.quantity)}
+                </StyledTableCell>
+                <StyledTableCell width={60}>
+                    <TextField
+                        size="small"
+                        sx={{
+                            '.MuiInputBase-input': {
+                                padding: 1,
+                                fontSize: 12
+                            }
+                        }}
+                    />
+                </StyledTableCell>
+                <StyledTableCell width={60}>
+                    <TextField
+                        size="small"
+                        sx={{
+                            '.MuiInputBase-input': {
+                                padding: 1,
+                                fontSize: 12
+                            }
+                        }}
+                    />
                 </StyledTableCell>
                 <StyledTableCell width={20} align="center" padding="none">
                     <IconButton
@@ -354,38 +438,23 @@ const StoreRoomMasterRow = ({
                         <DeleteIcon color="primary" fontSize="small" />
                     </IconButton>
                 </StyledTableCell>
-                {/* <StyledTableCell width={50} align="right">
-                    <ButtonGroup variant="outlined" sx={{ fontSize: 5 }}>
-                        <Button sx={{ fontSize: 10 }}>edit</Button>
-                        <Button sx={{ fontSize: 10 }}>delete</Button>
-                    </ButtonGroup>
-                    <Box sx={{ display: 'flex' }}>
-                        <IconButton
-                            sx={{ marginLeft: '0.7rem', marginRight: '0.7rem' }}
-                            onClick={(event: MouseEvent<HTMLElement>) => handleEditClick(event, storeRoomMasterItem)}>
-                            <ModeEditIcon color="primary" fontSize="small" />
-                        </IconButton>
-                        <IconButton
-                            onClick={(event: MouseEvent<HTMLElement>) => handleDeleteClick(event, storeRoomMasterItem)}>
-                            <DeleteIcon color="primary" fontSize="small" />
-                        </IconButton>
-                    </Box>
-                </StyledTableCell> */}
             </TableRow>
         </Fragment>
     );
 };
 
 const StoreRoomMaster = () => {
+    const requestMasterItemsCheckedSelector = useAppSelector(selectRequestMasterItemsChecked);
+    const requestMasterItemsPendingCheckedSelector = useAppSelector(selectRequestMasterItemsPendingChecked);
     const storeRoomMasterItemsSelector = useAppSelector(selectStoreRoomMasterItems);
     const [page, setPage] = useState<number>(0);
     const location = useLocation();
     const [value, setValue] = useState<number>(0);
     const dispatch = useAppDispatch();
-    const requestMasterItemsCheckedSelector = useAppSelector(selectRequestMasterItemsChecked);
-    const requestMasterItemsPendingCheckedSelector = useAppSelector(selectRequestMasterItemsPendingChecked);
     const baseUrl = process.env.REACT_APP_BASE_URL;
     const { state } = useLocation();
+    const [order, setOrder] = useState<Order>('asc');
+    const [orderBy, setOrderBy] = useState<keyof IStoreRoom | keyof IMaster | keyof IOrderDetail>('id');
 
     useEffect(() => {
         dispatch(getStoreRoomMasterItemsThunk(page))
@@ -436,19 +505,15 @@ const StoreRoomMaster = () => {
         } else {
             dispatch(filterMasterDepartmentItemsThunk({ state: state, keyword: event.target.value, page: 0 }));
         }
-        // if (
-        //     state === 'extractions' ||
-        //     state === 'mass-spec' ||
-        //     state === 'rd' ||
-        //     state === 'screening' ||
-        //     state === 'shipping' ||
-        //     state === 'processing_lab' ||
-        //     state === 'qc-internal-standards' ||
-        //     state === 'qc-qa' ||
-        //     state === 'store-room'
-        // ) {
-        //     dispatch(filterMasterItemsThunk({ keyword: event.target.value, page: 0 }));
-        // }
+    };
+
+    const handleRequestSort = (
+        event: MouseEvent<unknown>,
+        property: keyof IStoreRoom | keyof IMaster | keyof IOrderDetail
+    ) => {
+        const isAsc = orderBy === property && order === 'asc';
+        setOrder(isAsc ? 'desc' : 'asc');
+        setOrderBy(property);
     };
 
     return (
@@ -475,20 +540,27 @@ const StoreRoomMaster = () => {
             </Grid>
             <Grid item padding={2}>
                 <Paper elevation={2} sx={{ padding: 0.5 }}>
-                    <TableContainer sx={{ height: 800, overflowY: 'auto' }}>
+                    <TableContainer sx={{ height: 700, overflowY: 'auto' }}>
                         <Table stickyHeader>
-                            <TableHead sx={{ height: 45, whiteSpace: 'nowrap' }}>
+                            <EnhancedTableHead order={order} orderBy={orderBy} onRequestSort={handleRequestSort} />
+                            {/* <TableHead sx={{ height: 45, whiteSpace: 'nowrap' }}>
                                 <TableRow>
                                     {columns.length > 0 &&
-                                        columns.map((column) => (
-                                            <StyledTableCell key={column.field} align={column.align}>
-                                                <Box>{column.tooltipName}</Box>
+                                        columns.map((column, index) => (
+                                            <StyledTableCell key={index} align={column.align}>
+                                                <Box>{column.label}</Box>
                                             </StyledTableCell>
                                         ))}
-                                    <StyledTableCell align="center">Edit</StyledTableCell>
-                                    <StyledTableCell align="center">Delete</StyledTableCell>
+                                    <StyledTableCell align="center">Received</StyledTableCell>
+                                    <StyledTableCell align="center">Issued</StyledTableCell>
+                                    <StyledTableCell align="center" sx={{ paddingLeft: 1, paddingRight: 1 }}>
+                                        Edit
+                                    </StyledTableCell>
+                                    <StyledTableCell align="center" sx={{ paddingLeft: 1, paddingRight: 1 }}>
+                                        Delete
+                                    </StyledTableCell>
                                 </TableRow>
-                            </TableHead>
+                            </TableHead> */}
                             <TableBody>
                                 {storeRoomMasterItemsSelector.response &&
                                     storeRoomMasterItemsSelector.response.content.length > 0 &&
@@ -511,32 +583,17 @@ const StoreRoomMaster = () => {
                         }}>
                         <Grid container justifyContent="space-between" paddingLeft={2} paddingRight={2}>
                             <Grid item>
-                                {' '}
-                                {(location.pathname === '/departments/extractions' ||
-                                    location.pathname === '/departments/mass-spec' ||
-                                    location.pathname === '/departments/processing-lab' ||
-                                    location.pathname === '/departments/rd' ||
-                                    location.pathname === '/departments/screening' ||
-                                    location.pathname === '/departments/shipping' ||
-                                    location.pathname === '/departments/qc-qa') && (
-                                    <BottomNavigationAction
-                                        label="Download"
-                                        onClick={handleDownloadClick}
-                                        icon={<DownloadIcon color="primary" sx={{ fontSize: 40 }} />}
-                                    />
-                                )}
-                                {(location.pathname === '/general-request/list' ||
-                                    location.pathname === '/office-supply-request/list' ||
-                                    location.pathname === '/store-room-request/list') && (
-                                    <BottomNavigationAction
-                                        label="Review"
-                                        onClick={handleReviewClick}
-                                        icon={<PreviewIcon color="primary" sx={{ fontSize: 40 }} />}
-                                        disabled={
-                                            requestMasterItemsCheckedSelector.requestMasterItemsChecked.length === 0
-                                        }
-                                    />
-                                )}
+                                <BottomNavigationAction
+                                    label="Download"
+                                    onClick={handleDownloadClick}
+                                    icon={<DownloadIcon color="primary" sx={{ fontSize: 40 }} />}
+                                />
+                                <BottomNavigationAction
+                                    label="Review"
+                                    onClick={handleReviewClick}
+                                    icon={<PreviewIcon color="primary" sx={{ fontSize: 40 }} />}
+                                    disabled={requestMasterItemsCheckedSelector.requestMasterItemsChecked.length === 0}
+                                />
                                 {(location.pathname === '/general-request/confirmation' ||
                                     location.pathname === '/office-supply-request/confirmation' ||
                                     location.pathname === '/store-room-request/confirmation') && (
@@ -550,19 +607,15 @@ const StoreRoomMaster = () => {
                                         }
                                     />
                                 )}
-                                {(location.pathname === '/general-request/confirmation' ||
-                                    location.pathname === '/office-supply-request/confirmation' ||
-                                    location.pathname === '/store-room-request/confirmation') && (
-                                    <BottomNavigationAction
-                                        label="Send"
-                                        onClick={handleEditClick}
-                                        icon={<SendIcon />}
-                                        disabled={
-                                            requestMasterItemsPendingCheckedSelector.requestMasterItemsPendingChecked
-                                                .length === 0
-                                        }
-                                    />
-                                )}
+                                <BottomNavigationAction
+                                    label="Send"
+                                    onClick={handleEditClick}
+                                    icon={<SendIcon />}
+                                    disabled={
+                                        requestMasterItemsPendingCheckedSelector.requestMasterItemsPendingChecked
+                                            .length === 0
+                                    }
+                                />
                                 {location.pathname === '/admin/master' && (
                                     <BottomNavigationAction
                                         label="Add Item"
