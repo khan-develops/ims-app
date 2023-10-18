@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { IStoreRoom } from './properties/IStoreRoom';
+import { IStoreRoom, IStoreRoomMaster } from './properties/IStoreRoom';
 
 const baseUrl = process.env.REACT_APP_BASE_URL;
 
@@ -21,4 +21,8 @@ export const updateStoreRoomItem = (storeRoomItem: IStoreRoom) => {
 
 export const getStoreRoomMasterItems = (page: number) => {
     return axios.get(`${baseUrl}/store-room-master/list?page=${page}`);
+};
+
+export const sortStoreRoomMasterItems = (params: { page: number, column: string, direction: string }) => {
+    return axios.get(`${baseUrl}/store-room-master/sort?page=${params.page}&column=${params.column}&direction=${params.direction}`);
 };

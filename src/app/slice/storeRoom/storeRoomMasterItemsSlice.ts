@@ -1,7 +1,7 @@
 import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { RootState } from '../../store';
 import { IStoreRoomMaster } from '../../api/properties/IStoreRoom';
-import { getStoreRoomMasterItems } from '../../api/storeRoom';
+import { getStoreRoomMasterItems, sortStoreRoomMasterItems } from '../../api/storeRoom';
 
 export interface StoreRoomMasterState {
     response: {
@@ -28,6 +28,14 @@ export const getStoreRoomMasterItemsThunk = createAsyncThunk('getStoreRoomMaster
     return response.data;
 });
 
+export const sortStoreRoomMasterItemsThunk = createAsyncThunk(
+    'sortStoreRoomMasterItemsThunk',
+    async (params: { page: number; column: string, direction: string }) => {
+        const response = await sortStoreRoomMasterItems(params);
+        return response.data;
+    }
+);
+
 export const storeRoomMasterItemsSlice = createSlice({
     name: 'storeRoomSlice',
     initialState,
@@ -46,6 +54,16 @@ export const storeRoomMasterItemsSlice = createSlice({
                 state.response = action.payload;
             })
             .addCase(getStoreRoomMasterItemsThunk.rejected, (state) => {
+                state.status = 'failed';
+            })
+            .addCase(sortStoreRoomMasterItemsThunk.pending, (state) => {
+                state.status = 'loading';
+            })
+            .addCase(sortStoreRoomMasterItemsThunk.fulfilled, (state, action: PayloadAction<IStoreRoomMaster[]>) => {
+                state.status = 'success';
+                state.response.content = action.payload;
+            })
+            .addCase(sortStoreRoomMasterItemsThunk.rejected, (state) => {
                 state.status = 'failed';
             });
     }

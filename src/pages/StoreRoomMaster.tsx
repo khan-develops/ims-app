@@ -30,7 +30,8 @@ import { useLocation } from 'react-router-dom';
 import {
     changeStoreRoomMasterItems,
     getStoreRoomMasterItemsThunk,
-    selectStoreRoomMasterItems
+    selectStoreRoomMasterItems,
+    sortStoreRoomMasterItemsThunk
 } from '../app/slice/storeRoom/storeRoomMasterItemsSlice';
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -511,9 +512,20 @@ const StoreRoomMaster = () => {
         event: MouseEvent<unknown>,
         property: keyof IStoreRoom | keyof IMaster | keyof IOrderDetail
     ) => {
-        const isAsc = orderBy === property && order === 'asc';
-        setOrder(isAsc ? 'desc' : 'asc');
-        setOrderBy(property);
+        if (order === 'asc' && orderBy === 'id') {
+            dispatch(sortStoreRoomMasterItemsThunk({ page: page, column: property, direction: order }))
+                .then(() => setOrderBy(property))
+                .catch((error: Error) => console.error(error.message));
+        } else if (order === 'asc' && orderBy === property) {
+            setOrder('desc');
+            dispatch(sortStoreRoomMasterItemsThunk({ page: page, column: property, direction: order }))
+                .then(() => setOrderBy(property))
+                .catch((error: Error) => console.error(error.message));
+        } else if (order === 'desc' && orderBy === property) {
+            dispatch(sortStoreRoomMasterItemsThunk({ page: page, column: property, direction: '' }))
+                .then(() => setOrderBy('id'))
+                .catch((error: Error) => console.error(error.message));
+        }
     };
 
     return (
