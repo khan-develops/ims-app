@@ -219,15 +219,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 
 const baseUrl = process.env.REACT_APP_BASE_URL;
 
-const MasterDepartmentRow = ({
-    openRows,
-    masterDepartmentItem,
-    handleExpandRow
-}: {
-    openRows: number[];
-    masterDepartmentItem: IMasterDepartment;
-    handleExpandRow: (masterDepartmentItem: IMasterDepartment) => void;
-}): JSX.Element => {
+const DepartmentRow = ({ departmentItem }: { departmentItem: IDepartment }): JSX.Element => {
     const masterDepartmentItemsSelector = useAppSelector(selectMasterDepartmentItems);
     const dispatch = useAppDispatch();
     const location = useLocation();
@@ -251,31 +243,12 @@ const MasterDepartmentRow = ({
         receivedDate: null
     });
 
-    const getOrderQuantityColor = (masterDepartmentItem: IMasterDepartment) => {
-        const minimumQuantity = masterDepartmentItem.departmentItems[0].minimumQuantity;
-        const maximumQuantity = masterDepartmentItem.departmentItems[0].maximumQuantity;
-        const totalQuantity =
-            masterDepartmentItem.orderDetail === null ? null : masterDepartmentItem.orderDetail.totalQuantity;
-        if (totalQuantity) {
-            if (!minimumQuantity || !maximumQuantity) {
-                return '#eded00';
-            } else if (minimumQuantity === 1 && maximumQuantity === 1 && totalQuantity < 1) {
-                return '#FF0000';
-            } else if (totalQuantity < minimumQuantity) {
-                return 'red';
-            } else {
-                return '#3CB371';
-            }
-        }
-    };
-
     const handleEnterKey = (
         event: KeyboardEvent<HTMLDivElement>,
         departmentItem: IDepartment,
         ref: HTMLDivElement | null
     ) => {
         if (event.key === 'Enter') {
-            inputRef.current.location = ref;
             departmentItem = {
                 ...departmentItem,
                 [(event.target as HTMLInputElement).name]: (event.target as HTMLInputElement).value
@@ -287,6 +260,7 @@ const MasterDepartmentRow = ({
                 })
             )
                 .then(() => {
+                    inputRef.current.location = ref;
                     if (ref) {
                         ref.style.backgroundColor = '#98FB98';
                         ref.style.transition = '1s background ease-in, 500ms transform ease-out 1s';
@@ -328,16 +302,6 @@ const MasterDepartmentRow = ({
         departmentItem: IDepartment,
         dateType: 'expirationDate' | 'receivedDate'
     ) => {
-        if (dateType === 'expirationDate') {
-            if (value) {
-                departmentItem = { ...departmentItem, expirationDate: value };
-            }
-        }
-        if (dateType === 'receivedDate') {
-            if (value) {
-                departmentItem = { ...departmentItem, receivedDate: value };
-            }
-        }
         dispatch(
             changeMasterDepartmentItems(
                 masterDepartmentItemsSelector.response.content.map((originalMasterDepartmentItem) => ({
@@ -346,15 +310,221 @@ const MasterDepartmentRow = ({
                         originalMasterDepartmentItem.id === masterDepartmentItem.id
                             ? originalMasterDepartmentItem.departmentItems.map((originalDepartmentItem) => ({
                                   ...originalDepartmentItem,
-                                  receivedDate:
+                                  [dateType]:
                                       departmentItem.id === originalDepartmentItem.id
                                           ? value
-                                          : originalDepartmentItem.receivedDate
+                                          : originalDepartmentItem[dateType]
                               }))
                             : masterDepartmentItem.departmentItems
                 }))
             )
         );
+    };
+
+    return (
+        <TableRow hover>
+            <StyledSubTableCell>
+                <TextField
+                    className={'location' + departmentItem.id.toString()}
+                    ref={(ref) => (inputRef.current.location = ref)}
+                    id={'location' + departmentItem.id.toString()}
+                    size="small"
+                    name="location"
+                    defaultValue={departmentItem.location === null ? '' : departmentItem.location}
+                    sx={{
+                        '.MuiInputBase-input': {
+                            padding: 1,
+                            fontSize: 11,
+                            width: 300
+                        }
+                    }}
+                    onKeyDown={(event: KeyboardEvent<HTMLDivElement>) =>
+                        handleEnterKey(event, departmentItem, inputRef.current.location)
+                    }
+                />
+            </StyledSubTableCell>
+            <StyledSubTableCell align="left">
+                <TextField
+                    id="minimumQuantity"
+                    ref={(ref) => (inputRef.current.minimumQuantity = ref)}
+                    size="small"
+                    type="number"
+                    InputProps={{
+                        inputProps: { min: 0 }
+                    }}
+                    name="minimumQuantity"
+                    defaultValue={departmentItem.minimumQuantity}
+                    sx={{
+                        '.MuiInputBase-input': {
+                            padding: 1,
+                            fontSize: 11
+                        }
+                    }}
+                    onKeyDown={(event: KeyboardEvent<HTMLDivElement>) =>
+                        handleEnterKey(event, departmentItem, inputRef.current.minimumQuantity)
+                    }
+                />
+            </StyledSubTableCell>
+            <StyledSubTableCell align="left">
+                <TextField
+                    id="maximumQuantity"
+                    ref={(ref) => (inputRef.current.maximumQuantity = ref)}
+                    size="small"
+                    type="number"
+                    InputProps={{
+                        inputProps: { min: 0 }
+                    }}
+                    name="maximumQuantity"
+                    sx={{
+                        '.MuiInputBase-input': {
+                            padding: 1,
+                            fontWeight: 400,
+                            fontSize: 11
+                        }
+                    }}
+                    defaultValue={departmentItem.maximumQuantity}
+                    onKeyDown={(event: KeyboardEvent<HTMLDivElement>) =>
+                        handleEnterKey(event, departmentItem, inputRef.current.maximumQuantity)
+                    }
+                />
+            </StyledSubTableCell>
+            <StyledSubTableCell align="left">
+                <TextField
+                    id="usageLevel"
+                    ref={(ref) => (inputRef.current.usageLevel = ref)}
+                    name="usageLevel"
+                    sx={{
+                        '.MuiInputBase-input': {
+                            padding: 1,
+                            fontWeight: 400,
+                            fontSize: 11,
+                            width: 250
+                        }
+                    }}
+                    InputProps={{
+                        inputProps: { min: 0 }
+                    }}
+                    size="small"
+                    defaultValue={departmentItem.usageLevel}
+                    onKeyDown={(event: KeyboardEvent<HTMLDivElement>) =>
+                        handleEnterKey(event, departmentItem, inputRef.current.usageLevel)
+                    }
+                />
+            </StyledSubTableCell>
+            <StyledSubTableCell align="left">
+                <TextField
+                    id="quantity"
+                    ref={(ref) => (inputRef.current.quantity = ref)}
+                    type="number"
+                    name="quantity"
+                    sx={{
+                        '.MuiInputBase-input': {
+                            padding: 1,
+                            fontWeight: 400,
+                            fontSize: 11
+                        }
+                    }}
+                    InputProps={{
+                        inputProps: { min: 0 }
+                    }}
+                    size="small"
+                    defaultValue={departmentItem.quantity}
+                    onKeyDown={(event: KeyboardEvent<HTMLDivElement>) =>
+                        handleEnterKey(event, departmentItem, inputRef.current.quantity)
+                    }
+                />
+            </StyledSubTableCell>
+            <StyledSubTableCell align="left">
+                <TextField
+                    id="lotNumber"
+                    ref={(ref) => (inputRef.current.lotNumber = ref)}
+                    size="small"
+                    name="lotNumber"
+                    defaultValue={departmentItem.lotNumber === null ? '' : departmentItem.lotNumber}
+                    sx={{
+                        '.MuiInputBase-input': {
+                            padding: 1,
+                            fontSize: 11
+                        }
+                    }}
+                    onKeyDown={(event: KeyboardEvent<HTMLDivElement>) =>
+                        handleEnterKey(event, departmentItem, inputRef.current.lotNumber)
+                    }
+                />
+            </StyledSubTableCell>
+            <StyledSubTableCell align="left">
+                <LocalizationProvider dateAdapter={AdapterMoment}>
+                    <DateTimePicker
+                        ref={(ref) => (inputRef.current.expirationDate = ref)}
+                        value={departmentItem.expirationDate}
+                        onChange={(value: Date | null) => handleDateChange(value, departmentItem, 'expirationDate')}
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                sx={{
+                                    '.MuiInputBase-input': {
+                                        padding: 1,
+                                        fontSize: 11,
+                                        width: 200
+                                    }
+                                }}
+                            />
+                        )}
+                        onClose={() => handleDatePickerClose(departmentItem)}
+                    />
+                </LocalizationProvider>
+            </StyledSubTableCell>
+            <StyledSubTableCell align="left">
+                <LocalizationProvider dateAdapter={AdapterMoment}>
+                    <DateTimePicker
+                        inputRef={(ref) => (inputRef.current.receivedDate = ref)}
+                        value={departmentItem.receivedDate}
+                        onChange={(value: Date | null) => handleDateChange(value, departmentItem, 'receivedDate')}
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                sx={{
+                                    '.MuiInputBase-input': {
+                                        padding: 1,
+                                        fontSize: 11,
+                                        width: 200
+                                    }
+                                }}
+                            />
+                        )}
+                        onClose={() => handleDatePickerClose(departmentItem)}
+                    />
+                </LocalizationProvider>
+            </StyledSubTableCell>
+        </TableRow>
+    );
+};
+
+const MasterDepartmentRow = ({
+    openRows,
+    masterDepartmentItem,
+    handleExpandRow
+}: {
+    openRows: number[];
+    masterDepartmentItem: IMasterDepartment;
+    handleExpandRow: (masterDepartmentItem: IMasterDepartment) => void;
+}): JSX.Element => {
+    const getOrderQuantityColor = (masterDepartmentItem: IMasterDepartment) => {
+        const minimumQuantity = masterDepartmentItem.departmentItems[0].minimumQuantity;
+        const maximumQuantity = masterDepartmentItem.departmentItems[0].maximumQuantity;
+        const totalQuantity =
+            masterDepartmentItem.orderDetail === null ? null : masterDepartmentItem.orderDetail.totalQuantity;
+        if (totalQuantity) {
+            if (!minimumQuantity || !maximumQuantity) {
+                return '#eded00';
+            } else if (minimumQuantity === 1 && maximumQuantity === 1 && totalQuantity < 1) {
+                return '#FF0000';
+            } else if (totalQuantity < minimumQuantity) {
+                return 'red';
+            } else {
+                return '#3CB371';
+            }
+        }
     };
 
     return (
@@ -416,222 +586,8 @@ const MasterDepartmentRow = ({
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        {masterDepartmentItem.departmentItems.map((departmentItem) => (
-                                            <TableRow key={departmentItem.location} hover>
-                                                <StyledSubTableCell>
-                                                    <TextField
-                                                        className={'location' + departmentItem.id.toString()}
-                                                        ref={(ref) => (inputRef.current.location = ref)}
-                                                        id={'location' + departmentItem.id.toString()}
-                                                        size="small"
-                                                        name="location"
-                                                        defaultValue={
-                                                            departmentItem.location === null
-                                                                ? ''
-                                                                : departmentItem.location
-                                                        }
-                                                        sx={{
-                                                            '.MuiInputBase-input': {
-                                                                padding: 1,
-                                                                fontSize: 11,
-                                                                width: 300
-                                                            }
-                                                        }}
-                                                        onKeyDown={(event: KeyboardEvent<HTMLDivElement>) =>
-                                                            handleEnterKey(
-                                                                event,
-                                                                departmentItem,
-                                                                inputRef.current.location
-                                                            )
-                                                        }
-                                                    />
-                                                </StyledSubTableCell>
-                                                <StyledSubTableCell align="left">
-                                                    <TextField
-                                                        id="minimumQuantity"
-                                                        ref={(ref) => (inputRef.current.minimumQuantity = ref)}
-                                                        size="small"
-                                                        type="number"
-                                                        InputProps={{
-                                                            inputProps: { min: 0 }
-                                                        }}
-                                                        name="minimumQuantity"
-                                                        defaultValue={departmentItem.minimumQuantity}
-                                                        sx={{
-                                                            '.MuiInputBase-input': {
-                                                                padding: 1,
-                                                                fontSize: 11
-                                                            }
-                                                        }}
-                                                        onKeyDown={(event: KeyboardEvent<HTMLDivElement>) =>
-                                                            handleEnterKey(
-                                                                event,
-                                                                departmentItem,
-                                                                inputRef.current.minimumQuantity
-                                                            )
-                                                        }
-                                                    />
-                                                </StyledSubTableCell>
-                                                <StyledSubTableCell align="left">
-                                                    <TextField
-                                                        id="maximumQuantity"
-                                                        ref={(ref) => (inputRef.current.maximumQuantity = ref)}
-                                                        size="small"
-                                                        type="number"
-                                                        InputProps={{
-                                                            inputProps: { min: 0 }
-                                                        }}
-                                                        name="maximumQuantity"
-                                                        sx={{
-                                                            '.MuiInputBase-input': {
-                                                                padding: 1,
-                                                                fontWeight: 400,
-                                                                fontSize: 11
-                                                            }
-                                                        }}
-                                                        defaultValue={departmentItem.maximumQuantity}
-                                                        onKeyDown={(event: KeyboardEvent<HTMLDivElement>) =>
-                                                            handleEnterKey(
-                                                                event,
-                                                                departmentItem,
-                                                                inputRef.current.maximumQuantity
-                                                            )
-                                                        }
-                                                    />
-                                                </StyledSubTableCell>
-                                                <StyledSubTableCell align="left">
-                                                    <TextField
-                                                        id="usageLevel"
-                                                        ref={(ref) => (inputRef.current.usageLevel = ref)}
-                                                        name="usageLevel"
-                                                        sx={{
-                                                            '.MuiInputBase-input': {
-                                                                padding: 1,
-                                                                fontWeight: 400,
-                                                                fontSize: 11,
-                                                                width: 250
-                                                            }
-                                                        }}
-                                                        InputProps={{
-                                                            inputProps: { min: 0 }
-                                                        }}
-                                                        size="small"
-                                                        defaultValue={departmentItem.usageLevel}
-                                                        onKeyDown={(event: KeyboardEvent<HTMLDivElement>) =>
-                                                            handleEnterKey(
-                                                                event,
-                                                                departmentItem,
-                                                                inputRef.current.usageLevel
-                                                            )
-                                                        }
-                                                    />
-                                                </StyledSubTableCell>
-                                                <StyledSubTableCell align="left">
-                                                    <TextField
-                                                        id="quantity"
-                                                        ref={(ref) => (inputRef.current.quantity = ref)}
-                                                        type="number"
-                                                        name="quantity"
-                                                        sx={{
-                                                            '.MuiInputBase-input': {
-                                                                padding: 1,
-                                                                fontWeight: 400,
-                                                                fontSize: 11
-                                                            }
-                                                        }}
-                                                        InputProps={{
-                                                            inputProps: { min: 0 }
-                                                        }}
-                                                        size="small"
-                                                        defaultValue={departmentItem.quantity}
-                                                        onKeyDown={(event: KeyboardEvent<HTMLDivElement>) =>
-                                                            handleEnterKey(
-                                                                event,
-                                                                departmentItem,
-                                                                inputRef.current.quantity
-                                                            )
-                                                        }
-                                                    />
-                                                </StyledSubTableCell>
-                                                <StyledSubTableCell align="left">
-                                                    <TextField
-                                                        id="lotNumber"
-                                                        ref={(ref) => (inputRef.current.lotNumber = ref)}
-                                                        size="small"
-                                                        name="lotNumber"
-                                                        defaultValue={
-                                                            departmentItem.lotNumber === null
-                                                                ? ''
-                                                                : departmentItem.lotNumber
-                                                        }
-                                                        sx={{
-                                                            '.MuiInputBase-input': {
-                                                                padding: 1,
-                                                                fontSize: 11
-                                                            }
-                                                        }}
-                                                        onKeyDown={(event: KeyboardEvent<HTMLDivElement>) =>
-                                                            handleEnterKey(
-                                                                event,
-                                                                departmentItem,
-                                                                inputRef.current.lotNumber
-                                                            )
-                                                        }
-                                                    />
-                                                </StyledSubTableCell>
-                                                <StyledSubTableCell align="left">
-                                                    <LocalizationProvider dateAdapter={AdapterMoment}>
-                                                        <DateTimePicker
-                                                            ref={(ref) => (inputRef.current.expirationDate = ref)}
-                                                            value={departmentItem.expirationDate}
-                                                            onChange={(value: Date | null) =>
-                                                                handleDateChange(
-                                                                    value,
-                                                                    departmentItem,
-                                                                    'expirationDate'
-                                                                )
-                                                            }
-                                                            renderInput={(params) => (
-                                                                <TextField
-                                                                    {...params}
-                                                                    sx={{
-                                                                        '.MuiInputBase-input': {
-                                                                            padding: 1,
-                                                                            fontSize: 11,
-                                                                            width: 200
-                                                                        }
-                                                                    }}
-                                                                />
-                                                            )}
-                                                            onClose={() => handleDatePickerClose(departmentItem)}
-                                                        />
-                                                    </LocalizationProvider>
-                                                </StyledSubTableCell>
-                                                <StyledSubTableCell align="left">
-                                                    <LocalizationProvider dateAdapter={AdapterMoment}>
-                                                        <DateTimePicker
-                                                            inputRef={(ref) => (inputRef.current.receivedDate = ref)}
-                                                            value={departmentItem.receivedDate}
-                                                            onChange={(value: Date | null) =>
-                                                                handleDateChange(value, departmentItem, 'receivedDate')
-                                                            }
-                                                            renderInput={(params) => (
-                                                                <TextField
-                                                                    {...params}
-                                                                    sx={{
-                                                                        '.MuiInputBase-input': {
-                                                                            padding: 1,
-                                                                            fontSize: 11,
-                                                                            width: 200
-                                                                        }
-                                                                    }}
-                                                                />
-                                                            )}
-                                                            onClose={() => handleDatePickerClose(departmentItem)}
-                                                        />
-                                                    </LocalizationProvider>
-                                                </StyledSubTableCell>
-                                            </TableRow>
+                                        {masterDepartmentItem.departmentItems.map((departmentItem, index) => (
+                                            <DepartmentRow key={index} departmentItem={departmentItem} />
                                         ))}
                                     </TableBody>
                                 </Table>
@@ -955,185 +911,3 @@ const DepartmentsMaster = () => {
 };
 
 export default DepartmentsMaster;
-
-// const handleQuantityChange = (
-//     event: ChangeEvent<HTMLInputElement>,
-//     masterDepartmentItemId: number | undefined,
-//     departmentItemId: number
-// ) => {
-//     dispatch(
-//         changeMasterDepartmentItems(
-//             masterDepartmentItemsSelector.response.content.map((masterDepartmentItem) => ({
-//                 ...masterDepartmentItem,
-//                 departmentItems:
-//                     masterDepartmentItem.id === masterDepartmentItemId
-//                         ? masterDepartmentItem.departmentItems.map((departmentItem) => ({
-//                               ...departmentItem,
-//                               quantity:
-//                                   departmentItem.id === departmentItemId
-//                                       ? parseInt(event.target.value)
-//                                       : departmentItem.quantity
-//                           }))
-//                         : masterDepartmentItem.departmentItems
-//             }))
-//         )
-//     );
-// };
-
-// const handleLotNumberChange = (
-//     event: ChangeEvent<HTMLInputElement>,
-//     masterDepartmentItemId: number | undefined,
-//     departmentItemId: number
-// ) => {
-//     dispatch(
-//         changeMasterDepartmentItems(
-//             masterDepartmentItemsSelector.response.content.map((masterDepartmentItem) => ({
-//                 ...masterDepartmentItem,
-//                 departmentItems:
-//                     masterDepartmentItem.id === masterDepartmentItemId
-//                         ? masterDepartmentItem.departmentItems.map((departmentItem) => ({
-//                               ...departmentItem,
-//                               lotNumber:
-//                                   departmentItem.id === departmentItemId ? event.target.value : departmentItem.lotNumber
-//                           }))
-//                         : masterDepartmentItem.departmentItems
-//             }))
-//         )
-//     );
-// };
-
-// const handleLocationChange = (
-//     event: ChangeEvent<HTMLInputElement>,
-//     masterDepartmentItemId: number | undefined,
-//     departmentItemId: number
-// ) => {
-//     dispatch(
-//         changeMasterDepartmentItems(
-//             masterDepartmentItemsSelector.response.content.map((masterDepartmentItem) => ({
-//                 ...masterDepartmentItem,
-//                 departmentItems:
-//                     masterDepartmentItem.id === masterDepartmentItemId
-//                         ? masterDepartmentItem.departmentItems.map((departmentItem) => ({
-//                               ...departmentItem,
-//                               location:
-//                                   departmentItem.id === departmentItemId ? event.target.value : departmentItem.location
-//                           }))
-//                         : masterDepartmentItem.departmentItems
-//             }))
-//         )
-//     );
-// };
-// const handleMinimumQtyChange = (
-//     event: ChangeEvent<HTMLInputElement>,
-//     masterDepartmentItemId: number | undefined,
-//     departmentItemId: number
-// ) => {
-//     dispatch(changeMasterDepartmentItems([...masterDepartmentItemsSelector.response.content]));
-//     dispatch(
-//         changeMasterDepartmentItems(
-//             masterDepartmentItemsSelector.response.content.map((masterDepartmentItem) => ({
-//                 ...masterDepartmentItem,
-//                 departmentItems:
-//                     masterDepartmentItem.id === masterDepartmentItemId
-//                         ? masterDepartmentItem.departmentItems.map((departmentItem) => ({
-//                               ...departmentItem,
-//                               minimumQuantity:
-//                                   departmentItem.id === departmentItemId
-//                                       ? event.target.value
-//                                       : departmentItem.location
-//                           }))
-//                         : masterDepartmentItem.departmentItems
-//             }))
-//         )
-//     );
-// };
-// const handleMaximumQtyChange = (
-//     event: ChangeEvent<HTMLInputElement>,
-//     masterDepartmentItemId: number | undefined,
-//     departmentItemId: number
-// ) => {
-// dispatch(
-//     changeMasterDepartmentItems(
-//         masterDepartmentItemsSelector.response.content.map((masterDepartmentItem) => ({
-//             ...masterDepartmentItem,
-//             departmentItems:
-//                 masterDepartmentItem.id === masterDepartmentItemId
-//                     ? masterDepartmentItem.departmentItems.map((departmentItem) => ({
-//                           ...departmentItem,
-//                           maximumQuantity:
-//                               departmentItem.id === departmentItemId
-//                                   ? event.target.value
-//                                   : departmentItem.location
-//                       }))
-//                     : masterDepartmentItem.departmentItems
-//         }))
-//     )
-// );
-// };
-// const handleUsageLevelChange = (
-//     event: ChangeEvent<HTMLInputElement>,
-//     masterDepartmentItemId: number | undefined,
-//     departmentItemId: number
-// ) => {
-//     dispatch(
-//         changeMasterDepartmentItems(
-//             masterDepartmentItemsSelector.response.content.map((masterDepartmentItem) => ({
-//                 ...masterDepartmentItem,
-//                 departmentItems:
-//                     masterDepartmentItem.id === masterDepartmentItemId
-//                         ? masterDepartmentItem.departmentItems.map((departmentItem) => ({
-//                               ...departmentItem,
-//                               usageLevel:
-//                                   departmentItem.id === departmentItemId
-//                                       ? event.target.value
-//                                       : departmentItem.usageLevel
-//                           }))
-//                         : masterDepartmentItem.departmentItems
-//             }))
-//         )
-//     );
-// };
-
-// const handleExpirationDateChange = (
-//     value: Date | null,
-//     masterDepartmentItemId: number | undefined,
-//     departmentItemId: number
-// ) => {
-//     dispatch(
-//         changeMasterDepartmentItems(
-//             masterDepartmentItemsSelector.response.content.map((masterDepartmentItem) => ({
-//                 ...masterDepartmentItem,
-//                 departmentItems:
-//                     masterDepartmentItem.id === masterDepartmentItemId
-//                         ? masterDepartmentItem.departmentItems.map((departmentItem) => ({
-//                               ...departmentItem,
-//                               expirationDate:
-//                                   departmentItem.id === departmentItemId ? value : departmentItem.expirationDate
-//                           }))
-//                         : masterDepartmentItem.departmentItems
-//             }))
-//         )
-//     );
-// };
-
-// const handleReceivedDateChange = (
-//     value: Date | null,
-//     masterDepartmentItemId: number | undefined,
-//     departmentItemId: number
-// ) => {
-// dispatch(
-//     changeMasterDepartmentItems(
-//         masterDepartmentItemsSelector.response.content.map((masterDepartmentItem) => ({
-//             ...masterDepartmentItem,
-//             departmentItems:
-//                 masterDepartmentItem.id === masterDepartmentItemId
-//                     ? masterDepartmentItem.departmentItems.map((departmentItem) => ({
-//                           ...departmentItem,
-//                           receivedDate:
-//                               departmentItem.id === departmentItemId ? value : departmentItem.receivedDate
-//                       }))
-//                     : masterDepartmentItem.departmentItems
-//         }))
-//     )
-// );
-// };
