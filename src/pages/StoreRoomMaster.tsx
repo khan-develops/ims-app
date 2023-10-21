@@ -603,7 +603,7 @@ const StoreRoomMaster = () => {
                 </Paper>
             </Grid>
             <Grid item>
-                <Paper variant="elevation" elevation={5} sx={{ height: 80 }}>
+                <Paper variant="elevation" elevation={5} sx={{ height: 70 }}>
                     <BottomNavigation
                         sx={{ display: 'flex', justifyContent: 'space-around', width: '100%' }}
                         showLabels

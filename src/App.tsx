@@ -7,7 +7,7 @@ import StoreRoomMaster from './pages/StoreRoomMaster';
 import RequestMasterDepartment from './pages/RequestMaster';
 import RequestMasterAdmin from './pages/RequestMasterDashboard';
 import Layout from './components/Layout';
-import { Box } from '@mui/material';
+import { Box, ThemeProvider, createTheme } from '@mui/material';
 import Auth from './pages/Auth';
 import RequestMasterDepartmentItems from './components/RequestMasterItems';
 import RequestMasterDepartmentComplete from './components/RequestMasterItemsComplete';
@@ -57,16 +57,29 @@ const router = createBrowserRouter(
     )
 );
 
+const theme = createTheme({
+    palette: {
+        primary: {
+            main: '#1347a4' // your primary color
+        },
+        secondary: {
+            main: '#2f3643' // your secondary color
+        }
+    }
+});
+
 const App = () => {
     return (
-        <Box sx={{height: '100%'}}>
-            <UnauthenticatedTemplate>
-                <Auth />
-            </UnauthenticatedTemplate>
-            <AuthenticatedTemplate>
-                <RouterProvider router={router} />
-            </AuthenticatedTemplate>
-        </Box>
+        <ThemeProvider theme={theme}>
+            <Box sx={{ height: '100%' }}>
+                <UnauthenticatedTemplate>
+                    <Auth />
+                </UnauthenticatedTemplate>
+                <AuthenticatedTemplate>
+                    <RouterProvider router={router} />
+                </AuthenticatedTemplate>
+            </Box>
+        </ThemeProvider>
     );
 };
 
