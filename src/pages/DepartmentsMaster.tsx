@@ -228,6 +228,7 @@ const MasterDepartmentRow = ({
     masterDepartmentItem: IMasterDepartment;
     handleExpandRow: (masterDepartmentItem: IMasterDepartment) => void;
 }): JSX.Element => {
+    const masterDepartmentItemsSelector = useAppSelector(selectMasterDepartmentItems);
     const dispatch = useAppDispatch();
     const location = useLocation();
     const inputRef = useRef<{
@@ -249,15 +250,6 @@ const MasterDepartmentRow = ({
         expirationDate: null,
         receivedDate: null
     });
-
-    const handleClose = (departmentItem: IDepartment) => {
-        dispatch(
-            updateDepartmentItemThunk({
-                state: location.state,
-                departmentItem: departmentItem
-            })
-        );
-    };
 
     const getOrderQuantityColor = (masterDepartmentItem: IMasterDepartment) => {
         const minimumQuantity = masterDepartmentItem.departmentItems[0].minimumQuantity;
@@ -320,6 +312,17 @@ const MasterDepartmentRow = ({
         }
     };
 
+    const handleDatePickerClose = (departmentItem: IDepartment) => {
+        dispatch(
+            updateDepartmentItemThunk({
+                state: location.state,
+                departmentItem: departmentItem
+            })
+        )
+            .then((response) => console.log(response))
+            .catch((error: Error) => console.error(error.message));
+    };
+
     const handleDateChange = (
         value: Date | null,
         departmentItem: IDepartment,
@@ -336,13 +339,22 @@ const MasterDepartmentRow = ({
             }
         }
         dispatch(
-            updateDepartmentItemThunk({
-                state: location.state,
-                departmentItem: departmentItem
-            })
-        )
-            .then((response) => console.log(response))
-            .catch((error: Error) => console.error(error.message));
+            changeMasterDepartmentItems(
+                masterDepartmentItemsSelector.response.content.map((originalMasterDepartmentItem) => ({
+                    ...originalMasterDepartmentItem,
+                    departmentItems:
+                        originalMasterDepartmentItem.id === masterDepartmentItem.id
+                            ? originalMasterDepartmentItem.departmentItems.map((originalDepartmentItem) => ({
+                                  ...originalDepartmentItem,
+                                  receivedDate:
+                                      departmentItem.id === originalDepartmentItem.id
+                                          ? value
+                                          : originalDepartmentItem.receivedDate
+                              }))
+                            : masterDepartmentItem.departmentItems
+                }))
+            )
+        );
     };
 
     return (
@@ -591,7 +603,7 @@ const MasterDepartmentRow = ({
                                                                     }}
                                                                 />
                                                             )}
-                                                            onClose={() => handleClose(departmentItem)}
+                                                            onClose={() => handleDatePickerClose(departmentItem)}
                                                         />
                                                     </LocalizationProvider>
                                                 </StyledSubTableCell>
@@ -615,7 +627,7 @@ const MasterDepartmentRow = ({
                                                                     }}
                                                                 />
                                                             )}
-                                                            onClose={() => handleClose(departmentItem)}
+                                                            onClose={() => handleDatePickerClose(departmentItem)}
                                                         />
                                                     </LocalizationProvider>
                                                 </StyledSubTableCell>
@@ -1109,19 +1121,19 @@ export default DepartmentsMaster;
 //     masterDepartmentItemId: number | undefined,
 //     departmentItemId: number
 // ) => {
-//     dispatch(
-//         changeMasterDepartmentItems(
-//             masterDepartmentItemsSelector.response.content.map((masterDepartmentItem) => ({
-//                 ...masterDepartmentItem,
-//                 departmentItems:
-//                     masterDepartmentItem.id === masterDepartmentItemId
-//                         ? masterDepartmentItem.departmentItems.map((departmentItem) => ({
-//                               ...departmentItem,
-//                               receivedDate:
-//                                   departmentItem.id === departmentItemId ? value : departmentItem.receivedDate
-//                           }))
-//                         : masterDepartmentItem.departmentItems
-//             }))
-//         )
-//     );
+// dispatch(
+//     changeMasterDepartmentItems(
+//         masterDepartmentItemsSelector.response.content.map((masterDepartmentItem) => ({
+//             ...masterDepartmentItem,
+//             departmentItems:
+//                 masterDepartmentItem.id === masterDepartmentItemId
+//                     ? masterDepartmentItem.departmentItems.map((departmentItem) => ({
+//                           ...departmentItem,
+//                           receivedDate:
+//                               departmentItem.id === departmentItemId ? value : departmentItem.receivedDate
+//                       }))
+//                     : masterDepartmentItem.departmentItems
+//         }))
+//     )
+// );
 // };
