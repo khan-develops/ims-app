@@ -1,7 +1,8 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { RootState } from '../../store';
-import { IMasterDepartment } from '../../api/properties/IMaster';
+import { IMaster, IMasterDepartment } from '../../api/properties/IMaster';
 import { filterMasterDepartmentItems, getMasterDepartmentItems, sortMasterDepartmentItems } from '../../api/master';
+import { MasterDepartmentItemState } from './masterDepartmentItemSlice';
 
 export interface MasterDepartmentItemsState {
     response: {
@@ -63,7 +64,7 @@ export const masterDepartmentItemsSlice = createSlice({
     name: 'masterDepartmentItemsSlice',
     initialState,
     reducers: {
-        changeMasterDepartmentItems: (state, action) => {
+        changeMasterDepartmentItems: (state, action: PayloadAction<IMasterDepartment[]>) => {
             state.response.content = action.payload;
         }
     },
@@ -72,8 +73,8 @@ export const masterDepartmentItemsSlice = createSlice({
             .addCase(getMasterDepartmentItemsThunk.pending, (state) => {
                 state.status = 'loading';
             })
-            .addCase(getMasterDepartmentItemsThunk.fulfilled, (state, action) => {
-                state.response = action.payload;
+            .addCase(getMasterDepartmentItemsThunk.fulfilled, (state, action: PayloadAction<IMasterDepartment[]>) => {
+                state.response.content = action.payload;
             })
             .addCase(getMasterDepartmentItemsThunk.rejected, (state) => {
                 state.status = 'failed';
@@ -81,8 +82,8 @@ export const masterDepartmentItemsSlice = createSlice({
             .addCase(sortMasterDepartmentItemsThunk.pending, (state) => {
                 state.status = 'loading';
             })
-            .addCase(sortMasterDepartmentItemsThunk.fulfilled, (state, action) => {
-                state.response = action.payload;
+            .addCase(sortMasterDepartmentItemsThunk.fulfilled, (state, action: PayloadAction<IMasterDepartment[]>) => {
+                state.response.content = action.payload;
             })
             .addCase(sortMasterDepartmentItemsThunk.rejected, (state) => {
                 state.status = 'failed';
@@ -90,8 +91,8 @@ export const masterDepartmentItemsSlice = createSlice({
             .addCase(filterMasterDepartmentItemsThunk.pending, (state) => {
                 state.status = 'loading';
             })
-            .addCase(filterMasterDepartmentItemsThunk.fulfilled, (state, action) => {
-                state.response = action.payload;
+            .addCase(filterMasterDepartmentItemsThunk.fulfilled, (state, action: PayloadAction<IMasterDepartment[]>) => {
+                state.response.content = action.payload;
             })
             .addCase(filterMasterDepartmentItemsThunk.rejected, (state) => {
                 state.status = 'failed';

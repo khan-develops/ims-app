@@ -292,44 +292,49 @@ const Row = ({
     ) => {
         dispatch(
             changeMasterDepartmentItems(
-                masterDepartmentItemsSelector.response.content.map((masterDepartmentItem) => ({
-                    ...masterDepartmentItem,
-                    departmentItems:
-                        masterDepartmentItem.id === masterDepartmentItemId
-                            ? masterDepartmentItem.departmentItems.map((departmentItem) => ({
-                                  ...departmentItem,
-                                  minimumQuantity:
-                                      departmentItem.id === departmentItemId
-                                          ? event.target.value
-                                          : departmentItem.location
-                              }))
-                            : masterDepartmentItem.departmentItems
-                }))
+                [...masterDepartmentItemsSelector.response.content]
             )
         );
+        // dispatch(
+        //     changeMasterDepartmentItems(
+        //         masterDepartmentItemsSelector.response.content.map((masterDepartmentItem) => ({
+        //             ...masterDepartmentItem,
+        //             departmentItems:
+        //                 masterDepartmentItem.id === masterDepartmentItemId
+        //                     ? masterDepartmentItem.departmentItems.map((departmentItem) => ({
+        //                           ...departmentItem,
+        //                           minimumQuantity:
+        //                               departmentItem.id === departmentItemId
+        //                                   ? event.target.value
+        //                                   : departmentItem.location
+        //                       }))
+        //                     : masterDepartmentItem.departmentItems
+        //         }))
+        //     )
+        // );
     };
     const handleMaximumQtyChange = (
         event: ChangeEvent<HTMLInputElement>,
         masterDepartmentItemId: number | undefined,
         departmentItemId: number
     ) => {
-        dispatch(
-            changeMasterDepartmentItems(
-                masterDepartmentItemsSelector.response.content.map((masterDepartmentItem) => ({
-                    ...masterDepartmentItem,
-                    departmentItems:
-                        masterDepartmentItem.id === masterDepartmentItemId
-                            ? masterDepartmentItem.departmentItems.map((departmentItem) => ({
-                                  ...departmentItem,
-                                  maximumQuantity:
-                                      departmentItem.id === departmentItemId
-                                          ? event.target.value
-                                          : departmentItem.location
-                              }))
-                            : masterDepartmentItem.departmentItems
-                }))
-            )
-        );
+        // dispatch(
+        //     changeMasterDepartmentItems(
+        //         masterDepartmentItemsSelector.response.content.map((masterDepartmentItem) => ({
+        //             ...masterDepartmentItem,
+        //             departmentItems:
+        //                 masterDepartmentItem.id === masterDepartmentItemId
+        //                     ? masterDepartmentItem.departmentItems.map((departmentItem) => ({
+        //                           ...departmentItem,
+        //                           maximumQuantity:
+        //                               departmentItem.id === departmentItemId
+        //                                   ? event.target.value
+        //                                   : departmentItem.location
+        //                       }))
+        //                     : masterDepartmentItem.departmentItems
+        //         }))
+        //     )
+        // );
     };
     const handleUsageLevelChange = (
         event: ChangeEvent<HTMLInputElement>,
@@ -360,21 +365,21 @@ const Row = ({
         masterDepartmentItemId: number | undefined,
         departmentItemId: number
     ) => {
-        dispatch(
-            changeMasterDepartmentItems(
-                masterDepartmentItemsSelector.response.content.map((masterDepartmentItem) => ({
-                    ...masterDepartmentItem,
-                    departmentItems:
-                        masterDepartmentItem.id === masterDepartmentItemId
-                            ? masterDepartmentItem.departmentItems.map((departmentItem) => ({
-                                  ...departmentItem,
-                                  expirationDate:
-                                      departmentItem.id === departmentItemId ? value : departmentItem.expirationDate
-                              }))
-                            : masterDepartmentItem.departmentItems
-                }))
-            )
-        );
+        // dispatch(
+        //     changeMasterDepartmentItems(
+        //         masterDepartmentItemsSelector.response.content.map((masterDepartmentItem) => ({
+        //             ...masterDepartmentItem,
+        //             departmentItems:
+        //                 masterDepartmentItem.id === masterDepartmentItemId
+        //                     ? masterDepartmentItem.departmentItems.map((departmentItem) => ({
+        //                           ...departmentItem,
+        //                           expirationDate:
+        //                               departmentItem.id === departmentItemId ? value : departmentItem.expirationDate
+        //                       }))
+        //                     : masterDepartmentItem.departmentItems
+        //         }))
+        //     )
+        // );
     };
 
     const handleReceivedDateChange = (
@@ -382,21 +387,21 @@ const Row = ({
         masterDepartmentItemId: number | undefined,
         departmentItemId: number
     ) => {
-        dispatch(
-            changeMasterDepartmentItems(
-                masterDepartmentItemsSelector.response.content.map((masterDepartmentItem) => ({
-                    ...masterDepartmentItem,
-                    departmentItems:
-                        masterDepartmentItem.id === masterDepartmentItemId
-                            ? masterDepartmentItem.departmentItems.map((departmentItem) => ({
-                                  ...departmentItem,
-                                  receivedDate:
-                                      departmentItem.id === departmentItemId ? value : departmentItem.receivedDate
-                              }))
-                            : masterDepartmentItem.departmentItems
-                }))
-            )
-        );
+        // dispatch(
+        //     changeMasterDepartmentItems(
+        //         masterDepartmentItemsSelector.response.content.map((masterDepartmentItem) => ({
+        //             ...masterDepartmentItem,
+        //             departmentItems:
+        //                 masterDepartmentItem.id === masterDepartmentItemId
+        //                     ? masterDepartmentItem.departmentItems.map((departmentItem) => ({
+        //                           ...departmentItem,
+        //                           receivedDate:
+        //                               departmentItem.id === departmentItemId ? value : departmentItem.receivedDate
+        //                       }))
+        //                     : masterDepartmentItem.departmentItems
+        //         }))
+        //     )
+        // );
     };
 
     const handleClose = (departmentItem: IDepartment) => {
@@ -462,7 +467,9 @@ const Row = ({
                     {masterDepartmentItem.orderDetail && masterDepartmentItem.orderDetail.orderQuantity}
                 </StyledTableCell>
                 <StyledTableCell>${masterDepartmentItem.unitPrice}</StyledTableCell>
-                <StyledTableCell>${masterDepartmentItem.orderDetail && masterDepartmentItem.orderDetail.totalPrice}</StyledTableCell>
+                <StyledTableCell>
+                    ${masterDepartmentItem.orderDetail && masterDepartmentItem.orderDetail.totalPrice}
+                </StyledTableCell>
                 <StyledTableCell width={200}>{masterDepartmentItem.comment}</StyledTableCell>
                 <StyledTableCell width={80}>{masterDepartmentItem.category}</StyledTableCell>
             </StyledTableRow>

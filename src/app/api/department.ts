@@ -12,11 +12,15 @@ export const getDepartmentItem = (params: { state: string; id: number }) => {
 };
 
 export const createDepartmentItem = (params: { state: string; departmentItem: IDepartment }) => {
-    return axios.post(`${baseUrl}${params.state}`, params.departmentItem);
+    return axios.post(`${baseUrl}${params.state}/create`, params.departmentItem);
 };
 
 export const updateDepartmentItem = (params: { state: string; departmentItem: IDepartment }) => {
     return axios.patch(`${baseUrl}/departments/${params.state}/${params.departmentItem.id}/update`, params.departmentItem);
+};
+
+export const updateDepartmentItemQuantity = (params: { state: string; departmentItemId: number; quantity: number; updateAction: 'RECEIVED' | 'ISSUED'; }) => {
+    return axios.patch(`${baseUrl}/departments/${params.state}/${params.departmentItemId}/update-quantity?updateAction=${params.updateAction}&quantity=${params.quantity}`);
 };
 
 export const getDepartmentMasterItems = (params: { state: string; page: number }) => {
@@ -24,7 +28,7 @@ export const getDepartmentMasterItems = (params: { state: string; page: number }
 };
 
 export const assignDepartmentMasterItem = (params: { state: string; masterItemId: number }) => {
-    return axios.post(`${baseUrl}/department-master/${params.state}/assign/${params.masterItemId}`);
+    return axios.post(`${baseUrl}/department-master/${params.state}/${params.masterItemId}/assign`);
 };
 
 export const getGrandTotal = (state: string) => {

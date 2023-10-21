@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { RootState } from '../../store';
 import { IDepartment } from '../../api/properties/IDepartment';
-import { updateDepartmentItem } from '../../api/department';
+import { updateDepartmentItem, updateDepartmentItemQuantity } from '../../api/department';
 
 export interface DepartmentUpdateState {
     response: IDepartment | null;
@@ -17,6 +17,14 @@ export const updateDepartmentItemThunk = createAsyncThunk(
     'updateDepartmentItemThunk',
     async (params: { state: string; departmentItem: IDepartment }) => {
         const response = await updateDepartmentItem(params);
+        return response.data;
+    }
+);
+
+export const updateDepartmentItemQuantityThunk = createAsyncThunk(
+    'updateDepartmentItemQuantityThunk',
+    async (params: { state: string; departmentItemId: number, quantity: number, updateAction: 'RECEIVED' | 'ISSUED' }) => {
+        const response = await updateDepartmentItemQuantity(params);
         return response.data;
     }
 );
