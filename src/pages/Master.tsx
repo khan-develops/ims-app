@@ -8,7 +8,6 @@ import {
     TableHead,
     TableRow,
     Paper,
-    Box,
     styled,
     Menu,
     MenuItem,
@@ -202,8 +201,6 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 
 const MasterCardItem = ({
     masterItem,
-    index,
-    page,
     handleActionClick
 }: {
     masterItem: IMaster;
@@ -228,42 +225,6 @@ const MasterCardItem = ({
         );
     };
 
-    // const handleAssign = (departmentName: string): void => {
-    //     dispatch(deleteMasterItemThunk(masterItem.id))
-    //         .then((response) => {
-    //             setAnchorElDelete({ anchorEl: null, masterItem: null });
-    //             dispatch(getMasterItemsThunk(page));
-    //         })
-    //         .catch((error: Error) => console.error(error.message));
-    // };
-
-    // const handleEditClick = (event: MouseEvent<HTMLElement>, masterItem: IMaster) => {
-    //     dispatch(
-    //         toggleDrawer({
-    //             type: DRAWER_TOGGLE_TYPE.UPDATE_MASTER_ITEM,
-    //             masterItem: masterItem
-    //         })
-    //     );
-    // };
-
-    // const handleAssignItem = (departmentName: string) => {
-    //     // dispatch(
-    //     //     departmentMasterItemAssignThunk({
-    //     //         state: departmentName,
-    //     //         masterItem: anchorElAssign.masterItem
-    //     //     })
-    //     // )
-    //     //     .then((response) => {
-    //     //         console.log(response.payload);
-    //     //     })
-    //     //     .catch((error: Error) => console.error(error.message));
-    //     setAnchorElAssign({ anchorEl: null, masterItem: null });
-    // };
-
-    // const handleCloseDepartmentMenu = () => {
-    //     setAnchorElAssign({ anchorEl: null, masterItem: null });
-    // };
-
     return (
         <Card sx={{ marginBottom: 1, padding: 0.5 }}>
             <CardHeader
@@ -284,7 +245,7 @@ const MasterCardItem = ({
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            <TableRow>
+                            <TableRow hover>
                                 <StyledTableCell>{masterItem.purchaseUnit}</StyledTableCell>
                                 <StyledTableCell>{masterItem.manufacturer}</StyledTableCell>
                                 <StyledTableCell>{masterItem.recentCN}</StyledTableCell>

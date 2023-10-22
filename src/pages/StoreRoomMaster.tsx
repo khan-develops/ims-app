@@ -93,42 +93,42 @@ const columns: {
         id: 'totalQuantity',
         numeric: true,
         label: 'Total Qty',
-        align: 'left',
+        align: 'center',
         padding: 'normal'
     },
     {
         id: 'minimumQuantity',
         numeric: true,
         label: 'Min Qty',
-        align: 'left',
+        align: 'center',
         padding: 'normal'
     },
     {
         id: 'maximumQuantity',
         numeric: true,
         label: 'Max Qty',
-        align: 'left',
+        align: 'center',
         padding: 'normal'
     },
     {
         id: 'orderQuantity',
         numeric: true,
-        label: 'Order Quantity',
-        align: 'left',
+        label: 'Order Qty',
+        align: 'center',
         padding: 'normal'
     },
     {
         id: 'unitPrice',
         numeric: true,
         label: 'Unit Price',
-        align: 'left',
+        align: 'center',
         padding: 'normal'
     },
     {
         id: 'totalPrice',
         numeric: true,
         label: 'Total Price',
-        align: 'left',
+        align: 'center',
         padding: 'normal'
     }
 ];
@@ -174,13 +174,12 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
         fontSize: 12,
         fontWeight: 700,
-        color: theme.palette.common.black,
-        backgroundColor: '#c6c6c6',
+        color: theme.palette.common.white,
+        backgroundColor: '#2f3643',
         paddingTop: 12,
         paddingBottom: 12
     },
     [`&.${tableCellClasses.body}`]: {
-        backgroundColor: '#f1f1f1',
         fontSize: 12,
         paddingTop: 8,
         paddingBottom: 8
@@ -189,7 +188,6 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 
 const StyledTableItemCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.body}`]: {
-        backgroundColor: '#f4f4f4',
         fontSize: 12,
         paddingLeft: 16,
         paddingRight: 16,
@@ -357,6 +355,24 @@ const StoreRoomMasterRow = ({
         }
     };
 
+    const getOrderQuantityColor = (masterDepartmentItem: IMasterDepartment) => {
+        const minimumQuantity = masterDepartmentItem.departmentItems[0].minimumQuantity;
+        const maximumQuantity = masterDepartmentItem.departmentItems[0].maximumQuantity;
+        const totalQuantity =
+            masterDepartmentItem.orderDetail === null ? null : masterDepartmentItem.orderDetail.totalQuantity;
+        if (totalQuantity) {
+            if (!minimumQuantity || !maximumQuantity) {
+                return '#eded00';
+            } else if (minimumQuantity === 1 && maximumQuantity === 1 && totalQuantity < 1) {
+                return '#FF0000';
+            } else if (totalQuantity < minimumQuantity) {
+                return 'red';
+            } else {
+                return '#3CB371';
+            }
+        }
+    };
+
     return (
         <Fragment>
             <TableRow>
@@ -383,41 +399,111 @@ const StoreRoomMasterRow = ({
                 <StyledTableCell>{masterDepartmentItem.partNumber}</StyledTableCell>
                 <StyledTableCell>{masterDepartmentItem.recentCN}</StyledTableCell>
                 <StyledTableCell>{masterDepartmentItem.departmentItems[0].location}</StyledTableCell>
-                <StyledTableCell width={60}>
-                    {masterDepartmentItem.departmentItems[0].quantity}
-                    {/* <TextField
-                        ref={inputRef}
-                        size="small"
-                        type="number"
-                        InputProps={{
-                            inputProps: { min: 0 }
-                        }}
+                <StyledTableCell width={100}>
+                    <Box
                         sx={{
-                            '.MuiInputBase-input': {
-                                padding: 1,
-                                fontSize: 12
-                            }
-                        }}
-                        id={masterDepartmentItem.id?.toString()}
-                        value={masterDepartmentItem.departmentItems[0].quantity}
-                        onKeyDown={(event: KeyboardEvent) => updateStoreRoomItem(event, masterDepartmentItem.id)}
-                        onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                            handleChangeQty(masterDepartmentItem.id, event)
-                        }
-                    /> */}
+                            display: 'flex',
+                            justifyContent: 'center',
+                            border: '2px solid #f2f2f2',
+                            paddingTop: 0.5,
+                            paddingBottom: 0.5,
+                            marginRight: 2,
+                            borderRadius: 1,
+                            backgroundColor: '#f2f2f2'
+                        }}>
+                        <Typography sx={{ fontWeight: 900, fontSize: 15 }}>
+                            {masterDepartmentItem.departmentItems[0].quantity}
+                        </Typography>
+                    </Box>
                 </StyledTableCell>
-                <StyledTableCell>{masterDepartmentItem.departmentItems[0].minimumQuantity}</StyledTableCell>
-                <StyledTableCell>{masterDepartmentItem.departmentItems[0].maximumQuantity}</StyledTableCell>
-                <StyledTableCell>
-                    {masterDepartmentItem &&
-                        masterDepartmentItem.orderDetail &&
-                        masterDepartmentItem.orderDetail.orderQuantity}
+                <StyledTableCell width={100}>
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            border: '2px solid #f2f2f2',
+                            paddingTop: 0.5,
+                            paddingBottom: 0.5,
+                            marginRight: 2,
+                            borderRadius: 1,
+                            backgroundColor: '#f2f2f2'
+                        }}>
+                        <Typography sx={{ fontWeight: 900, fontSize: 15 }}>
+                            {masterDepartmentItem.departmentItems[0].minimumQuantity}
+                        </Typography>
+                    </Box>
                 </StyledTableCell>
-                <StyledTableCell>${masterDepartmentItem.unitPrice}</StyledTableCell>
+                <StyledTableCell width={100}>
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            border: '2px solid #f2f2f2',
+                            paddingTop: 0.5,
+                            paddingBottom: 0.5,
+                            marginRight: 2,
+                            borderRadius: 1,
+                            backgroundColor: '#f2f2f2'
+                        }}>
+                        <Typography sx={{ fontWeight: 900, fontSize: 15 }}>
+                            {masterDepartmentItem.departmentItems[0].maximumQuantity}
+                        </Typography>
+                    </Box>
+                </StyledTableCell>
+                <StyledTableCell width={100}>
+                    {masterDepartmentItem && masterDepartmentItem.orderDetail && (
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                justifyContent: 'center',
+                                border: `2px solid ${getOrderQuantityColor(masterDepartmentItem)}`,
+                                paddingTop: 0.5,
+                                paddingBottom: 0.5,
+                                marginRight: 2,
+                                borderRadius: 1,
+                                backgroundColor: getOrderQuantityColor(masterDepartmentItem)
+                            }}>
+                            <Typography sx={{ fontWeight: 900, fontSize: 15 }}>
+                                {masterDepartmentItem.orderDetail.orderQuantity}
+                            </Typography>
+                        </Box>
+                    )}
+                </StyledTableCell>
+                <StyledTableCell width={100}>
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            border: '2px solid #f2f2f2',
+                            paddingTop: 0.5,
+                            paddingBottom: 0.5,
+                            marginRight: 2,
+                            borderRadius: 1,
+                            backgroundColor: '#f2f2f2'
+                        }}>
+                        <Typography sx={{ fontWeight: 900, fontSize: 13 }}>
+                            ${masterDepartmentItem.unitPrice}
+                        </Typography>
+                    </Box>
+                </StyledTableCell>
                 <StyledTableCell>
-                    {masterDepartmentItem &&
-                        masterDepartmentItem.orderDetail &&
-                        masterDepartmentItem.orderDetail.totalQuantity}
+                    {masterDepartmentItem && masterDepartmentItem.orderDetail && (
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                justifyContent: 'center',
+                                border: '2px solid #f2f2f2',
+                                paddingTop: 0.5,
+                                paddingBottom: 0.5,
+                                marginRight: 2,
+                                borderRadius: 1,
+                                backgroundColor: '#f2f2f2'
+                            }}>
+                            <Typography sx={{ fontWeight: 900, fontSize: 13 }}>
+                                ${masterDepartmentItem.orderDetail.totalPrice}
+                            </Typography>
+                        </Box>
+                    )}
                 </StyledTableCell>
                 <StyledTableCell width={70}>
                     <TextField

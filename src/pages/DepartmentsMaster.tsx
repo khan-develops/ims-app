@@ -27,7 +27,8 @@ import {
     Toolbar,
     alpha,
     InputBase,
-    TableSortLabel
+    TableSortLabel,
+    Chip
 } from '@mui/material';
 import { useLocation } from 'react-router-dom';
 import { handlePage } from '../app/common/pageSlice';
@@ -45,6 +46,8 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { IMaster, IMasterDepartment } from '../app/api/properties/IMaster';
 import SearchIcon from '@mui/icons-material/Search';
 import DownloadIcon from '@mui/icons-material/Download';
+import ModeEditIcon from '@mui/icons-material/ModeEdit';
+import DeleteIcon from '@mui/icons-material/Delete';
 import PreviewIcon from '@mui/icons-material/Preview';
 import EditIcon from '@mui/icons-material/Edit';
 import SendIcon from '@mui/icons-material/Send';
@@ -63,84 +66,88 @@ const columns: {
     label: string;
     align: 'left' | 'right' | 'center';
     padding: 'checkbox' | 'normal' | 'none';
+    size: number;
 }[] = [
-    { id: 'item', numeric: false, label: 'Item', align: 'left', padding: 'normal' },
+    { id: 'item', numeric: false, label: 'Item', align: 'left', padding: 'normal', size: 400 },
     {
         id: 'purchaseUnit',
         numeric: false,
         label: 'Purchase Unit',
         align: 'left',
-        padding: 'normal'
+        padding: 'normal',
+        size: 100
     },
     {
         id: 'partNumber',
         numeric: false,
         label: 'Part Number',
         align: 'left',
-        padding: 'normal'
+        padding: 'normal',
+        size: 100
     },
     {
         id: 'recentCN',
         numeric: false,
         label: 'Recent CN',
         align: 'left',
-        padding: 'normal'
+        padding: 'normal',
+        size: 100
     },
     {
         id: 'recentVendor',
         numeric: false,
         label: 'Recent Vendor',
         align: 'left',
-        padding: 'normal'
-    },
-    {
-        id: 'drugClass',
-        numeric: false,
-        label: 'Drug Class',
-        align: 'left',
-        padding: 'normal'
+        padding: 'normal',
+        size: 150
     },
     {
         id: 'totalQuantity',
-        numeric: false,
+        numeric: true,
         label: 'Total Qty',
-        align: 'left',
-        padding: 'normal'
+        align: 'center',
+        padding: 'normal',
+        size: 80
     },
     {
         id: 'orderQuantity',
         numeric: false,
         label: 'Order Qty',
-        align: 'left',
-        padding: 'normal'
+        align: 'center',
+        padding: 'normal',
+        size: 80
     },
     {
         id: 'unitPrice',
         numeric: false,
         label: 'Unit Price',
         align: 'left',
-        padding: 'normal'
+        padding: 'normal',
+        size: 80
     },
     {
         id: 'totalPrice',
         numeric: false,
         label: 'Total Price',
         align: 'left',
-        padding: 'normal'
-    },
-    {
-        id: 'comment',
-        numeric: false,
-        label: 'Comment',
-        align: 'left',
-        padding: 'normal'
+        padding: 'normal',
+        size: 80
     },
     {
         id: 'category',
         numeric: false,
         label: 'Category',
         align: 'left',
-        padding: 'normal'
+        padding: 'normal',
+        size: 80
+    },
+    {
+        id: 'drugClass',
+        numeric: false,
+        label: 'Drug Class',
+        align: 'left',
+        padding: 'normal',
+        size: 80
     }
 ];
 
@@ -182,6 +189,20 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
+    root: {
+        '&.MuiTableSortLabel-root': {
+            color: 'white'
+        },
+        '&.MuiTableSortLabel-root:hover': {
+            color: 'white'
+        },
+        '&.Mui-active': {
+            color: 'white'
+        },
+        '& .MuiTableSortLabel-icon': {
+            color: 'white !important'
+        }
+    },
     [`&.${tableCellClasses.head}`]: {
         fontSize: 12,
         fontWeight: 700,
@@ -217,9 +238,26 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
     }
 }));
 
+const StyledTableItemCell = styled(TableCell)(({ theme }) => ({
+    [`&.${tableCellClasses.body}`]: {
+        fontSize: 12,
+        paddingLeft: 16,
+        paddingRight: 16,
+        paddingTop: 8,
+        paddingBottom: 8,
+        borderBottom: 'none'
+    }
+}));
+
 const baseUrl = process.env.REACT_APP_BASE_URL;
 
-const DepartmentRow = ({ departmentItem }: { departmentItem: IDepartment }): JSX.Element => {
+const DepartmentRow = ({
+    departmentItem,
+    masterDepartmentItem
+}: {
+    departmentItem: IDepartment;
+    masterDepartmentItem: IMasterDepartment;
+}): JSX.Element => {
     const masterDepartmentItemsSelector = useAppSelector(selectMasterDepartmentItems);
     const dispatch = useAppDispatch();
     const location = useLocation();
@@ -315,11 +353,34 @@ const DepartmentRow = ({ departmentItem }: { departmentItem: IDepartment }): JSX
                                           ? value
                                           : originalDepartmentItem[dateType]
                               }))
-                            : masterDepartmentItem.departmentItems
+                            : originalMasterDepartmentItem.departmentItems
                 }))
             )
         );
     };
+
+    const handleEditClick = (event: MouseEvent<HTMLElement>, masterDepartmentItem: IMasterDepartment) => {
+        if (masterDepartmentItem) {
+            dispatch(
+                toggleDrawer({
+                    type: DRAWER_TOGGLE_TYPE.UPDATE_STORE_ROOM_ITEM,
+                    storeRoomItem: {
+                        id: masterDepartmentItem.id,
+                        location: masterDepartmentItem.departmentItems[0].location,
+                        quantity: masterDepartmentItem.departmentItems[0].quantity,
+                        minimumQuantity: masterDepartmentItem.departmentItems[0].minimumQuantity,
+                        maximumQuantity: masterDepartmentItem.departmentItems[0].maximumQuantity,
+                        usageLevel: masterDepartmentItem.departmentItems[0].usageLevel,
+                        lotNumber: masterDepartmentItem.departmentItems[0].lotNumber,
+                        expirationDate: masterDepartmentItem.departmentItems[0].expirationDate,
+                        receivedDate: masterDepartmentItem.departmentItems[0].receivedDate
+                    }
+                })
+            );
+        }
+    };
+
+    const handleDeleteClick = (event: MouseEvent<HTMLElement>, masterDepartmentItem: IMasterDepartment) => {};
 
     return (
         <TableRow hover>
@@ -496,6 +557,17 @@ const DepartmentRow = ({ departmentItem }: { departmentItem: IDepartment }): JSX
                     />
                 </LocalizationProvider>
             </StyledSubTableCell>
+            <StyledTableCell width={20} align="center" padding="none">
+                <IconButton onClick={(event: MouseEvent<HTMLElement>) => handleEditClick(event, masterDepartmentItem)}>
+                    <ModeEditIcon color="primary" fontSize="small" />
+                </IconButton>
+            </StyledTableCell>
+            <StyledTableCell width={20} align="center" padding="none">
+                <IconButton
+                    onClick={(event: MouseEvent<HTMLElement>) => handleDeleteClick(event, masterDepartmentItem)}>
+                    <DeleteIcon color="primary" fontSize="small" />
+                </IconButton>
+            </StyledTableCell>
         </TableRow>
     );
 };
@@ -529,12 +601,18 @@ const MasterDepartmentRow = ({
 
     return (
         <Fragment>
+            <TableRow>
+                <StyledTableItemCell colSpan={columns.length + 1}>
+                    <Box sx={{ width: '100%', display: 'flex', marginLeft: 7 }}>
+                        <Typography variant="body2" sx={{ color: 'GrayText' }}>
+                            {masterDepartmentItem.comment}
+                        </Typography>
+                    </Box>
+                </StyledTableItemCell>
+            </TableRow>
             <StyledTableRow hover>
-                <TableCell>
-                    <IconButton
-                        sx={{ padding: 0 }}
-                        onClick={() => handleExpandRow(masterDepartmentItem)}
-                        color="inherit">
+                <TableCell padding="checkbox">
+                    <IconButton onClick={() => handleExpandRow(masterDepartmentItem)} color="inherit">
                         {openRows.includes(masterDepartmentItem.id) ? (
                             <KeyboardArrowUpIcon fontSize="medium" />
                         ) : (
@@ -542,30 +620,87 @@ const MasterDepartmentRow = ({
                         )}
                     </IconButton>
                 </TableCell>
-                <StyledTableCell>{masterDepartmentItem.item}</StyledTableCell>
-                <StyledTableCell>{masterDepartmentItem.purchaseUnit}</StyledTableCell>
-                <StyledTableCell>{masterDepartmentItem.partNumber}</StyledTableCell>
-                <StyledTableCell>{masterDepartmentItem.recentCN}</StyledTableCell>
-                <StyledTableCell>{masterDepartmentItem.recentVendor}</StyledTableCell>
-                <StyledTableCell>{masterDepartmentItem.drugClass}</StyledTableCell>
-                <StyledTableCell sx={{ textAlign: 'center' }}>
-                    <Typography variant="inherit" sx={{ fontWeight: 900 }}>
-                        {masterDepartmentItem.orderDetail && masterDepartmentItem.orderDetail.totalQuantity}
-                    </Typography>
+                <StyledTableCell width={400}>{masterDepartmentItem.item}</StyledTableCell>
+                <StyledTableCell width={100}>{masterDepartmentItem.purchaseUnit}</StyledTableCell>
+                <StyledTableCell width={100}>{masterDepartmentItem.partNumber}</StyledTableCell>
+                <StyledTableCell width={100}>{masterDepartmentItem.recentCN}</StyledTableCell>
+                <StyledTableCell width={150}>{masterDepartmentItem.recentVendor}</StyledTableCell>
+                <StyledTableCell width={70}>
+                    {masterDepartmentItem.orderDetail && masterDepartmentItem.orderDetail.totalQuantity && (
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                justifyContent: 'center',
+                                border: '2px solid #f2f2f2',
+                                paddingTop: 0.5,
+                                paddingBottom: 0.5,
+                                marginRight: 2,
+                                borderRadius: 1,
+                                backgroundColor: '#f2f2f2'
+                            }}>
+                            <Typography sx={{ fontWeight: 900, fontSize: 15 }}>
+                                {masterDepartmentItem.orderDetail.totalQuantity}
+                            </Typography>
+                        </Box>
+                    )}
                 </StyledTableCell>
-                <StyledTableCell
-                    align="center"
-                    sx={{
-                        backgroundColor: getOrderQuantityColor(masterDepartmentItem)
-                    }}>
-                    {masterDepartmentItem.orderDetail && masterDepartmentItem.orderDetail.orderQuantity}
+                <StyledTableCell width={80}>
+                    {masterDepartmentItem.orderDetail && (
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                justifyContent: 'center',
+                                border: `2px solid ${getOrderQuantityColor(masterDepartmentItem)}`,
+                                paddingTop: 0.5,
+                                paddingBottom: 0.5,
+                                marginRight: 2,
+                                borderRadius: 1,
+                                backgroundColor: getOrderQuantityColor(masterDepartmentItem)
+                            }}>
+                            <Typography sx={{ fontWeight: 900, fontSize: 15 }}>
+                                {masterDepartmentItem.orderDetail.totalQuantity}
+                            </Typography>
+                        </Box>
+                    )}
                 </StyledTableCell>
-                <StyledTableCell>${masterDepartmentItem.unitPrice}</StyledTableCell>
                 <StyledTableCell>
-                    ${masterDepartmentItem.orderDetail && masterDepartmentItem.orderDetail.totalPrice}
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            border: '2px solid #f2f2f2',
+                            paddingTop: 0.5,
+                            paddingBottom: 0.5,
+                            marginRight: 2,
+                            borderRadius: 1,
+                            backgroundColor: '#f2f2f2'
+                        }}>
+                        <Typography sx={{ fontWeight: 900, fontSize: 13 }}>
+                            ${masterDepartmentItem.unitPrice}
+                        </Typography>
+                    </Box>
                 </StyledTableCell>
-                <StyledTableCell>{masterDepartmentItem.comment}</StyledTableCell>
+                <StyledTableCell>
+                    {masterDepartmentItem.orderDetail && (
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                justifyContent: 'center',
+                                border: '2px solid #f2f2f2',
+                                paddingTop: 0.5,
+                                paddingBottom: 0.5,
+                                marginRight: 2,
+                                borderRadius: 1,
+                                backgroundColor: '#f2f2f2'
+                            }}>
+                            <Typography sx={{ fontWeight: 900, fontSize: 13 }}>
+                                ${masterDepartmentItem.orderDetail.totalPrice}
+                            </Typography>
+                        </Box>
+                    )}
+                </StyledTableCell>
                 <StyledTableCell>{masterDepartmentItem.category}</StyledTableCell>
+                <StyledTableCell>{masterDepartmentItem.drugClass}</StyledTableCell>
             </StyledTableRow>
             {openRows.find((id) => id === masterDepartmentItem.id) && (
                 <TableRow hover>
@@ -583,11 +718,17 @@ const MasterDepartmentRow = ({
                                             <StyledSubTableCell align="left">Lot #</StyledSubTableCell>
                                             <StyledSubTableCell align="left">Expiration Date</StyledSubTableCell>
                                             <StyledSubTableCell align="left">Received Date</StyledSubTableCell>
+                                            <StyledSubTableCell align="left">Edit</StyledSubTableCell>
+                                            <StyledSubTableCell align="left">Delete</StyledSubTableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
                                         {masterDepartmentItem.departmentItems.map((departmentItem, index) => (
-                                            <DepartmentRow key={index} departmentItem={departmentItem} />
+                                            <DepartmentRow
+                                                key={index}
+                                                departmentItem={departmentItem}
+                                                masterDepartmentItem={masterDepartmentItem}
+                                            />
                                         ))}
                                     </TableBody>
                                 </Table>
@@ -637,8 +778,23 @@ const EnhancedTableHead = (props: EnhancedTableProps) => {
                     <StyledTableCell
                         key={headCell.id}
                         align={headCell.align}
+                        width={headCell.size}
                         sortDirection={orderBy === headCell.id ? order : false}>
                         <TableSortLabel
+                            sx={{
+                                '&.MuiTableSortLabel-root': {
+                                    color: 'white'
+                                },
+                                '&.MuiTableSortLabel-root:hover': {
+                                    color: 'white'
+                                },
+                                '&.Mui-active': {
+                                    color: 'white'
+                                },
+                                '& .MuiTableSortLabel-icon': {
+                                    color: 'white !important'
+                                }
+                            }}
                             active={orderBy === headCell.id}
                             direction={orderBy === headCell.id ? order : 'asc'}
                             onClick={createSortHandler(headCell.id)}>
@@ -662,10 +818,7 @@ const DepartmentsMaster = () => {
     const dispatch = useAppDispatch();
     const location = useLocation();
     const [openRows, setOpenRows] = useState<number[]>([]);
-    const [sort, setSort] = useState<{ column: string; direction: '' | 'ASC' | 'DESC' }>({ column: '', direction: '' });
-    const containerRef = useRef<HTMLDivElement | null>(null);
     const [value, setValue] = useState<number>(0);
-    const { state } = useLocation();
     const [order, setOrder] = useState<Order>('asc');
     const [orderBy, setOrderBy] = useState<keyof IMaster | keyof IOrderDetail>('id');
 
@@ -688,27 +841,6 @@ const DepartmentsMaster = () => {
             setOpenRows(openRows.filter((id) => id !== masterDepartmentItem.id));
         } else {
             setOpenRows([...openRows, masterDepartmentItem.id]);
-        }
-    };
-
-    const handleSort = (field: string) => {
-        if (sort.direction === '') {
-            setSort({ column: field, direction: 'ASC' });
-            dispatch(
-                sortMasterDepartmentItemsThunk({ state: location.state, page: page, column: field, direction: 'ASC' })
-            );
-        }
-        if (sort.direction === 'ASC') {
-            setSort({ column: field, direction: 'DESC' });
-            dispatch(
-                sortMasterDepartmentItemsThunk({ state: location.state, page: page, column: field, direction: 'DESC' })
-            );
-        }
-        if (sort.direction === 'DESC') {
-            setSort({ column: field, direction: '' });
-            dispatch(
-                sortMasterDepartmentItemsThunk({ state: location.state, page: page, column: field, direction: '' })
-            );
         }
     };
 
