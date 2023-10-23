@@ -189,20 +189,6 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
-    root: {
-        '&.MuiTableSortLabel-root': {
-            color: 'white'
-        },
-        '&.MuiTableSortLabel-root:hover': {
-            color: 'white'
-        },
-        '&.Mui-active': {
-            color: 'white'
-        },
-        '& .MuiTableSortLabel-icon': {
-            color: 'white !important'
-        }
-    },
     [`&.${tableCellClasses.head}`]: {
         fontSize: 12,
         fontWeight: 700,

@@ -127,34 +127,34 @@ const MenuAdmin = () => {
                     <Button
                         size="small"
                         sx={{
-                            color: location.pathname === '/admin/request/general' ? 'yellow' : '#fff',
+                            color: location.pathname === '/admin/request-master/general-request' ? 'yellow' : '#fff',
                             fontWeight: '700'
                         }}
                         component={Link}
-                        to="/admin/request/general"
-                        state="general">
+                        to="/admin/request-master/general-request"
+                        state="general-request">
                         general
                     </Button>
                     <Button
                         size="small"
                         sx={{
-                            color: location.pathname === '/admin/request/office-supply' ? 'yellow' : '#fff',
+                            color: location.pathname === '/admin/request-master/office-supply-request' ? 'yellow' : '#fff',
                             fontWeight: '700'
                         }}
                         component={Link}
-                        to="/admin/request/office-supply"
-                        state="office-supply">
+                        to="/admin/request-master/office-supply-request"
+                        state="office-supply-request">
                         office supply
                     </Button>
                     <Button
                         size="small"
                         sx={{
-                            color: location.pathname === '/admin/request/store-room' ? 'yellow' : '#fff',
+                            color: location.pathname === '/admin/request-master/store-room-request' ? 'yellow' : '#fff',
                             fontWeight: '700'
                         }}
                         component={Link}
-                        to="/admin/request/store-room"
-                        state="store-room">
+                        to="/admin/request-master/store-room"
+                        state="store-room-request">
                         store room
                     </Button>
                     <Button

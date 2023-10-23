@@ -20,7 +20,7 @@ const initialState: RequestMasterItemsState = {
 
 export const getRequestMasterItemsPendingThunk = createAsyncThunk(
     'getRequestMasterDepartmentItemsThunk',
-    async (params: { state: string; page: number }) => {
+    async (params: { state: string; department: string, page: number }) => {
         const response = await getRequestMasterItemsPending(params);
         return response.data;
     }

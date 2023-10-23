@@ -2,29 +2,44 @@ import { IMaster } from "./IMaster";
 
 export interface IRequest {
     id: number;
-    item: string;
     recentCN: number;
     department: string;
-    status: string;
+    confirmation: string;
+    orderStatus: string;
     quantity: number;
     timeRequested: Date;
     timeUpdated: Date;
-    comment: string;
+    requester: string;
     customText: string;
-    detail: string;
+    customDetail: string;
 }
 
 export interface IRequestMaster {
     id: number;
-    item: string;
     recentCN: number;
     department: string;
-    status: string;
+    confirmation: string;
+    orderStatus: string;
     quantity: number;
     timeRequested: Date;
     timeUpdated: Date;
-    comment: string;
+    requester: string;
     customText: string;
-    detail: string;
+    customDetail: string;
+    masterItem: IMaster
+}
+
+export interface IRequestMaster extends Partial<{ checked: boolean }> {
+    id: number;
+    recentCN: number;
+    department: string;
+    confirmation: string;
+    orderStatus: string;
+    quantity: number;
+    timeRequested: Date;
+    timeUpdated: Date;
+    requester: string;
+    customText: string;
+    customDetail: string;
     masterItem: IMaster
 }

@@ -72,8 +72,7 @@ const RequestItemReviewForm = () => {
                     customText: 'custom text',
                     location: 'store room',
                     id: item.id,
-                    itemId: item.masterItem.id,
-                    item: item.item
+                    itemId: item.masterItem.id
                 }))
             })
         );
@@ -96,7 +95,7 @@ const RequestItemReviewForm = () => {
                             requestMasterItemsCheckedSelector.requestMasterItemsChecked.map(
                                 (requestMasterCheckedItem, index) => (
                                     <TableRow key={index}>
-                                        <TableCell>{requestMasterCheckedItem.item}</TableCell>
+                                        <TableCell>{requestMasterCheckedItem.checked}</TableCell>
                                         <TableCell>
                                             <TextField
                                                 ref={inputRef}

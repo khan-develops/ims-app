@@ -46,16 +46,18 @@ const columns: { field: string; headerName: string | JSX.Element }[] = [
     { field: 'comment', headerName: 'Comment' }
 ];
 
-const RequestMasterDepartmentItems = () => {
+const RequestMasterItems = () => {
     const requestMasterItemsSelector = useAppSelector(selectRequestMasterItems);
     const requestMasterItemsCheckedSelector = useAppSelector(selectRequestMasterItemsChecked);
     const { type } = useAppSelector(selectDrawerToggleType);
     const dispatch = useAppDispatch();
     const [page, setPage] = useState<number>(0);
     const location = useLocation();
+    const [selectedDepartment, setSelectedDepartment] = useState<string>('extractions');
 
     useEffect(() => {
-        dispatch(getRequestMasterItemsThunk({ state: location.state, page: page }));
+        console.log(location);
+        dispatch(getRequestMasterItemsThunk({ state: location.state, department: selectedDepartment, page: page }));
     }, [dispatch, location.pathname, location.state, page, useAppSelector]);
 
     const handleChangePage = (event: any, page: number): void => {
@@ -113,11 +115,11 @@ const RequestMasterDepartmentItems = () => {
                                             }
                                         />
                                     </StyledTableCell>
-                                    <StyledTableCell>{requestMasterItem.item}</StyledTableCell>
+                                    <StyledTableCell>{requestMasterItem.masterItem.item}</StyledTableCell>
                                     <StyledTableCell>{requestMasterItem.recentCN}</StyledTableCell>
                                     <StyledTableCell>{requestMasterItem.masterItem.purchaseUnit}</StyledTableCell>
                                     <StyledTableCell>{requestMasterItem.masterItem.partNumber}</StyledTableCell>
-                                    <StyledTableCell>{requestMasterItem.detail}</StyledTableCell>
+                                    <StyledTableCell>{requestMasterItem.customDetail}</StyledTableCell>
                                 </TableRow>
                             ))}
                     </TableBody>
@@ -141,4 +143,4 @@ const RequestMasterDepartmentItems = () => {
     );
 };
 
-export default RequestMasterDepartmentItems;
+export default RequestMasterItems;

@@ -346,21 +346,6 @@ const Master = (): JSX.Element => {
         }
     };
 
-    const handleSort = (field: string) => {
-        if (sort.direction === '') {
-            setSort({ column: field, direction: 'ASC' });
-            dispatch(sortMasterItemsThunk({ page: page, column: field, direction: 'ASC' }));
-        }
-        if (sort.direction === 'ASC') {
-            setSort({ column: field, direction: 'DESC' });
-            dispatch(sortMasterItemsThunk({ page: page, column: field, direction: 'DESC' }));
-        }
-        if (sort.direction === 'DESC') {
-            setSort({ column: field, direction: '' });
-            dispatch(sortMasterItemsThunk({ page: page, column: field, direction: '' }));
-        }
-    };
-
     const handleActionClick = (
         event: MouseEvent<HTMLElement>,
         masterItem: IMaster,

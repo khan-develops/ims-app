@@ -7,6 +7,7 @@ import MenuAdmin from './menu/MenuAdmin';
 import NavbarBottom from './navbar/NavbarBottom';
 import { Fragment } from 'react';
 import MenuSub from './menu/MenuSub';
+import MenuDepartment from './menu/MenuDepartment';
 
 const Layout = () => {
     const profileDetailSelector = useAppSelector(selectProfileDetail);
@@ -15,6 +16,7 @@ const Layout = () => {
         <Grid container sx={{ height: '100%' }} direction="column" border={'1px solid red'}>
             <Grid item>
                 <MenuAdmin />
+                <MenuDepartment/>
             </Grid>
             <Grid item flexGrow={1}>
                 <Outlet />

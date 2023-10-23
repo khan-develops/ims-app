@@ -53,6 +53,7 @@ const RequestMasterDepartmentPending = () => {
     const requestMasterItemsPendingCheckedSelector = useAppSelector(selectRequestMasterItemsPendingChecked);
     const dispatch = useAppDispatch();
     const [page, setPage] = useState<number>(0);
+    const [selectedDepartment, setSelectedDepartment] = useState<string>('extractions')
 
     const location = useLocation();
 
@@ -60,6 +61,7 @@ const RequestMasterDepartmentPending = () => {
         dispatch(
             getRequestMasterItemsPendingThunk({
                 state: location.state,
+                department: selectedDepartment,
                 page: page
             })
         );
@@ -112,7 +114,7 @@ const RequestMasterDepartmentPending = () => {
             dispatch(
                 updateRequestMasterItemThunk({
                     state: location.state,
-                    id: requestMasterItem.id,
+                    department: selectedDepartment,
                     requestMasterItem: requestMasterItem
                 })
             );
@@ -139,7 +141,7 @@ const RequestMasterDepartmentPending = () => {
             dispatch(
                 updateRequestMasterItemThunk({
                     state: location.state,
-                    id: requestMasterItem.id,
+                    department: selectedDepartment,
                     requestMasterItem: requestMasterItem
                 })
             );
@@ -174,7 +176,7 @@ const RequestMasterDepartmentPending = () => {
                                             }
                                         />
                                     </StyledTableCell>
-                                    <StyledTableCell>{requestMasterItem.item}</StyledTableCell>
+                                    <StyledTableCell>{requestMasterItem.masterItem.item}</StyledTableCell>
                                     <StyledTableCell>{requestMasterItem.recentCN}</StyledTableCell>
                                     <StyledTableCell width={100}>
                                         <TextField
@@ -209,7 +211,7 @@ const RequestMasterDepartmentPending = () => {
                                             }
                                         />
                                     </StyledTableCell>
-                                    <StyledTableCell>{requestMasterItem.detail}</StyledTableCell>
+                                    <StyledTableCell>{requestMasterItem.customDetail}</StyledTableCell>
                                 </TableRow>
                             ))}
                     </TableBody>

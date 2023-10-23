@@ -45,6 +45,7 @@ const RequestMasterDepartmentComplete = () => {
     const requestMasterItemsCompleteSelector = useAppSelector(selectRequestMasterItemsComplete);
     const dispatch = useAppDispatch();
     const [page, setPage] = useState<number>(0);
+    const [selectedDepartment, setSelectedDepartment] = useState<string>('extractions')
 
     const location = useLocation();
 
@@ -52,6 +53,7 @@ const RequestMasterDepartmentComplete = () => {
         dispatch(
             getRequestMasterItemsCompleteThunk({
                 state: location.state,
+                department: selectedDepartment,
                 page
             })
         );
@@ -77,17 +79,17 @@ const RequestMasterDepartmentComplete = () => {
                         {requestMasterItemsCompleteSelector.response.content.length > 0 &&
                             requestMasterItemsCompleteSelector.response.content.map((requestItem, index) => (
                                 <TableRow key={index}>
-                                    <StyledTableCell>{requestItem && requestItem.item}</StyledTableCell>
+                                    <StyledTableCell>{requestItem && requestItem.masterItem.item}</StyledTableCell>
                                     <StyledTableCell>{requestItem && requestItem.recentCN}</StyledTableCell>
                                     <StyledTableCell>{requestItem.quantity}</StyledTableCell>
-                                    <StyledTableCell>{requestItem.status}</StyledTableCell>
+                                    <StyledTableCell>{requestItem.confirmation}</StyledTableCell>
                                     <StyledTableCell>
                                         {moment(requestItem.timeRequested).format('MM/DD/YYYY')}
                                     </StyledTableCell>
                                     <StyledTableCell>
                                         {moment(requestItem.timeUpdated).format('MM/DD/YYYY')}
                                     </StyledTableCell>
-                                    <StyledTableCell>{requestItem.detail}</StyledTableCell>
+                                    <StyledTableCell>{requestItem.customDetail}</StyledTableCell>
                                 </TableRow>
                             ))}
                     </TableBody>

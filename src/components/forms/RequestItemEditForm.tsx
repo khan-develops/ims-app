@@ -93,7 +93,7 @@ const RequestItemEditForm = () => {
                             requestMasterItemsCheckedSelector.requestMasterItemsChecked.map(
                                 (requestMasterCheckedItem, index) => (
                                     <TableRow key={index}>
-                                        <TableCell>{requestMasterCheckedItem.item}</TableCell>
+                                        <TableCell>{requestMasterCheckedItem.checked}</TableCell>
                                         <TableCell>
                                             <TextField
                                                 ref={inputRef}

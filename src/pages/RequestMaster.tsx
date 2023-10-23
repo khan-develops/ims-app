@@ -47,6 +47,7 @@ const RequestMasterDepartment = () => {
     const navigate = useNavigate();
     const [activeStep, setActiveStep] = useState(0);
     const dispatch = useAppDispatch();
+    console.log(location);
 
     useEffect(() => {
         navigate(`/departments/${location.state}-request/list`, {
