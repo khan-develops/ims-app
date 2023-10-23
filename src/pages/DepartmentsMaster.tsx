@@ -189,6 +189,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
+
     [`&.${tableCellClasses.head}`]: {
         fontSize: 12,
         fontWeight: 700,

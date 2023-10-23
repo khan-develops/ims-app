@@ -20,11 +20,11 @@ const MenuDepartment = () => {
                 <Box sx={{ display: 'flex', gap: 1 }}>
                     <Button
                         sx={{
-                            color: location.pathname === '/extractions' ? 'yellow' : '#fff',
+                            color: location.pathname === '/departments/extractions' ? 'yellow' : '#fff',
                             fontWeight: '700'
                         }}
                         component={Link}
-                        to="/extractions"
+                        to="/departments/extractions"
                         state="extractions">
                         extractions
                     </Button>
@@ -126,12 +126,12 @@ const MenuDepartment = () => {
                     )}
                     <Button
                         sx={{
-                            color: location.pathname === 'extractions/general-request' ? 'yellow' : '#fff',
+                            color: location.pathname === '/requests/general-request/list' ? 'yellow' : '#fff',
                             fontWeight: '700'
                         }}
                         component={Link}
-                        to="/extractions/general-request"
-                        state="extractions/general-request">
+                        to="/requests/general-request/list"
+                        state="general-request">
                         general request
                     </Button>
                     <Button

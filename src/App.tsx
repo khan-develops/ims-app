@@ -20,14 +20,11 @@ const router = createBrowserRouter(
                 <Route path="dashboard" element={<Dashboard />} />
                 <Route path="master" element={<Master />} />
                 <Route path="store-room" element={<StoreRoomMaster />} />
-                <Route path="request-master">
-                    <Route path="general-request" element={<RequestMasterAdmin />} />
-                    <Route path="office-supply-request" element={<RequestMasterAdmin />} />
-                    <Route path="store-room-request" element={<RequestMasterAdmin />} />
-                </Route>
+                <Route path="general-request-dashboard" element={<RequestMasterAdmin />} />
+                <Route path="office-supply-request-dashboard" element={<RequestMasterAdmin />} />
+                <Route path="store-room-request-dashboard" element={<RequestMasterAdmin />} />
             </Route>
-
-            <Route path="extractions" element={<Departments />}>
+            <Route path='requests'>
                 <Route path="general-request" element={<RequestMaster />}>
                     <Route path="list" element={<RequestMasterItems />} />
                     <Route path="confirmation" element={<RequestMasterPending />} />
@@ -44,141 +41,16 @@ const router = createBrowserRouter(
                     <Route path="status" element={<RequestMasterComplete />} />
                 </Route>
             </Route>
-            <Route path="mass-spec" element={<Departments />}>
-                <Route path="general-request" element={<RequestMaster />}>
-                    <Route path="list" element={<RequestMasterItems />} />
-                    <Route path="confirmation" element={<RequestMasterPending />} />
-                    <Route path="status" element={<RequestMasterComplete />} />
-                </Route>
-                <Route path="office-supply-request" element={<RequestMaster />}>
-                    <Route path="list" element={<RequestMasterItems />} />
-                    <Route path="confirmation" element={<RequestMasterPending />} />
-                    <Route path="status" element={<RequestMasterComplete />} />
-                </Route>
-                <Route path="store-room-request" element={<RequestMaster />}>
-                    <Route path="list" element={<RequestMasterItems />} />
-                    <Route path="confirmation" element={<RequestMasterPending />} />
-                    <Route path="status" element={<RequestMasterComplete />} />
-                </Route>
-            </Route>
-            <Route path="processing-lab" element={<Departments />}>
-                <Route path="general-request" element={<RequestMaster />}>
-                    <Route path="list" element={<RequestMasterItems />} />
-                    <Route path="confirmation" element={<RequestMasterPending />} />
-                    <Route path="status" element={<RequestMasterComplete />} />
-                </Route>
-                <Route path="office-supply-request" element={<RequestMaster />}>
-                    <Route path="list" element={<RequestMasterItems />} />
-                    <Route path="confirmation" element={<RequestMasterPending />} />
-                    <Route path="status" element={<RequestMasterComplete />} />
-                </Route>
-                <Route path="store-room-request" element={<RequestMaster />}>
-                    <Route path="list" element={<RequestMasterItems />} />
-                    <Route path="confirmation" element={<RequestMasterPending />} />
-                    <Route path="status" element={<RequestMasterComplete />} />
-                </Route>
-            </Route>
-            <Route path="rd" element={<Departments />}>
-                <Route path="general-request" element={<RequestMaster />}>
-                    <Route path="list" element={<RequestMasterItems />} />
-                    <Route path="confirmation" element={<RequestMasterPending />} />
-                    <Route path="status" element={<RequestMasterComplete />} />
-                </Route>
-                <Route path="office-supply-request" element={<RequestMaster />}>
-                    <Route path="list" element={<RequestMasterItems />} />
-                    <Route path="confirmation" element={<RequestMasterPending />} />
-                    <Route path="status" element={<RequestMasterComplete />} />
-                </Route>
-                <Route path="store-room-request" element={<RequestMaster />}>
-                    <Route path="list" element={<RequestMasterItems />} />
-                    <Route path="confirmation" element={<RequestMasterPending />} />
-                    <Route path="status" element={<RequestMasterComplete />} />
-                </Route>
-            </Route>
-            <Route path="screening" element={<Departments />}>
-                <Route path="general-request" element={<RequestMaster />}>
-                    <Route path="list" element={<RequestMasterItems />} />
-                    <Route path="confirmation" element={<RequestMasterPending />} />
-                    <Route path="status" element={<RequestMasterComplete />} />
-                </Route>
-                <Route path="office-supply-request" element={<RequestMaster />}>
-                    <Route path="list" element={<RequestMasterItems />} />
-                    <Route path="confirmation" element={<RequestMasterPending />} />
-                    <Route path="status" element={<RequestMasterComplete />} />
-                </Route>
-                <Route path="store-room-request" element={<RequestMaster />}>
-                    <Route path="list" element={<RequestMasterItems />} />
-                    <Route path="confirmation" element={<RequestMasterPending />} />
-                    <Route path="status" element={<RequestMasterComplete />} />
-                </Route>
-            </Route>
-            <Route path="shipping" element={<Departments />}>
-                <Route path="general-request" element={<RequestMaster />}>
-                    <Route path="list" element={<RequestMasterItems />} />
-                    <Route path="confirmation" element={<RequestMasterPending />} />
-                    <Route path="status" element={<RequestMasterComplete />} />
-                </Route>
-                <Route path="office-supply-request" element={<RequestMaster />}>
-                    <Route path="list" element={<RequestMasterItems />} />
-                    <Route path="confirmation" element={<RequestMasterPending />} />
-                    <Route path="status" element={<RequestMasterComplete />} />
-                </Route>
-                <Route path="store-room-request" element={<RequestMaster />}>
-                    <Route path="list" element={<RequestMasterItems />} />
-                    <Route path="confirmation" element={<RequestMasterPending />} />
-                    <Route path="status" element={<RequestMasterComplete />} />
-                </Route>
-            </Route>
-            <Route path="shipping" element={<Departments />}>
-                <Route path="general-request" element={<RequestMaster />}>
-                    <Route path="list" element={<RequestMasterItems />} />
-                    <Route path="confirmation" element={<RequestMasterPending />} />
-                    <Route path="status" element={<RequestMasterComplete />} />
-                </Route>
-                <Route path="office-supply-request" element={<RequestMaster />}>
-                    <Route path="list" element={<RequestMasterItems />} />
-                    <Route path="confirmation" element={<RequestMasterPending />} />
-                    <Route path="status" element={<RequestMasterComplete />} />
-                </Route>
-                <Route path="store-room-request" element={<RequestMaster />}>
-                    <Route path="list" element={<RequestMasterItems />} />
-                    <Route path="confirmation" element={<RequestMasterPending />} />
-                    <Route path="status" element={<RequestMasterComplete />} />
-                </Route>
-            </Route>
-            <Route path="qc-internal-standards" element={<Departments />}>
-                <Route path="general-request" element={<RequestMaster />}>
-                    <Route path="list" element={<RequestMasterItems />} />
-                    <Route path="confirmation" element={<RequestMasterPending />} />
-                    <Route path="status" element={<RequestMasterComplete />} />
-                </Route>
-                <Route path="office-supply-request" element={<RequestMaster />}>
-                    <Route path="list" element={<RequestMasterItems />} />
-                    <Route path="confirmation" element={<RequestMasterPending />} />
-                    <Route path="status" element={<RequestMasterComplete />} />
-                </Route>
-                <Route path="store-room-request" element={<RequestMaster />}>
-                    <Route path="list" element={<RequestMasterItems />} />
-                    <Route path="confirmation" element={<RequestMasterPending />} />
-                    <Route path="status" element={<RequestMasterComplete />} />
-                </Route>
-            </Route>
-            <Route path="qc-qa" element={<Departments />}>
-                <Route path="general-request" element={<RequestMaster />}>
-                    <Route path="list" element={<RequestMasterItems />} />
-                    <Route path="confirmation" element={<RequestMasterPending />} />
-                    <Route path="status" element={<RequestMasterComplete />} />
-                </Route>
-                <Route path="office-supply-request" element={<RequestMaster />}>
-                    <Route path="list" element={<RequestMasterItems />} />
-                    <Route path="confirmation" element={<RequestMasterPending />} />
-                    <Route path="status" element={<RequestMasterComplete />} />
-                </Route>
-                <Route path="store-room-request" element={<RequestMaster />}>
-                    <Route path="list" element={<RequestMasterItems />} />
-                    <Route path="confirmation" element={<RequestMasterPending />} />
-                    <Route path="status" element={<RequestMasterComplete />} />
-                </Route>
+            <Route path="departments">
+                <Route path="extractions" element={<Departments />} />
+                <Route path="mass-spec" element={<Departments />} />
+                <Route path="processing-lab" element={<Departments />} />
+                <Route path="rd" element={<Departments />} />
+                <Route path="screening" element={<Departments />} />
+                <Route path="shipping" element={<Departments />} />
+                <Route path="shipping" element={<Departments />} />
+                <Route path="qc-internal-standards" element={<Departments />} />
+                <Route path="qc-qa" element={<Departments />} />
             </Route>
         </Route>
     )
