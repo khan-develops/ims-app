@@ -175,7 +175,7 @@ const EnhancedTableHead = (props: EnhancedTableProps) => {
 
 const RequestMasterItems = () => {
     const masterItemsSelector = useAppSelector(selectMasterItems);
-    const [checkedItems, setCheckedItems] = useState<number[]>([]);
+    const [selectedIds, setSelectedIds] = useState<number[]>([]);
     const { type } = useAppSelector(selectDrawerToggleType);
     const dispatch = useAppDispatch();
     const [page, setPage] = useState<number>(0);
@@ -288,6 +288,14 @@ const RequestMasterItems = () => {
     };
 
     const handleSelectAllClick = (event: ChangeEvent<HTMLInputElement>) => {
+        if (selectedIds.length < masterItemsSelector.response.content.length) {
+            setSelectedIds([1,2,3]
+                masterItemsSelector.response.content.reduce(
+                    (acc, masterItem) => {return [1, 2 ,3 ]},
+                    []
+                )
+            );
+        }
         if (masterItemsSelector.response.content.filter((masterItem) => masterItem.checked).length === 0) {
             dispatch(
                 changeMasterItems([
