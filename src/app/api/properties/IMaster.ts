@@ -39,6 +39,7 @@ export interface IMasterDepartment {
     itemType: string;
     itemGroup: string;
     drugClass: string;
+    checked: boolean;
     orderDetail: IOrderDetail;
     departmentItems: IDepartment[];
 }

@@ -1,23 +1,16 @@
 import {
-    AppBar,
-    BottomNavigation,
-    BottomNavigationAction,
     Box,
     Checkbox,
     Drawer,
-    Grid,
-    InputBase,
+    FormControlLabel,
     Paper,
     Table,
     TableBody,
     TableCell,
     TableContainer,
     TableHead,
-    TablePagination,
     TableRow,
     TableSortLabel,
-    Toolbar,
-    alpha,
     styled,
     tableCellClasses
 } from '@mui/material';
@@ -27,75 +20,11 @@ import { useLocation } from 'react-router-dom';
 import { selectDrawerToggleType, toggleDrawer } from '../app/slice/drawerToggle/drawerToggleTypeSlice';
 import { DRAWER_TOGGLE_TYPE } from '../common/constants';
 import RequestItemReviewForm from './forms/RequestItemReviewForm';
-import { getRequestMasterItemsThunk, selectRequestMasterItems } from '../app/slice/request/requestMasterItemsSlice';
-import {
-    changeRequestMasterItemsChecked,
-    selectRequestMasterItemsChecked
-} from '../app/slice/request/requestMasterItemsCheckedSlice';
-import { IRequestMaster } from '../app/api/properties/IRequest';
 import { IMaster } from '../app/api/properties/IMaster';
-import SearchIcon from '@mui/icons-material/Search';
-import SendIcon from '@mui/icons-material/Send';
-import EditIcon from '@mui/icons-material/Edit';
-import AddBoxIcon from '@mui/icons-material/AddBox';
-import DownloadIcon from '@mui/icons-material/Download';
-import PreviewIcon from '@mui/icons-material/Preview';
 import { visuallyHidden } from '@mui/utils';
 import FileSaver from 'file-saver';
 import axios from 'axios';
-
-const Search = styled('div')(({ theme }) => ({
-    borderRadius: theme.shape.borderRadius,
-    backgroundColor: alpha(theme.palette.common.white, 0.15),
-    '&:hover': {
-        backgroundColor: alpha(theme.palette.common.white, 0.25)
-    },
-    marginLeft: 0,
-    width: '100%',
-    [theme.breakpoints.up('sm')]: {
-        marginLeft: theme.spacing(1),
-        width: 'auto'
-    }
-}));
-
-const SearchIconWrapper = styled('div')(({ theme }) => ({
-    padding: theme.spacing(0, 2),
-    height: '100%',
-    position: 'absolute',
-    pointerEvents: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center'
-}));
-
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-    color: 'inherit',
-    '& .MuiInputBase-input': {
-        padding: theme.spacing(1, 1, 1, 0),
-        paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-        transition: theme.transitions.create('width'),
-        width: '100%',
-        [theme.breakpoints.up('sm')]: {
-            width: '25rem'
-        }
-    }
-}));
-
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
-    [`&.${tableCellClasses.head}`]: {
-        backgroundColor: '#f9f9f9',
-        fontSize: 12,
-        fontWeight: 700,
-        color: theme.palette.common.black,
-        paddingTop: 1,
-        paddingBottom: 1
-    },
-    [`&.${tableCellClasses.body}`]: {
-        fontSize: 12,
-        paddingTop: 10,
-        paddingBottom: 10
-    }
-}));
+import { changeMasterItems, getMasterItemsThunk, selectMasterItems } from '../app/slice/master/masterItemsSlice';
 
 const columns: {
     id: keyof IMaster;
@@ -114,14 +43,6 @@ const columns: {
         size: 80
     },
     {
-        id: 'purchaseUnit',
-        numeric: false,
-        label: 'Purchase Unit',
-        align: 'left',
-        padding: 'normal',
-        size: 80
-    },
-    {
         id: 'recentCN',
         numeric: false,
         label: 'Recent CN',
@@ -130,26 +51,61 @@ const columns: {
         size: 80
     },
     {
+        id: 'purchaseUnit',
+        numeric: false,
+        label: 'Purchase Unit',
+        align: 'left',
+        padding: 'normal',
+        size: 80
+    },
+
+    {
         id: 'partNumber',
         numeric: false,
         label: 'Part Number',
         align: 'left',
         padding: 'normal',
         size: 80
+    },
+    {
+        id: 'comment',
+        numeric: false,
+        label: 'Comment',
+        align: 'left',
+        padding: 'normal',
+        size: 80
     }
 ];
+
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+    [`&.${tableCellClasses.head}`]: {
+        fontSize: 12,
+        fontWeight: 700,
+        color: theme.palette.common.white,
+        backgroundColor: '#2f3643',
+        paddingTop: 12,
+        paddingBottom: 12
+    },
+    [`&.${tableCellClasses.body}`]: {
+        fontSize: 12,
+        paddingTop: 8,
+        paddingBottom: 8
+    }
+}));
 
 type Order = 'asc' | 'desc';
 const baseUrl = process.env.REACT_APP_BASE_URL;
 
 interface EnhancedTableProps {
     onRequestSort: (event: MouseEvent<unknown>, property: keyof IMaster) => void;
+    onSelectAllClick: (event: ChangeEvent<HTMLInputElement>) => void;
     order: Order;
     orderBy: string;
 }
 
 const EnhancedTableHead = (props: EnhancedTableProps) => {
-    const { order, orderBy, onRequestSort } = props;
+    const masterItemsSelector = useAppSelector(selectMasterItems);
+    const { onSelectAllClick, order, orderBy, onRequestSort } = props;
     const createSortHandler = (property: keyof IMaster) => (event: MouseEvent<unknown>) => {
         onRequestSort(event, property);
     };
@@ -157,11 +113,33 @@ const EnhancedTableHead = (props: EnhancedTableProps) => {
     return (
         <TableHead sx={{ whiteSpace: 'nowrap' }}>
             <TableRow>
+                <StyledTableCell padding="checkbox">
+                    <FormControlLabel
+                        label=""
+                        control={
+                            <Checkbox
+                                color="default"
+                                sx={{ paddingTop: 0, paddingBottom: 0, color: 'white' }}
+                                indeterminate={
+                                    masterItemsSelector.response.content.filter((masterItem) => masterItem.checked)
+                                        .length > 0 &&
+                                    masterItemsSelector.response.content.filter((masterItem) => masterItem.checked)
+                                        .length < masterItemsSelector.response.content.length
+                                }
+                                checked={
+                                    masterItemsSelector.response.content.filter(
+                                        (masterItem) => masterItem.checked === true
+                                    ).length === masterItemsSelector.response.content.length
+                                }
+                                onChange={onSelectAllClick}
+                            />
+                        }
+                    />
+                </StyledTableCell>
                 {columns.map((headCell) => (
                     <StyledTableCell
                         key={headCell.id}
                         align={headCell.align}
-                        width={headCell.size}
                         sortDirection={orderBy === headCell.id ? order : false}>
                         <TableSortLabel
                             sx={{
@@ -196,8 +174,8 @@ const EnhancedTableHead = (props: EnhancedTableProps) => {
 };
 
 const RequestMasterItems = () => {
-    const requestMasterItemsSelector = useAppSelector(selectRequestMasterItems);
-    const requestMasterItemsCheckedSelector = useAppSelector(selectRequestMasterItemsChecked);
+    const masterItemsSelector = useAppSelector(selectMasterItems);
+    const [checkedItems, setCheckedItems] = useState<number[]>([]);
     const { type } = useAppSelector(selectDrawerToggleType);
     const dispatch = useAppDispatch();
     const [page, setPage] = useState<number>(0);
@@ -206,38 +184,67 @@ const RequestMasterItems = () => {
     const [value, setValue] = useState<number>(0);
     const [order, setOrder] = useState<Order>('asc');
     const [orderBy, setOrderBy] = useState<keyof IMaster>('id');
+    const [dense, setDense] = useState(false);
 
     useEffect(() => {
-        dispatch(getRequestMasterItemsThunk({ state: location.state, department: selectedDepartment, page: page }));
-    }, [dispatch, location.pathname, location.state, page, useAppSelector]);
+        dispatch(getMasterItemsThunk(page));
+    }, [dispatch, page]);
 
-
-
-    const handleCheckboxChange = (event: ChangeEvent<HTMLInputElement>, departmentMasterItem: IRequestMaster) => {
-        const exists = requestMasterItemsCheckedSelector.requestMasterItemsChecked.some(
-            (item) => item.id === departmentMasterItem.id
+    const handleAddClick = () => {
+        dispatch(
+            toggleDrawer({
+                type: DRAWER_TOGGLE_TYPE.ADD_MASTER_ITEM
+            })
         );
-        if (exists) {
-            dispatch(
-                changeRequestMasterItemsChecked(
-                    requestMasterItemsCheckedSelector.requestMasterItemsChecked.filter(
-                        (item) => item.id !== departmentMasterItem.id
-                    )
-                )
-            );
-        }
-        if (!exists) {
-            dispatch(
-                changeRequestMasterItemsChecked([
-                    ...requestMasterItemsCheckedSelector.requestMasterItemsChecked,
-                    departmentMasterItem
-                ])
-            );
-        }
+    };
+
+    const handleCheckboxChange = (event: ChangeEvent<HTMLInputElement>, masterItem: IMaster) => {
+        dispatch(
+            changeMasterItems(
+                masterItemsSelector.response.content.map((item) => ({
+                    ...item,
+                    checked: item.id === masterItem.id ? event.target.checked : item.checked
+                }))
+            )
+        );
     };
 
     const handleKeywordChange = (event: ChangeEvent<HTMLInputElement>) => {
         // dispatch(filterMasterDepartmentItemsThunk({ state: state, keyword: event.target.value, page: 0 }));
+    };
+
+    const handleReviewClick = () => {
+        dispatch(toggleDrawer({ type: DRAWER_TOGGLE_TYPE.UPDATE_REQUEST_REVIEW }));
+    };
+
+    const handleDownloadClick = () => {
+        return axios.get(`${baseUrl}/download/${location.state}/list`).then((response) => {
+            const blob = new Blob([response.data], {
+                type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            });
+            FileSaver.saveAs(blob, `${location.state}.xlsx`);
+        });
+    };
+
+    const handleEditClick = (event: MouseEvent<HTMLElement>) => {
+        // if (masterDepartmentItem) {
+        //     dispatch(
+        //         toggleDrawer({
+        //             type: DRAWER_TOGGLE_TYPE.UPDATE_STORE_ROOM_ITEM,
+        //             storeRoomItem: {
+        //                 id: masterDepartmentItem.id,
+        //                 location: masterDepartmentItem.departmentItems[0].location,
+        //                 quantity: masterDepartmentItem.departmentItems[0].quantity,
+        //                 minimumQuantity: masterDepartmentItem.departmentItems[0].minimumQuantity,
+        //                 maximumQuantity: masterDepartmentItem.departmentItems[0].maximumQuantity,
+        //                 usageLevel: masterDepartmentItem.departmentItems[0].usageLevel,
+        //                 lotNumber: masterDepartmentItem.departmentItems[0].lotNumber,
+        //                 expirationDate: masterDepartmentItem.departmentItems[0].expirationDate,
+        //                 receivedDate: masterDepartmentItem.departmentItems[0].receivedDate
+        //             }
+        //         })
+        //     );
+        // }
     };
 
     const handleRequestSort = (event: MouseEvent<unknown>, property: keyof IMaster) => {
@@ -280,87 +287,66 @@ const RequestMasterItems = () => {
         // }
     };
 
-    const handleReviewClick = () => {
-        dispatch(toggleDrawer({ type: DRAWER_TOGGLE_TYPE.UPDATE_REQUEST_REVIEW }));
-    };
-
-    const handleDownloadClick = () => {
-        return axios.get(`${baseUrl}/download/${location.state}/list`).then((response) => {
-            const blob = new Blob([response.data], {
-                type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-            });
-            FileSaver.saveAs(blob, `${location.state}.xlsx`);
-        });
-    };
-
-    const handleEditClick = (event: MouseEvent<HTMLElement>) => {
-        // if (masterDepartmentItem) {
-        //     dispatch(
-        //         toggleDrawer({
-        //             type: DRAWER_TOGGLE_TYPE.UPDATE_STORE_ROOM_ITEM,
-        //             storeRoomItem: {
-        //                 id: masterDepartmentItem.id,
-        //                 location: masterDepartmentItem.departmentItems[0].location,
-        //                 quantity: masterDepartmentItem.departmentItems[0].quantity,
-        //                 minimumQuantity: masterDepartmentItem.departmentItems[0].minimumQuantity,
-        //                 maximumQuantity: masterDepartmentItem.departmentItems[0].maximumQuantity,
-        //                 usageLevel: masterDepartmentItem.departmentItems[0].usageLevel,
-        //                 lotNumber: masterDepartmentItem.departmentItems[0].lotNumber,
-        //                 expirationDate: masterDepartmentItem.departmentItems[0].expirationDate,
-        //                 receivedDate: masterDepartmentItem.departmentItems[0].receivedDate
-        //             }
-        //         })
-        //     );
-        // }
-    };
-
-    const handleAddClick = () => {
-        dispatch(
-            toggleDrawer({
-                type: DRAWER_TOGGLE_TYPE.ADD_MASTER_ITEM
-            })
-        );
+    const handleSelectAllClick = (event: ChangeEvent<HTMLInputElement>) => {
+        if (masterItemsSelector.response.content.filter((masterItem) => masterItem.checked).length === 0) {
+            dispatch(
+                changeMasterItems([
+                    ...masterItemsSelector.response.content.map((masterItem) => ({ ...masterItem, checked: true }))
+                ])
+            );
+        } else {
+            dispatch(
+                changeMasterItems([
+                    ...masterItemsSelector.response.content.map((masterItem) => ({ ...masterItem, checked: false }))
+                ])
+            );
+        }
     };
 
     return (
- 
-                <Box component={Paper} elevation={3}>
-                    <TableContainer sx={{ height: '60vh' }}>
-                        <Table size="small" stickyHeader>
-                            <EnhancedTableHead order={order} orderBy={orderBy} onRequestSort={handleRequestSort} />
-                            <TableBody>
-                                {requestMasterItemsSelector.response.content.length > 0 &&
-                                    requestMasterItemsSelector.response.content.map((requestMasterItem, index) => (
-                                        <TableRow key={index}>
-                                            <StyledTableCell>
-                                                <Checkbox
-                                                    onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                                                        handleCheckboxChange(event, requestMasterItem)
-                                                    }
-                                                    checked={
-                                                        requestMasterItemsCheckedSelector.requestMasterItemsChecked.find(
-                                                            (item) => item.id === requestMasterItem.id
-                                                        ) !== undefined
-                                                    }
-                                                />
-                                            </StyledTableCell>
-                                            <StyledTableCell>{requestMasterItem.masterItem.item}</StyledTableCell>
-                                            <StyledTableCell>{requestMasterItem.recentCN}</StyledTableCell>
-                                            <StyledTableCell>
-                                                {requestMasterItem.masterItem.purchaseUnit}
-                                            </StyledTableCell>
-                                            <StyledTableCell>{requestMasterItem.masterItem.partNumber}</StyledTableCell>
-                                            <StyledTableCell>{requestMasterItem.customDetail}</StyledTableCell>
-                                        </TableRow>
-                                    ))}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                    <Drawer anchor="bottom" open={type === DRAWER_TOGGLE_TYPE.UPDATE_REQUEST_REVIEW}>
-                        <RequestItemReviewForm />
-                    </Drawer>
-                </Box>
-
+        <Box>
+            <Paper elevation={2} sx={{ padding: 0.5 }}>
+                <TableContainer sx={{ height: 600, overflowY: 'auto' }}>
+                    <Table stickyHeader>
+                        <EnhancedTableHead
+                            order={order}
+                            orderBy={orderBy}
+                            onSelectAllClick={handleSelectAllClick}
+                            onRequestSort={handleRequestSort}
+                        />
+                        <TableBody>
+                            {masterItemsSelector.response.content.length > 0 &&
+                                masterItemsSelector.response.content.map((masterItem, index) => (
+                                    <TableRow key={index}>
+                                        <StyledTableCell padding="checkbox">
+                                            <FormControlLabel
+                                                label=""
+                                                control={
+                                                    <Checkbox
+                                                        color="default"
+                                                        onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                                                            handleCheckboxChange(event, masterItem)
+                                                        }
+                                                        checked={masterItem.checked}
+                                                    />
+                                                }
+                                            />
+                                        </StyledTableCell>
+                                        <StyledTableCell>{masterItem.item}</StyledTableCell>
+                                        <StyledTableCell>{masterItem.recentCN}</StyledTableCell>
+                                        <StyledTableCell>{masterItem.purchaseUnit}</StyledTableCell>
+                                        <StyledTableCell>{masterItem.partNumber}</StyledTableCell>
+                                        <StyledTableCell>{masterItem.comment}</StyledTableCell>
+                                    </TableRow>
+                                ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+                <Drawer anchor="bottom" open={type === DRAWER_TOGGLE_TYPE.UPDATE_REQUEST_REVIEW}>
+                    <RequestItemReviewForm />
+                </Drawer>
+            </Paper>
+        </Box>
     );
 };
 

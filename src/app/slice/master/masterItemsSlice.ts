@@ -48,7 +48,7 @@ export const masterItemsSlice = createSlice({
     name: 'master',
     initialState,
     reducers: {
-        changeMasterItems: (state, action: PayloadAction<IMaster[]>) => {
+        changeMasterItems: (state, action) => {
             state.response.content = action.payload;
         }
     },
@@ -57,7 +57,12 @@ export const masterItemsSlice = createSlice({
             .addCase(getMasterItemsThunk.pending, (state) => {
                 state.status = 'loading';
             })
-            .addCase(getMasterItemsThunk.fulfilled, (state, action) => {
+            .addCase(getMasterItemsThunk.fulfilled, (state, action: PayloadAction<{
+                content: IMaster[];
+                number: number;
+                totalElements: number;
+                size: number;
+            }>) => {
                 state.status = 'success';
                 state.response = action.payload;
             })
