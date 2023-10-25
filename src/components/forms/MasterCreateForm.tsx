@@ -44,8 +44,7 @@ const MasterCreateForm = () => {
         comment: '',
         itemType: '',
         itemGroup: '',
-        drugClass: '',
-        checked: false
+        drugClass: ''
     });
 
     const handleSubmit = () => {

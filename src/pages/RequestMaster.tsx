@@ -1,4 +1,4 @@
-import { Step, StepButton, Stepper } from '@mui/material';
+import { Step, StepButton, Stepper, Tab, Tabs } from '@mui/material';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 import RequestMasterDepartmentPending from '../components/RequestMasterItemsPending';
 import RequestMasterDepartmentComplete from '../components/RequestMasterItemsComplete';
@@ -162,6 +162,11 @@ const RequestMasterItems = () => {
         );
     };
 
+    const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+        console.log(location);
+        setValue(newValue);
+    };
+
     return (
         <Grid container height="100%" direction="column" justifyContent="space-between">
             <Grid item>
@@ -185,7 +190,32 @@ const RequestMasterItems = () => {
                 </AppBar>
             </Grid>
             <Grid item padding={2}>
-                <Stepper activeStep={2} sx={{ marginBottom: 4 }}>
+                <Box sx={{ marginBottom: 2 }}>
+                    <Paper>
+                        <Tabs value={value} onChange={handleChange}>
+                            <Tab
+                                label="Items"
+                                component={Link}
+                                to={`/requests/${location.state}/list`}
+                                state={location.state}
+                            />
+                            <Tab
+                                label="confirmation"
+                                component={Link}
+                                to={`/requests/${location.state}/confirmation`}
+                                state={location.state}
+                            />
+                            <Tab
+                                label="status"
+                                component={Link}
+                                to={`/requests/${location.state}/status`}
+                                state={location.state}
+                            />
+                        </Tabs>
+                    </Paper>
+                </Box>
+
+                {/* <Stepper activeStep={2} sx={{ marginBottom: 4 }}>
                     <Step>
                         <StepButton
                             icon={
@@ -234,7 +264,7 @@ const RequestMasterItems = () => {
                             Status
                         </StepButton>
                     </Step>
-                </Stepper>
+                </Stepper> */}
                 <Outlet />
             </Grid>
             <Grid>
@@ -244,10 +274,7 @@ const RequestMasterItems = () => {
                         <BottomNavigation
                             sx={{ display: 'flex', justifyContent: 'space-around', width: '100%' }}
                             showLabels
-                            value={value}
-                            onChange={(event, newValue) => {
-                                setValue(newValue);
-                            }}>
+                            value={value}>
                             <Grid container justifyContent="space-between" paddingLeft={2} paddingRight={2}>
                                 <Grid item>
                                     {' '}

@@ -101,11 +101,12 @@ interface EnhancedTableProps {
     onSelectAllClick: (event: ChangeEvent<HTMLInputElement>) => void;
     order: Order;
     orderBy: string;
+    selectedIds: number[];
 }
 
 const EnhancedTableHead = (props: EnhancedTableProps) => {
     const masterItemsSelector = useAppSelector(selectMasterItems);
-    const { onSelectAllClick, order, orderBy, onRequestSort } = props;
+    const { onSelectAllClick, order, orderBy, onRequestSort, selectedIds } = props;
     const createSortHandler = (property: keyof IMaster) => (event: MouseEvent<unknown>) => {
         onRequestSort(event, property);
     };
@@ -114,26 +115,17 @@ const EnhancedTableHead = (props: EnhancedTableProps) => {
         <TableHead sx={{ whiteSpace: 'nowrap' }}>
             <TableRow>
                 <StyledTableCell padding="checkbox">
-                    <FormControlLabel
-                        label=""
-                        control={
-                            <Checkbox
-                                color="default"
-                                sx={{ paddingTop: 0, paddingBottom: 0, color: 'white' }}
-                                indeterminate={
-                                    masterItemsSelector.response.content.filter((masterItem) => masterItem.checked)
-                                        .length > 0 &&
-                                    masterItemsSelector.response.content.filter((masterItem) => masterItem.checked)
-                                        .length < masterItemsSelector.response.content.length
-                                }
-                                checked={
-                                    masterItemsSelector.response.content.filter(
-                                        (masterItem) => masterItem.checked === true
-                                    ).length === masterItemsSelector.response.content.length
-                                }
-                                onChange={onSelectAllClick}
-                            />
+                    <Checkbox
+                        color="default"
+                        sx={{ paddingTop: 0, paddingBottom: 0, color: 'white' }}
+                        indeterminate={
+                            selectedIds.length > 0 && selectedIds.length < masterItemsSelector.response.content.length
                         }
+                        checked={
+                            masterItemsSelector.response.content.length > 0 &&
+                            selectedIds.length === masterItemsSelector.response.content.length
+                        }
+                        onChange={onSelectAllClick}
                     />
                 </StyledTableCell>
                 {columns.map((headCell) => (
@@ -199,14 +191,11 @@ const RequestMasterItems = () => {
     };
 
     const handleCheckboxChange = (event: ChangeEvent<HTMLInputElement>, masterItem: IMaster) => {
-        dispatch(
-            changeMasterItems(
-                masterItemsSelector.response.content.map((item) => ({
-                    ...item,
-                    checked: item.id === masterItem.id ? event.target.checked : item.checked
-                }))
-            )
-        );
+        if (event.target.checked) {
+            setSelectedIds([...selectedIds, masterItem.id]);
+        } else {
+            setSelectedIds([...selectedIds.filter((id) => id !== masterItem.id)]);
+        }
     };
 
     const handleKeywordChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -289,25 +278,14 @@ const RequestMasterItems = () => {
 
     const handleSelectAllClick = (event: ChangeEvent<HTMLInputElement>) => {
         if (selectedIds.length < masterItemsSelector.response.content.length) {
-            setSelectedIds([1,2,3]
+            setSelectedIds(
                 masterItemsSelector.response.content.reduce(
-                    (acc, masterItem) => {return [1, 2 ,3 ]},
+                    (acc: number[], masterItem) => (acc.includes(masterItem.id) ? acc : [...acc, masterItem.id]),
                     []
                 )
             );
-        }
-        if (masterItemsSelector.response.content.filter((masterItem) => masterItem.checked).length === 0) {
-            dispatch(
-                changeMasterItems([
-                    ...masterItemsSelector.response.content.map((masterItem) => ({ ...masterItem, checked: true }))
-                ])
-            );
         } else {
-            dispatch(
-                changeMasterItems([
-                    ...masterItemsSelector.response.content.map((masterItem) => ({ ...masterItem, checked: false }))
-                ])
-            );
+            setSelectedIds([]);
         }
     };
 
@@ -317,6 +295,7 @@ const RequestMasterItems = () => {
                 <TableContainer sx={{ height: 600, overflowY: 'auto' }}>
                     <Table stickyHeader>
                         <EnhancedTableHead
+                            selectedIds={selectedIds}
                             order={order}
                             orderBy={orderBy}
                             onSelectAllClick={handleSelectAllClick}
@@ -327,17 +306,12 @@ const RequestMasterItems = () => {
                                 masterItemsSelector.response.content.map((masterItem, index) => (
                                     <TableRow key={index}>
                                         <StyledTableCell padding="checkbox">
-                                            <FormControlLabel
-                                                label=""
-                                                control={
-                                                    <Checkbox
-                                                        color="default"
-                                                        onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                                                            handleCheckboxChange(event, masterItem)
-                                                        }
-                                                        checked={masterItem.checked}
-                                                    />
+                                            <Checkbox
+                                                color="default"
+                                                onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                                                    handleCheckboxChange(event, masterItem)
                                                 }
+                                                checked={selectedIds.includes(masterItem.id)}
                                             />
                                         </StyledTableCell>
                                         <StyledTableCell>{masterItem.item}</StyledTableCell>

@@ -140,7 +140,7 @@ const MenuDepartment = () => {
                             fontWeight: '700'
                         }}
                         component={Link}
-                        to="/office-supply-request/list"
+                        to="/requests/office-supply-request/list"
                         state="office-supply-request">
                         office supply request
                     </Button>
@@ -150,7 +150,7 @@ const MenuDepartment = () => {
                             fontWeight: '700'
                         }}
                         component={Link}
-                        to="/store-room-request/list"
+                        to="/requests/store-room-request/list"
                         state="store-room-request">
                         store room request
                     </Button>
