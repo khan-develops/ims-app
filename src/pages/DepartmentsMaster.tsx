@@ -189,7 +189,6 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
-
     [`&.${tableCellClasses.head}`]: {
         fontSize: 12,
         fontWeight: 700,
@@ -625,7 +624,7 @@ const MasterDepartmentRow = ({
                                 borderRadius: 1,
                                 backgroundColor: '#f2f2f2'
                             }}>
-                            <Typography sx={{ fontWeight: 900, fontSize: 15 }}>
+                            <Typography sx={{ fontWeight: 900, fontSize: 14 }}>
                                 {masterDepartmentItem.orderDetail.totalQuantity}
                             </Typography>
                         </Box>
@@ -644,7 +643,7 @@ const MasterDepartmentRow = ({
                                 borderRadius: 1,
                                 backgroundColor: getOrderQuantityColor(masterDepartmentItem)
                             }}>
-                            <Typography sx={{ fontWeight: 900, fontSize: 15 }}>
+                            <Typography sx={{ fontWeight: 900, fontSize: 14 }}>
                                 {masterDepartmentItem.orderDetail.totalQuantity}
                             </Typography>
                         </Box>
@@ -662,7 +661,7 @@ const MasterDepartmentRow = ({
                             borderRadius: 1,
                             backgroundColor: '#f2f2f2'
                         }}>
-                        <Typography sx={{ fontWeight: 900, fontSize: 13 }}>
+                        <Typography sx={{ fontWeight: 700, fontSize: 12 }}>
                             ${masterDepartmentItem.unitPrice}
                         </Typography>
                     </Box>
@@ -680,7 +679,7 @@ const MasterDepartmentRow = ({
                                 borderRadius: 1,
                                 backgroundColor: '#f2f2f2'
                             }}>
-                            <Typography sx={{ fontWeight: 900, fontSize: 13 }}>
+                            <Typography sx={{ fontWeight: 700, fontSize: 12 }}>
                                 ${masterDepartmentItem.orderDetail.totalPrice}
                             </Typography>
                         </Box>
@@ -862,40 +861,43 @@ const DepartmentsMaster = () => {
 
     const handleRequestSort = (event: MouseEvent<unknown>, property: keyof IMaster | keyof IOrderDetail) => {
         if (order === 'asc' && orderBy === 'id') {
+            setOrder('asc');
+            setOrderBy(property);
             dispatch(
                 sortMasterDepartmentItemsThunk({
                     state: location.state,
                     page: page,
                     column: property,
-                    direction: order
+                    direction: 'asc'
                 })
             )
-                .then(() => setOrderBy(property))
+                .then()
                 .catch((error: Error) => console.error(error.message));
         } else if (order === 'asc' && orderBy === property) {
+            setOrder('desc');
+            setOrderBy(property);
             dispatch(
                 sortMasterDepartmentItemsThunk({
                     state: location.state,
                     page: page,
                     column: property,
-                    direction: order
+                    direction: 'desc'
                 })
             )
-                .then(() => setOrder('desc'))
+                .then()
                 .catch((error: Error) => console.error(error.message));
         } else if (order === 'desc' && orderBy === property) {
+            setOrder('asc');
+            setOrderBy('id');
             dispatch(
                 sortMasterDepartmentItemsThunk({
                     state: location.state,
                     page: page,
-                    column: property,
-                    direction: order
+                    column: 'id',
+                    direction: 'asc'
                 })
             )
-                .then(() => {
-                    setOrder('asc');
-                    setOrderBy('id');
-                })
+                .then(() => {})
                 .catch((error: Error) => console.error(error.message));
         }
     };

@@ -119,7 +119,7 @@ const RequestMasterItems = () => {
     const [page, setPage] = useState<number>(0);
 
     useEffect(() => {
-        navigate(`/requests/general-request/list`, {
+        navigate(location.pathname, {
             state: location.state
         });
         setActiveStep(0);
@@ -191,7 +191,7 @@ const RequestMasterItems = () => {
             </Grid>
             <Grid item padding={2}>
                 <Box sx={{ marginBottom: 2 }}>
-                    <Paper>
+                    <Paper square>
                         <Tabs value={value} onChange={handleChange}>
                             <Tab
                                 label="Items"

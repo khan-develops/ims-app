@@ -22,7 +22,7 @@ import {
     selectRequestMasterItemsComplete
 } from '../app/slice/request/requestMasterItemsCompleteSlice';
 import { IMaster } from '../app/api/properties/IMaster';
-import { IRequest } from '../app/api/properties/IRequest';
+import { IRequest, IRequestMaster } from '../app/api/properties/IRequest';
 import { visuallyHidden } from '@mui/utils';
 import { selectDrawerToggleType } from '../app/slice/drawerToggle/drawerToggleTypeSlice';
 
@@ -68,9 +68,9 @@ const columns: {
         size: 80
     },
     {
-        id: 'timeReceived',
+        id: 'timeRequested',
         numeric: false,
-        label: 'Time Received',
+        label: 'Time Requested',
         align: 'left',
         padding: 'normal',
         size: 80
@@ -209,48 +209,129 @@ const RequestMasterDepartmentComplete = () => {
         setPage(page);
     };
 
+    const handleRequestSort = (event: MouseEvent<unknown>, property: keyof IMaster | keyof IRequest) => {
+        // if (order === 'asc' && orderBy === 'id') {
+        //     dispatch(
+        //         sortMasterDepartmentItemsThunk({
+        //             state: location.state,
+        //             page: page,
+        //             column: property,
+        //             direction: order
+        //         })
+        //     )
+        //         .then(() => setOrderBy(property))
+        //         .catch((error: Error) => console.error(error.message));
+        // } else if (order === 'asc' && orderBy === property) {
+        //     dispatch(
+        //         sortMasterDepartmentItemsThunk({
+        //             state: location.state,
+        //             page: page,
+        //             column: property,
+        //             direction: order
+        //         })
+        //     )
+        //         .then(() => setOrder('desc'))
+        //         .catch((error: Error) => console.error(error.message));
+        // } else if (order === 'desc' && orderBy === property) {
+        //     dispatch(
+        //         sortMasterDepartmentItemsThunk({
+        //             state: location.state,
+        //             page: page,
+        //             column: property,
+        //             direction: order
+        //         })
+        //     )
+        //         .then(() => {
+        //             setOrder('asc');
+        //             setOrderBy('id');
+        //         })
+        //         .catch((error: Error) => console.error(error.message));
+        // }
+    };
+
+    const handleSelectAllClick = (event: ChangeEvent<HTMLInputElement>) => {
+        if (selectedIds.length < requestMasterItemsCompleteSelector.response.content.length) {
+            setSelectedIds(
+                requestMasterItemsCompleteSelector.response.content.reduce(
+                    (acc: number[], requestMasterItem) =>
+                        acc.includes(requestMasterItem.id) ? acc : [...acc, requestMasterItem.id],
+                    []
+                )
+            );
+        } else {
+            setSelectedIds([]);
+        }
+    };
+
+    const handleCheckboxChange = (event: ChangeEvent<HTMLInputElement>, requestMasterItem: IRequestMaster) => {
+        // const exists = requestMasterItemsPendingCheckedSelector.requestMasterItemsPendingChecked.some(
+        //     (item) => item.id === departmentMasterItem.id
+        // );
+        // if (exists) {
+        //     dispatch(
+        //         changeRequestItemsPendingChecked(
+        //             requestMasterItemsPendingCheckedSelector.requestMasterItemsPendingChecked.filter(
+        //                 (item) => item.id !== departmentMasterItem.id
+        //             )
+        //         )
+        //     );
+        // }
+        // if (!exists) {
+        //     dispatch(
+        //         changeRequestItemsPendingChecked([
+        //             ...requestMasterItemsPendingCheckedSelector.requestMasterItemsPendingChecked,
+        //             departmentMasterItem
+        //         ])
+        //     );
+        // }
+    };
+
     return (
-        <Box component={Paper} elevation={3}>
-            <TableContainer sx={{ height: '60vh' }}>
-                <Table stickyHeader>
-                    <EnhancedTableHead
-                        selectedIds={selectedIds}
-                        order={order}
-                        orderBy={orderBy}
-                        onSelectAllClick={handleSelectAllClick}
-                        onRequestSort={handleRequestSort}
-                    />
-                    <TableBody>
-                        {requestMasterItemsCompleteSelector.response.content.length > 0 &&
-                            requestMasterItemsCompleteSelector.response.content.map((requestItem, index) => (
-                                <TableRow key={index}>
-                                    <StyledTableCell>{requestItem && requestItem.masterItem.item}</StyledTableCell>
-                                    <StyledTableCell>{requestItem && requestItem.recentCN}</StyledTableCell>
-                                    <StyledTableCell>{requestItem.quantity}</StyledTableCell>
-                                    <StyledTableCell>{requestItem.confirmation}</StyledTableCell>
-                                    <StyledTableCell>
-                                        {moment(requestItem.timeRequested).format('MM/DD/YYYY')}
-                                    </StyledTableCell>
-                                    <StyledTableCell>
-                                        {moment(requestItem.timeUpdated).format('MM/DD/YYYY')}
-                                    </StyledTableCell>
-                                    <StyledTableCell>{requestItem.customDetail}</StyledTableCell>
-                                </TableRow>
-                            ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>
-            <TablePagination
-                sx={{ marginTop: 3 }}
-                rowsPerPageOptions={[]}
-                component="div"
-                count={requestMasterItemsCompleteSelector.response.totalElements}
-                rowsPerPage={requestMasterItemsCompleteSelector.response.size}
-                page={requestMasterItemsCompleteSelector.response.number}
-                onPageChange={handleChangePage}
-                showFirstButton={true}
-                showLastButton={true}
-            />
+        <Box>
+            <Paper elevation={2} sx={{ padding: 0.5 }}>
+                <TableContainer sx={{ height: 600, overflowY: 'auto' }}>
+                    <Table stickyHeader>
+                        <EnhancedTableHead
+                            selectedIds={selectedIds}
+                            order={order}
+                            orderBy={orderBy}
+                            onSelectAllClick={handleSelectAllClick}
+                            onRequestSort={handleRequestSort}
+                        />
+                        <TableBody>
+                            {requestMasterItemsCompleteSelector.response.content.length > 0 &&
+                                requestMasterItemsCompleteSelector.response.content.map((requestMasterItem, index) => (
+                                    <TableRow key={index}>
+                                        <StyledTableCell padding="checkbox">
+                                            <Checkbox
+                                                color="default"
+                                                onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                                                    handleCheckboxChange(event, requestMasterItem)
+                                                }
+                                                checked={selectedIds.includes(requestMasterItem.id)}
+                                            />
+                                        </StyledTableCell>
+                                        <StyledTableCell>
+                                            {requestMasterItem && requestMasterItem.masterItem.item}
+                                        </StyledTableCell>
+                                        <StyledTableCell>
+                                            {requestMasterItem && requestMasterItem.masterItem.recentCN}
+                                        </StyledTableCell>
+                                        <StyledTableCell>{requestMasterItem.quantity}</StyledTableCell>
+                                        <StyledTableCell>{requestMasterItem.confirmation}</StyledTableCell>
+                                        <StyledTableCell>
+                                            {moment(requestMasterItem.timeRequested).format('MM/DD/YYYY')}
+                                        </StyledTableCell>
+                                        <StyledTableCell>
+                                            {moment(requestMasterItem.timeUpdated).format('MM/DD/YYYY')}
+                                        </StyledTableCell>
+                                        <StyledTableCell>{requestMasterItem.customDetail}</StyledTableCell>
+                                    </TableRow>
+                                ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            </Paper>
         </Box>
     );
 };

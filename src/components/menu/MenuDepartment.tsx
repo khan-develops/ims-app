@@ -18,24 +18,14 @@ const MenuDepartment = () => {
                 </Box>
 
                 <Box sx={{ display: 'flex', gap: 1 }}>
-                    <Button
-                        sx={{
-                            color: location.pathname === '/departments/extractions' ? 'yellow' : '#fff',
-                            fontWeight: '700'
-                        }}
-                        component={Link}
-                        to="/departments/extractions"
-                        state="extractions">
-                        extractions
-                    </Button>
                     {profileDetailSelector.profileDetail?.department === DEPARTMENT.EXTRACTIONS && (
                         <Button
                             sx={{
-                                color: location.pathname === '/extractions' ? 'yellow' : '#fff',
+                                color: location.pathname === '/departments/extractions' ? 'yellow' : '#fff',
                                 fontWeight: '700'
                             }}
                             component={Link}
-                            to="/extractions"
+                            to="/departments/extractions"
                             state="extractions">
                             extractions
                         </Button>
@@ -43,11 +33,11 @@ const MenuDepartment = () => {
                     {profileDetailSelector.profileDetail?.department === DEPARTMENT.MASS_SPEC && (
                         <Button
                             sx={{
-                                color: location.pathname === '/mass-spec' ? 'yellow' : '#fff',
+                                color: location.pathname === '/departments/mass-spec' ? 'yellow' : '#fff',
                                 fontWeight: '700'
                             }}
                             component={Link}
-                            to="/mass-spec"
+                            to="/departments/mass-spec"
                             state="mass-spec">
                             mass-spec
                         </Button>
@@ -55,7 +45,7 @@ const MenuDepartment = () => {
                     {profileDetailSelector.profileDetail?.department === DEPARTMENT.PROCESSING_LAB && (
                         <Button
                             sx={{
-                                color: location.pathname === '/processing-lab' ? 'yellow' : '#fff',
+                                color: location.pathname === '/departments/processing-lab' ? 'yellow' : '#fff',
                                 fontWeight: '700'
                             }}
                             component={Link}
@@ -67,11 +57,11 @@ const MenuDepartment = () => {
                     {profileDetailSelector.profileDetail?.department === DEPARTMENT.RD && (
                         <Button
                             sx={{
-                                color: location.pathname === '/rd' ? 'yellow' : '#fff',
+                                color: location.pathname === '/departments/rd' ? 'yellow' : '#fff',
                                 fontWeight: '700'
                             }}
                             component={Link}
-                            to="/rd"
+                            to="/departments/rd"
                             state="rd">
                             r&d
                         </Button>
@@ -79,11 +69,11 @@ const MenuDepartment = () => {
                     {profileDetailSelector.profileDetail?.department === DEPARTMENT.SCREENING && (
                         <Button
                             sx={{
-                                color: location.pathname === '/screening' ? 'yellow' : '#fff',
+                                color: location.pathname === '/departments/screening' ? 'yellow' : '#fff',
                                 fontWeight: '700'
                             }}
                             component={Link}
-                            to="/screening"
+                            to="/departments/screening"
                             state="screening">
                             screening
                         </Button>
@@ -91,11 +81,11 @@ const MenuDepartment = () => {
                     {profileDetailSelector.profileDetail?.department === DEPARTMENT.SHIPPING && (
                         <Button
                             sx={{
-                                color: location.pathname === '/shipping' ? 'yellow' : '#fff',
+                                color: location.pathname === '/departments/shipping' ? 'yellow' : '#fff',
                                 fontWeight: '700'
                             }}
                             component={Link}
-                            to="/shipping"
+                            to="/departments/shipping"
                             state="shipping">
                             shipping
                         </Button>
@@ -103,11 +93,11 @@ const MenuDepartment = () => {
                     {profileDetailSelector.profileDetail?.department === DEPARTMENT.SHIPPING && (
                         <Button
                             sx={{
-                                color: location.pathname === '/qc-internal-standards' ? 'yellow' : '#fff',
+                                color: location.pathname === '/departments/qc-internal-standards' ? 'yellow' : '#fff',
                                 fontWeight: '700'
                             }}
                             component={Link}
-                            to="/qc-internal-standards"
+                            to="/departments/qc-internal-standards"
                             state="qc-internal-standards">
                             qc internal standards
                         </Button>
@@ -115,7 +105,7 @@ const MenuDepartment = () => {
                     {profileDetailSelector.profileDetail?.department === DEPARTMENT.QC_QA && (
                         <Button
                             sx={{
-                                color: location.pathname === '/qc-qa' ? 'yellow' : '#fff',
+                                color: location.pathname === '/departments/qc-qa' ? 'yellow' : '#fff',
                                 fontWeight: '700'
                             }}
                             component={Link}
@@ -136,7 +126,7 @@ const MenuDepartment = () => {
                     </Button>
                     <Button
                         sx={{
-                            color: location.pathname === '/office-supply-request/list' ? 'yellow' : '#fff',
+                            color: location.pathname === '/requests/office-supply-request/list' ? 'yellow' : '#fff',
                             fontWeight: '700'
                         }}
                         component={Link}
@@ -146,7 +136,7 @@ const MenuDepartment = () => {
                     </Button>
                     <Button
                         sx={{
-                            color: location.pathname === '/store-room-request/list' ? 'yellow' : '#fff',
+                            color: location.pathname === '/requests/store-room-request/list' ? 'yellow' : '#fff',
                             fontWeight: '700'
                         }}
                         component={Link}

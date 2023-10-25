@@ -37,6 +37,7 @@ import masterItemDeleteReducer from './slice/master/masterItemDeleteSlice';
 import departmentNamesReducer from './slice/departmentName/departmentNamesSlice';
 import departmentNameCreateReducer from './slice/departmentName/departmentNameActionSlice';
 import departmentMasterItemAssignReducer from './slice/department/departmentMasterItemAssignSlice';
+import requestMasterItemsDashboardReducer from './slice/request/dashboard/requestMasterItemsDashboardSlice'
 
 export const store = configureStore({
     reducer: {
@@ -77,7 +78,8 @@ export const store = configureStore({
         masterItemDeleteStore: masterItemDeleteReducer,
         departmentNamesStore: departmentNamesReducer,
         departmentNameCreateStore: departmentNameCreateReducer,
-        departmentMasterItemAssignStore: departmentMasterItemAssignReducer
+        departmentMasterItemAssignStore: departmentMasterItemAssignReducer,
+        requestMasterItemsDashboardStore: requestMasterItemsDashboardReducer
     }
 });
 

@@ -53,6 +53,7 @@ import FileSaver from 'file-saver';
 import { IMaster } from '../app/api/properties/IMaster';
 import { visuallyHidden } from '@mui/utils';
 import { inventoryRequestDepartments } from '../components/common/routes';
+import { getRequestMasterItemsDashboardThunk } from '../app/slice/request/dashboard/requestMasterItemsDashboardSlice';
 
 const baseUrl = process.env.REACT_APP_BASE_URL;
 
@@ -265,7 +266,9 @@ const RequestMasterAdmin = () => {
     const [selectedDepartment, setSelectedDepartment] = useState<string>('extractions');
 
     useEffect(() => {
-        dispatch(getRequestMasterItemsThunk({ state: location.state, department: selectedDepartment, page: page }));
+        dispatch(
+            getRequestMasterItemsDashboardThunk({ state: location.state, department: selectedDepartment, page: page })
+        );
     }, [dispatch, location.pathname, location.state, page]);
 
     const handleChangePage = (event: any, page: number): void => {

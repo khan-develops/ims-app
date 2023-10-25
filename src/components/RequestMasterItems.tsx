@@ -24,10 +24,12 @@ import { IMaster } from '../app/api/properties/IMaster';
 import { visuallyHidden } from '@mui/utils';
 import FileSaver from 'file-saver';
 import axios from 'axios';
-import { changeMasterItems, getMasterItemsThunk, selectMasterItems } from '../app/slice/master/masterItemsSlice';
+import { selectMasterItems } from '../app/slice/master/masterItemsSlice';
+import { getRequestMasterItemsThunk, selectRequestMasterItems } from '../app/slice/request/requestMasterItemsSlice';
+import { IRequest, IRequestMaster } from '../app/api/properties/IRequest';
 
 const columns: {
-    id: keyof IMaster;
+    id: keyof IMaster | keyof IRequest;
     numeric: boolean;
     label: string;
     align: 'left' | 'right' | 'center';
@@ -97,7 +99,7 @@ type Order = 'asc' | 'desc';
 const baseUrl = process.env.REACT_APP_BASE_URL;
 
 interface EnhancedTableProps {
-    onRequestSort: (event: MouseEvent<unknown>, property: keyof IMaster) => void;
+    onRequestSort: (event: MouseEvent<unknown>, property: keyof IMaster | keyof IRequest) => void;
     onSelectAllClick: (event: ChangeEvent<HTMLInputElement>) => void;
     order: Order;
     orderBy: string;
@@ -107,7 +109,7 @@ interface EnhancedTableProps {
 const EnhancedTableHead = (props: EnhancedTableProps) => {
     const masterItemsSelector = useAppSelector(selectMasterItems);
     const { onSelectAllClick, order, orderBy, onRequestSort, selectedIds } = props;
-    const createSortHandler = (property: keyof IMaster) => (event: MouseEvent<unknown>) => {
+    const createSortHandler = (property: keyof IMaster | keyof IRequest) => (event: MouseEvent<unknown>) => {
         onRequestSort(event, property);
     };
 
@@ -166,7 +168,7 @@ const EnhancedTableHead = (props: EnhancedTableProps) => {
 };
 
 const RequestMasterItems = () => {
-    const masterItemsSelector = useAppSelector(selectMasterItems);
+    const requestMasterItemsSelector = useAppSelector(selectRequestMasterItems);
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
     const { type } = useAppSelector(selectDrawerToggleType);
     const dispatch = useAppDispatch();
@@ -179,8 +181,8 @@ const RequestMasterItems = () => {
     const [dense, setDense] = useState(false);
 
     useEffect(() => {
-        dispatch(getMasterItemsThunk(page));
-    }, [dispatch, page]);
+        dispatch(getRequestMasterItemsThunk({ state: location.state, page: page }));
+    }, [dispatch, page, location]);
 
     const handleAddClick = () => {
         dispatch(
@@ -190,11 +192,11 @@ const RequestMasterItems = () => {
         );
     };
 
-    const handleCheckboxChange = (event: ChangeEvent<HTMLInputElement>, masterItem: IMaster) => {
+    const handleCheckboxChange = (event: ChangeEvent<HTMLInputElement>, requestMasterItem: IRequestMaster) => {
         if (event.target.checked) {
-            setSelectedIds([...selectedIds, masterItem.id]);
+            setSelectedIds([...selectedIds, requestMasterItem.id]);
         } else {
-            setSelectedIds([...selectedIds.filter((id) => id !== masterItem.id)]);
+            setSelectedIds([...selectedIds.filter((id) => id !== requestMasterItem.id)]);
         }
     };
 
@@ -236,7 +238,7 @@ const RequestMasterItems = () => {
         // }
     };
 
-    const handleRequestSort = (event: MouseEvent<unknown>, property: keyof IMaster) => {
+    const handleRequestSort = (event: MouseEvent<unknown>, property: keyof IMaster | keyof IRequest) => {
         // if (order === 'asc' && orderBy === 'id') {
         //     dispatch(
         //         sortMasterDepartmentItemsThunk({
@@ -277,9 +279,9 @@ const RequestMasterItems = () => {
     };
 
     const handleSelectAllClick = (event: ChangeEvent<HTMLInputElement>) => {
-        if (selectedIds.length < masterItemsSelector.response.content.length) {
+        if (selectedIds.length < requestMasterItemsSelector.response.content.length) {
             setSelectedIds(
-                masterItemsSelector.response.content.reduce(
+                requestMasterItemsSelector.response.content.reduce(
                     (acc: number[], masterItem) => (acc.includes(masterItem.id) ? acc : [...acc, masterItem.id]),
                     []
                 )
@@ -302,23 +304,23 @@ const RequestMasterItems = () => {
                             onRequestSort={handleRequestSort}
                         />
                         <TableBody>
-                            {masterItemsSelector.response.content.length > 0 &&
-                                masterItemsSelector.response.content.map((masterItem, index) => (
+                            {requestMasterItemsSelector.response.content.length > 0 &&
+                                requestMasterItemsSelector.response.content.map((requestMasterItem, index) => (
                                     <TableRow key={index}>
                                         <StyledTableCell padding="checkbox">
                                             <Checkbox
                                                 color="default"
                                                 onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                                                    handleCheckboxChange(event, masterItem)
+                                                    handleCheckboxChange(event, requestMasterItem)
                                                 }
-                                                checked={selectedIds.includes(masterItem.id)}
+                                                checked={selectedIds.includes(requestMasterItem.id)}
                                             />
                                         </StyledTableCell>
-                                        <StyledTableCell>{masterItem.item}</StyledTableCell>
-                                        <StyledTableCell>{masterItem.recentCN}</StyledTableCell>
-                                        <StyledTableCell>{masterItem.purchaseUnit}</StyledTableCell>
-                                        <StyledTableCell>{masterItem.partNumber}</StyledTableCell>
-                                        <StyledTableCell>{masterItem.comment}</StyledTableCell>
+                                        <StyledTableCell>{requestMasterItem.masterItem.item}</StyledTableCell>
+                                        <StyledTableCell>{requestMasterItem.recentCN}</StyledTableCell>
+                                        <StyledTableCell>{requestMasterItem.masterItem.purchaseUnit}</StyledTableCell>
+                                        <StyledTableCell>{requestMasterItem.masterItem.partNumber}</StyledTableCell>
+                                        <StyledTableCell>{requestMasterItem.masterItem.comment}</StyledTableCell>
                                     </TableRow>
                                 ))}
                         </TableBody>

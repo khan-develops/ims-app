@@ -415,8 +415,8 @@ const RequestMasterDepartmentPending = () => {
                                         </StyledTableCell>
 
                                         <StyledTableCell>{requestMasterItem.masterItem.item}</StyledTableCell>
-                                        <StyledTableCell>{requestMasterItem.recentCN}</StyledTableCell>
-                                        <StyledTableCell width={100}>
+                                        <StyledTableCell>{requestMasterItem.masterItem.recentCN}</StyledTableCell>
+                                        <StyledTableCell>
                                             <TextField
                                                 size="small"
                                                 type="number"
@@ -435,8 +435,6 @@ const RequestMasterDepartmentPending = () => {
                                         </StyledTableCell>
                                         <StyledTableCell>
                                             <TextField
-                                                variant="standard"
-                                                sx={{ width: 150 }}
                                                 size="small"
                                                 id={requestMasterItem.id.toString()}
                                                 value={requestMasterItem.customText}
