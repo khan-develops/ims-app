@@ -64,6 +64,7 @@ import { IOrderDetail } from '../app/api/properties/IOrderDetail';
 import { visuallyHidden } from '@mui/utils';
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import IndeterminateCheckBoxIcon from '@mui/icons-material/IndeterminateCheckBox';
+import DisabledByDefaultIcon from '@mui/icons-material/DisabledByDefault';
 
 const columns: {
     id: keyof IMaster | keyof IOrderDetail;
@@ -212,12 +213,12 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 const StyledSubTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
         backgroundColor: '#f8fafc',
-        fontSize: 11,
+        fontSize: 12,
         fontWeight: 400,
         color: theme.palette.common.black
     },
     [`&.${tableCellClasses.body}`]: {
-        fontSize: 11
+        fontSize: 12
     }
 }));
 
@@ -252,22 +253,21 @@ const DepartmentRow = ({
     const masterDepartmentItemsSelector = useAppSelector(selectMasterDepartmentItems);
     const dispatch = useAppDispatch();
     const location = useLocation();
-    const [quantityTypeChange, setQuantityTypeChange] = useState<{
-        type: 'received' | 'issued' | '';
+    const [updateAction, setUpdateAction] = useState<{
+        action: 'received' | 'issued' | '';
         position: 'center' | 'left' | 'right';
-        color: 'warning' | 'success' | 'inherit';
-    }>({ type: '', position: 'center', color: 'inherit' });
+    }>({ action: '', position: 'center' });
     const inputRef = useRef<{
-        location: HTMLElement | null;
-        maximumQuantity: HTMLElement | null;
-        minimumQuantity: HTMLElement | null;
-        usageLevel: HTMLElement | null;
-        lotNumber: HTMLElement | null;
-        quantity: HTMLElement | null;
-        expirationDate: HTMLElement | null;
-        receivedDate: HTMLElement | null;
-        issued: HTMLElement | null;
-        received: HTMLElement | null;
+        location: HTMLDivElement | null;
+        maximumQuantity: HTMLDivElement | null;
+        minimumQuantity: HTMLDivElement | null;
+        usageLevel: HTMLDivElement | null;
+        lotNumber: HTMLDivElement | null;
+        quantity: HTMLInputElement | null;
+        expirationDate: HTMLDivElement | null;
+        receivedDate: HTMLDivElement | null;
+        issued: HTMLDivElement | null;
+        received: HTMLDivElement | null;
     }>({
         location: null,
         maximumQuantity: null,
@@ -281,46 +281,79 @@ const DepartmentRow = ({
         received: null
     });
 
-    const handleEnterKey = (
+    const updateQuantity = (
         event: KeyboardEvent<HTMLElement>,
         departmentItem: IDepartment,
-        ref: HTMLElement | null
+        ref: HTMLInputElement | null
     ) => {
         if (event.key === 'Enter') {
             departmentItem = {
                 ...departmentItem,
                 [(event.target as HTMLInputElement).name]: (event.target as HTMLInputElement).value
             };
-            dispatch(
-                updateDepartmentItemThunk({
-                    state: location.state,
-                    departmentItem: departmentItem
-                })
-            )
-                .then(() => {
-                    inputRef.current.quantity = ref;
-                    if (ref) {
-                        ref.style.backgroundColor = '#98FB98';
-                        ref.style.transition = '1s background ease-in, 500ms transform ease-out 1s';
-                        setTimeout(() => {
-                            if (ref) {
-                                ref.style.backgroundColor = '#FAFAFA';
-                            }
-                        }, 700);
-                    }
-                })
-                .catch((error: Error) => {
-                    console.error(error.message);
-                    if (ref) {
-                        ref.style.backgroundColor = '#FF0000';
-                        ref.style.transition = '1s background ease-in, 500ms transform ease-out 1s';
-                        setTimeout(() => {
-                            if (ref) {
-                                ref.style.backgroundColor = '#FAFAFA';
-                            }
-                        }, 700);
-                    }
-                });
+            if (updateAction.action === '') {
+                dispatch(
+                    updateDepartmentItemThunk({
+                        state: location.state,
+                        departmentItem: departmentItem
+                    })
+                )
+                    .then(() => {
+                        inputRef.current.quantity = ref;
+                        if (ref) {
+                            ref.style.backgroundColor = '#98FB98';
+                            ref.style.transition = '1s background ease-in, 500ms transform ease-out 1s';
+                            setTimeout(() => {
+                                if (ref) {
+                                    ref.style.backgroundColor = '#FAFAFA';
+                                }
+                            }, 700);
+                        }
+                    })
+                    .catch((error: Error) => {
+                        console.error(error.message);
+                        if (ref) {
+                            ref.style.backgroundColor = '#FF0000';
+                            ref.style.transition = '1s background ease-in, 500ms transform ease-out 1s';
+                            setTimeout(() => {
+                                if (ref) {
+                                    ref.style.backgroundColor = '#FAFAFA';
+                                }
+                            }, 700);
+                        }
+                    });
+            } else {
+                dispatch(
+                    updateDepartmentItemQuantityThunk({
+                        state: location.state,
+                        departmentItemId: departmentItem.id,
+                        quantity: parseInt((event.target as HTMLInputElement).value),
+                        updateAction: updateAction.action
+                    })
+                )
+                    .then((response) => {
+                        if (inputRef && inputRef.current && inputRef.current.quantity) {
+                            inputRef.current.quantity.value = response.payload.quantity;
+                            inputRef.current.quantity?.blur();
+                        }
+                        setUpdateAction({
+                            action: '',
+                            position: 'center'
+                        });
+                    })
+                    .catch((error: Error) => {
+                        console.error(error.message);
+                        if (ref) {
+                            ref.style.backgroundColor = '#FF0000';
+                            ref.style.transition = '1s background ease-in, 500ms transform ease-out 1s';
+                            setTimeout(() => {
+                                if (ref) {
+                                    ref.style.backgroundColor = '#FAFAFA';
+                                }
+                            }, 700);
+                        }
+                    });
+            }
         }
     };
 
@@ -385,13 +418,13 @@ const DepartmentRow = ({
     const updateTotalQuantity = (
         event: KeyboardEvent<HTMLInputElement>,
         newMasterDepartmentItem: IMasterDepartment,
-        updateAction: 'received' | 'issued',
+        action: 'received' | 'issued',
         ref: HTMLDivElement | null
     ): void => {
-        if (updateAction === 'received') {
+        if (action === 'received') {
             inputRef.current.received = ref;
         }
-        if (updateAction === 'issued') {
+        if (action === 'issued') {
             inputRef.current.issued = ref;
         }
 
@@ -401,7 +434,7 @@ const DepartmentRow = ({
                     state: location.state,
                     departmentItemId: newMasterDepartmentItem.departmentItems[0].id,
                     quantity: parseInt((event.target as HTMLInputElement).value),
-                    updateAction: updateAction
+                    updateAction: action
                 })
             )
                 .then((response) => {
@@ -445,18 +478,25 @@ const DepartmentRow = ({
         }
     };
 
-    const changeQuantity = (
-        event: MouseEvent,
-        ref: HTMLElement | null,
-        quantityTypeChange: 'issued' | 'received' | ''
-    ) => {
-        if (ref) {
-            ref.focus();
+    const handleIssuedReceived = (actionType: 'issued' | 'received' | '') => {
+        if (inputRef && inputRef.current && inputRef.current.quantity) {
+            inputRef.current.quantity?.focus();
+            inputRef.current.quantity.value = '';
         }
-        setQuantityTypeChange({
-            type: quantityTypeChange,
-            color: quantityTypeChange === 'received' ? 'success' : 'warning',
+
+        setUpdateAction({
+            action: actionType,
             position: 'received' ? 'right' : 'left'
+        });
+    };
+
+    const closeIssuedReceived = (defaultValue: number) => {
+        if (inputRef && inputRef.current && inputRef.current.quantity) {
+            inputRef.current.quantity?.blur();
+        }
+        setUpdateAction({
+            action: '',
+            position: 'center'
         });
     };
 
@@ -470,32 +510,40 @@ const DepartmentRow = ({
             <StyledSubTableCell width={150}>
                 <TextField
                     id="quantity"
-                    ref={(ref) => (inputRef.current.quantity = ref)}
                     type="number"
                     name="quantity"
+                    inputRef={(ref) => (inputRef.current.quantity = ref)}
                     InputProps={{
-                        inputProps: { min: 0, style: { textAlign: quantityTypeChange.position, fontWeight: 700 } },
+                        inputProps: {
+                            min: 0,
+                            style: { textAlign: updateAction.position, fontWeight: 700, fontSize: 14 }
+                        },
                         startAdornment:
-                            quantityTypeChange.type === 'issued' ? null : (
+                            updateAction.action === 'issued' ? null : updateAction.action === 'received' ? (
                                 <IconButton
                                     edge="start"
-                                    onClick={(event: MouseEvent) =>
-                                        changeQuantity(event, inputRef.current.quantity, 'received')
-                                    }
-                                    color={quantityTypeChange.color}>
+                                    onClick={() => closeIssuedReceived(departmentItem.quantity)}
+                                    color="error">
+                                    <DisabledByDefaultIcon />
+                                </IconButton>
+                            ) : (
+                                <IconButton
+                                    edge="start"
+                                    onClick={() => handleIssuedReceived('received')}
+                                    color="success">
                                     <AddBoxIcon />
                                 </IconButton>
                             ),
                         endAdornment:
-                            quantityTypeChange.type === 'received' ? null : (
+                            updateAction.action === 'received' ? null : updateAction.action === 'issued' ? (
                                 <IconButton
                                     edge="end"
-                                    onClick={(event: MouseEvent) =>
-                                        changeQuantity(event, inputRef.current.quantity, 'issued')
-                                    }
-                                    color={
-                                        quantityTypeChange?.type === 'issued' ? quantityTypeChange?.color : 'secondary'
-                                    }>
+                                    onClick={() => closeIssuedReceived(departmentItem.quantity)}
+                                    color="error">
+                                    <DisabledByDefaultIcon />
+                                </IconButton>
+                            ) : (
+                                <IconButton edge="end" color="warning" onClick={() => handleIssuedReceived('issued')}>
                                     <IndeterminateCheckBoxIcon />
                                 </IconButton>
                             )
@@ -503,7 +551,7 @@ const DepartmentRow = ({
                     size="small"
                     defaultValue={departmentItem.quantity}
                     onKeyDown={(event: KeyboardEvent<HTMLElement>) =>
-                        handleEnterKey(event, departmentItem, inputRef.current.quantity)
+                        updateQuantity(event, departmentItem, inputRef.current.quantity)
                     }
                 />
             </StyledSubTableCell>
@@ -519,7 +567,7 @@ const DepartmentRow = ({
                                 sx={{
                                     '.MuiInputBase-input': {
                                         padding: 1,
-                                        fontSize: 11,
+                                        fontSize: 12,
                                         width: 140
                                     }
                                 }}
@@ -541,7 +589,7 @@ const DepartmentRow = ({
                                 sx={{
                                     '.MuiInputBase-input': {
                                         padding: 1,
-                                        fontSize: 11,
+                                        fontSize: 12,
                                         width: 140
                                     }
                                 }}

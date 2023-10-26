@@ -1,4 +1,4 @@
-import { Step, StepButton, Stepper, Tab, Tabs } from '@mui/material';
+import { Button, Step, StepButton, Stepper, Tab, Tabs } from '@mui/material';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 import RequestMasterDepartmentPending from '../components/RequestMasterItemsPending';
 import RequestMasterDepartmentComplete from '../components/RequestMasterItemsComplete';
@@ -76,37 +76,6 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     }
 }));
 
-interface TabPanelProps {
-    children?: React.ReactNode;
-    dir?: string;
-    index: number;
-    value: number;
-}
-
-function TabPanel(props: TabPanelProps) {
-    const { children, value, index, ...other } = props;
-
-    return (
-        <div
-            role="tabpanel"
-            hidden={value !== index}
-            id={`simple-tabpanel-${index}`}
-            aria-labelledby={`simple-tab-${index}`}
-            {...other}>
-            {value === 0 && <RequestMasterDepartmentItems />}
-            {value === 1 && <RequestMasterDepartmentPending />}
-            {value === 2 && <RequestMasterDepartmentComplete />}
-        </div>
-    );
-}
-
-function a11yProps(index: number) {
-    return {
-        id: `full-width-tab-${index}`,
-        'aria-controls': `full-width-tabpanel-${index}`
-    };
-}
-
 const RequestMasterItems = () => {
     const location = useLocation();
     const navigate = useNavigate();
@@ -124,10 +93,6 @@ const RequestMasterItems = () => {
         });
         setActiveStep(0);
     }, [location.state]);
-
-    const handleStep = (step: number) => () => {
-        setActiveStep(step);
-    };
 
     const handleChangePage = (event: any, newPage: number): void => {
         setPage(newPage);
@@ -152,14 +117,6 @@ const RequestMasterItems = () => {
 
     const handleKeywordChange = (event: ChangeEvent<HTMLInputElement>) => {
         // dispatch(filterMasterDepartmentItemsThunk({ state: location.state, keyword: event.target.value, page: 0 }));
-    };
-
-    const handleAddClick = () => {
-        dispatch(
-            toggleDrawer({
-                type: DRAWER_TOGGLE_TYPE.ADD_MASTER_ITEM
-            })
-        );
     };
 
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -191,7 +148,7 @@ const RequestMasterItems = () => {
             </Grid>
             <Grid item padding={2}>
                 <Box sx={{ marginBottom: 2 }}>
-                    <Paper square>
+                    <Paper square sx={{ display: 'flex', justifyContent: 'space-between' }}>
                         <Tabs value={value} onChange={handleChange}>
                             <Tab
                                 label="Items"
@@ -212,59 +169,11 @@ const RequestMasterItems = () => {
                                 state={location.state}
                             />
                         </Tabs>
+                        <Button variant="text" sx={{ paddingRight: 2 }}>
+                            SEND
+                        </Button>
                     </Paper>
                 </Box>
-
-                {/* <Stepper activeStep={2} sx={{ marginBottom: 4 }}>
-                    <Step>
-                        <StepButton
-                            icon={
-                                activeStep === 0 ? (
-                                    <BorderColorIcon color="secondary" />
-                                ) : (
-                                    <Filter1Icon color="primary" />
-                                )
-                            }
-                            onClick={handleStep(0)}
-                            component={Link}
-                            to={`${location.state}-request/list`}
-                            state={location.state}>
-                            List
-                        </StepButton>
-                    </Step>
-                    <Step>
-                        <StepButton
-                            icon={
-                                activeStep === 1 ? (
-                                    <BorderColorIcon color="secondary" />
-                                ) : (
-                                    <Filter2Icon color="primary" />
-                                )
-                            }
-                            onClick={handleStep(1)}
-                            component={Link}
-                            to={`/departments/${location.state}-request/confirmation`}
-                            state={location.state}>
-                            Confirmation
-                        </StepButton>
-                    </Step>
-                    <Step>
-                        <StepButton
-                            icon={
-                                activeStep === 2 ? (
-                                    <BorderColorIcon color="secondary" />
-                                ) : (
-                                    <Filter3Icon color="primary" />
-                                )
-                            }
-                            onClick={handleStep(2)}
-                            component={Link}
-                            to={`/departments/${location.state}-request/status`}
-                            state={location.state}>
-                            Status
-                        </StepButton>
-                    </Step>
-                </Stepper> */}
                 <Outlet />
             </Grid>
             <Grid>
@@ -277,55 +186,17 @@ const RequestMasterItems = () => {
                             value={value}>
                             <Grid container justifyContent="space-between" paddingLeft={2} paddingRight={2}>
                                 <Grid item>
-                                    {' '}
-                                    {(location.pathname === '/departments/extractions' ||
-                                        location.pathname === '/departments/mass-spec' ||
-                                        location.pathname === '/departments/processing-lab' ||
-                                        location.pathname === '/departments/rd' ||
-                                        location.pathname === '/departments/screening' ||
-                                        location.pathname === '/departments/shipping' ||
-                                        location.pathname === '/departments/qc-qa') && (
-                                        <BottomNavigationAction
-                                            label="Download"
-                                            onClick={handleDownloadClick}
-                                            icon={<DownloadIcon color="primary" sx={{ fontSize: 40 }} />}
-                                        />
-                                    )}
-                                    {(location.pathname === '/general-request/list' ||
-                                        location.pathname === '/office-supply-request/list' ||
-                                        location.pathname === '/store-room-request/list') && (
-                                        <BottomNavigationAction
-                                            label="Review"
-                                            onClick={handleReviewClick}
-                                            icon={<PreviewIcon color="primary" sx={{ fontSize: 40 }} />}
-                                        />
-                                    )}
-                                    {(location.pathname === '/general-request/confirmation' ||
-                                        location.pathname === '/office-supply-request/confirmation' ||
-                                        location.pathname === '/store-room-request/confirmation') && (
-                                        <BottomNavigationAction
-                                            label="Send"
-                                            onClick={handleEditClick}
-                                            icon={<EditIcon color="primary" sx={{ fontSize: 40 }} />}
-                                        />
-                                    )}
-                                    {(location.pathname === '/general-request/confirmation' ||
-                                        location.pathname === '/office-supply-request/confirmation' ||
-                                        location.pathname === '/store-room-request/confirmation') && (
-                                        <BottomNavigationAction
-                                            label="Send"
-                                            onClick={handleEditClick}
-                                            icon={<SendIcon />}
-                                        />
-                                    )}
-                                    {location.pathname === '/admin/master' && (
-                                        <BottomNavigationAction
-                                            label="Add Item"
-                                            onClick={handleAddClick}
-                                            icon={<AddBoxIcon color="primary" sx={{ fontSize: 40 }} />}
-                                        />
-                                    )}
-                                    {/* <Switch /> */}
+                                    <BottomNavigationAction
+                                        label="Download"
+                                        onClick={handleDownloadClick}
+                                        icon={<DownloadIcon color="primary" sx={{ fontSize: 40 }} />}
+                                    />
+
+                                    <BottomNavigationAction
+                                        label="Review"
+                                        onClick={handleReviewClick}
+                                        icon={<PreviewIcon color="primary" sx={{ fontSize: 40 }} />}
+                                    />
                                 </Grid>
                                 <Grid item alignItems="center">
                                     <TablePagination

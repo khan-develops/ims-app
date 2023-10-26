@@ -107,7 +107,7 @@ interface EnhancedTableProps {
 }
 
 const EnhancedTableHead = (props: EnhancedTableProps) => {
-    const masterItemsSelector = useAppSelector(selectMasterItems);
+    const requestMasterItemSelector = useAppSelector(selectRequestMasterItems);
     const { onSelectAllClick, order, orderBy, onRequestSort, selectedIds } = props;
     const createSortHandler = (property: keyof IMaster | keyof IRequest) => (event: MouseEvent<unknown>) => {
         onRequestSort(event, property);
@@ -121,11 +121,12 @@ const EnhancedTableHead = (props: EnhancedTableProps) => {
                         color="default"
                         sx={{ paddingTop: 0, paddingBottom: 0, color: 'white' }}
                         indeterminate={
-                            selectedIds.length > 0 && selectedIds.length < masterItemsSelector.response.content.length
+                            selectedIds.length > 0 &&
+                            selectedIds.length < requestMasterItemSelector.response.content.length
                         }
                         checked={
-                            masterItemsSelector.response.content.length > 0 &&
-                            selectedIds.length === masterItemsSelector.response.content.length
+                            requestMasterItemSelector.response.content.length > 0 &&
+                            selectedIds.length === requestMasterItemSelector.response.content.length
                         }
                         onChange={onSelectAllClick}
                     />
@@ -184,28 +185,12 @@ const RequestMasterItems = () => {
         dispatch(getRequestMasterItemsThunk({ state: location.state, page: page }));
     }, [dispatch, page, location]);
 
-    const handleAddClick = () => {
-        dispatch(
-            toggleDrawer({
-                type: DRAWER_TOGGLE_TYPE.ADD_MASTER_ITEM
-            })
-        );
-    };
-
     const handleCheckboxChange = (event: ChangeEvent<HTMLInputElement>, requestMasterItem: IRequestMaster) => {
         if (event.target.checked) {
             setSelectedIds([...selectedIds, requestMasterItem.id]);
         } else {
             setSelectedIds([...selectedIds.filter((id) => id !== requestMasterItem.id)]);
         }
-    };
-
-    const handleKeywordChange = (event: ChangeEvent<HTMLInputElement>) => {
-        // dispatch(filterMasterDepartmentItemsThunk({ state: state, keyword: event.target.value, page: 0 }));
-    };
-
-    const handleReviewClick = () => {
-        dispatch(toggleDrawer({ type: DRAWER_TOGGLE_TYPE.UPDATE_REQUEST_REVIEW }));
     };
 
     const handleDownloadClick = () => {
@@ -238,45 +223,7 @@ const RequestMasterItems = () => {
         // }
     };
 
-    const handleRequestSort = (event: MouseEvent<unknown>, property: keyof IMaster | keyof IRequest) => {
-        // if (order === 'asc' && orderBy === 'id') {
-        //     dispatch(
-        //         sortMasterDepartmentItemsThunk({
-        //             state: location.state,
-        //             page: page,
-        //             column: property,
-        //             direction: order
-        //         })
-        //     )
-        //         .then(() => setOrderBy(property))
-        //         .catch((error: Error) => console.error(error.message));
-        // } else if (order === 'asc' && orderBy === property) {
-        //     dispatch(
-        //         sortMasterDepartmentItemsThunk({
-        //             state: location.state,
-        //             page: page,
-        //             column: property,
-        //             direction: order
-        //         })
-        //     )
-        //         .then(() => setOrder('desc'))
-        //         .catch((error: Error) => console.error(error.message));
-        // } else if (order === 'desc' && orderBy === property) {
-        //     dispatch(
-        //         sortMasterDepartmentItemsThunk({
-        //             state: location.state,
-        //             page: page,
-        //             column: property,
-        //             direction: order
-        //         })
-        //     )
-        //         .then(() => {
-        //             setOrder('asc');
-        //             setOrderBy('id');
-        //         })
-        //         .catch((error: Error) => console.error(error.message));
-        // }
-    };
+    const handleRequestSort = (event: MouseEvent<unknown>, property: keyof IMaster | keyof IRequest) => {};
 
     const handleSelectAllClick = (event: ChangeEvent<HTMLInputElement>) => {
         if (selectedIds.length < requestMasterItemsSelector.response.content.length) {
