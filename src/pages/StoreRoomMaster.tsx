@@ -274,13 +274,13 @@ const StoreRoomMasterRow = ({
     const updateTotalQuantity = (
         event: KeyboardEvent<HTMLInputElement>,
         newMasterDepartmentItem: IMasterDepartment,
-        updateAction: 'RECEIVED' | 'ISSUED',
+        updateAction: 'received' | 'issued',
         ref: HTMLDivElement | null
     ): void => {
-        if (updateAction === 'RECEIVED') {
+        if (updateAction === 'received') {
             inputRef.current.received = ref;
         }
-        if (updateAction === 'ISSUED') {
+        if (updateAction === 'issued') {
             inputRef.current.issued = ref;
         }
 
@@ -516,7 +516,7 @@ const StoreRoomMasterRow = ({
                             }
                         }}
                         onKeyDown={(event: KeyboardEvent<HTMLInputElement>) =>
-                            updateTotalQuantity(event, masterDepartmentItem, 'RECEIVED', inputRef.current.received)
+                            updateTotalQuantity(event, masterDepartmentItem, 'received', inputRef.current.received)
                         }
                     />
                 </StyledTableCell>
@@ -531,7 +531,7 @@ const StoreRoomMasterRow = ({
                             }
                         }}
                         onKeyDown={(event: KeyboardEvent<HTMLInputElement>) =>
-                            updateTotalQuantity(event, masterDepartmentItem, 'ISSUED', inputRef.current.issued)
+                            updateTotalQuantity(event, masterDepartmentItem, 'issued', inputRef.current.issued)
                         }
                     />
                 </StyledTableCell>

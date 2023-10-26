@@ -23,7 +23,7 @@ export const updateDepartmentItemThunk = createAsyncThunk(
 
 export const updateDepartmentItemQuantityThunk = createAsyncThunk(
     'updateDepartmentItemQuantityThunk',
-    async (params: { state: string; departmentItemId: number, quantity: number, updateAction: 'RECEIVED' | 'ISSUED' }) => {
+    async (params: { state: string; departmentItemId: number, quantity: number, updateAction: 'received' | 'issued' }) => {
         const response = await updateDepartmentItemQuantity(params);
         return response.data;
     }

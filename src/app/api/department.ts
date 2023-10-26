@@ -19,7 +19,7 @@ export const updateDepartmentItem = (params: { state: string; departmentItem: ID
     return axios.patch(`${baseUrl}/departments/${params.state}/${params.departmentItem.id}/update`, params.departmentItem);
 };
 
-export const updateDepartmentItemQuantity = (params: { state: string; departmentItemId: number; quantity: number; updateAction: 'RECEIVED' | 'ISSUED'; }) => {
+export const updateDepartmentItemQuantity = (params: { state: string; departmentItemId: number; quantity: number; updateAction: 'received' | 'issued'; }) => {
     return axios.patch(`${baseUrl}/departments/${params.state}/${params.departmentItemId}/update-quantity?updateAction=${params.updateAction}&quantity=${params.quantity}`);
 };
 
