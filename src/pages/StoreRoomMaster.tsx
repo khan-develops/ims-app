@@ -29,8 +29,6 @@ import {
 import { useLocation } from 'react-router-dom';
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { DRAWER_TOGGLE_TYPE } from '../common/constants';
-import { toggleDrawer } from '../app/slice/drawerToggle/drawerToggleTypeSlice';
 import { IStoreRoom } from '../app/api/properties/IStoreRoom';
 import { selectRequestMasterItemsChecked } from '../app/slice/request/requestMasterItemsCheckedSlice';
 import { selectRequestMasterItemsPendingChecked } from '../app/slice/request/requestMasterItemsPendingCheckedSlice';
@@ -53,6 +51,9 @@ import { IOrderDetail } from '../app/api/properties/IOrderDetail';
 import { IMaster, IMasterDepartment } from '../app/api/properties/IMaster';
 import { visuallyHidden } from '@mui/utils';
 import { updateDepartmentItemQuantityThunk } from '../app/slice/department/departmentItemUpdateSlice';
+import { toggleDepartmentItemDrawer } from '../app/slice/drawerToggle/departmentDrawerSlice';
+import { toggleRequestItemDrawer } from '../app/slice/drawerToggle/requestDrawerSlice';
+import { toggleMasterItemDrawer } from '../app/slice/drawerToggle/masterDrawerSlice';
 
 const columns: {
     id: keyof IStoreRoom | keyof IMaster | keyof IOrderDetail;
@@ -337,9 +338,9 @@ const StoreRoomMasterRow = ({
     const handleEditClick = (event: MouseEvent<HTMLElement>, masterDepartmentItem: IMasterDepartment) => {
         if (masterDepartmentItem) {
             dispatch(
-                toggleDrawer({
-                    type: DRAWER_TOGGLE_TYPE.UPDATE_STORE_ROOM_ITEM,
-                    storeRoomItem: {
+                toggleDepartmentItemDrawer({
+                    toggleType: 'UPDATE_STORE_ROOM_ITEM',
+                    departmentItem: {
                         id: masterDepartmentItem.id,
                         location: masterDepartmentItem.departmentItems[0].location,
                         quantity: masterDepartmentItem.departmentItems[0].quantity,
@@ -574,14 +575,15 @@ const StoreRoomMaster = () => {
 
     const handleAddClick = () => {
         dispatch(
-            toggleDrawer({
-                type: DRAWER_TOGGLE_TYPE.ADD_MASTER_ITEM
+            toggleMasterItemDrawer({
+                toggleType: 'ADD_MASTER_ITEM',
+                masterItem: null
             })
         );
     };
 
     const handleReviewClick = () => {
-        dispatch(toggleDrawer({ type: DRAWER_TOGGLE_TYPE.UPDATE_REQUEST_REVIEW }));
+        dispatch(toggleRequestItemDrawer({ toggleType: 'UPDATE_REQUEST_REVIEW', requestItem: null }));
     };
 
     const handleDownloadClick = () => {
@@ -594,7 +596,7 @@ const StoreRoomMaster = () => {
     };
 
     const handleEditClick = () => {
-        dispatch(toggleDrawer({ type: DRAWER_TOGGLE_TYPE.UPDATE_REQUEST_EDIT }));
+        dispatch(toggleRequestItemDrawer({ toggleType: 'UPDATE_REQUEST_EDIT', requestItem: null }));
     };
 
     const handleKeywordChange = (event: ChangeEvent<HTMLInputElement>) => {

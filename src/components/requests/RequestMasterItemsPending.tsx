@@ -7,7 +7,6 @@ import {
     TableCell,
     TableContainer,
     TableHead,
-    TablePagination,
     TableRow,
     TableSortLabel,
     TextField,
@@ -15,25 +14,21 @@ import {
     tableCellClasses
 } from '@mui/material';
 import { ChangeEvent, useEffect, useState, KeyboardEvent, MouseEvent } from 'react';
-import { useAppDispatch, useAppSelector } from '../app/hooks';
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { useLocation } from 'react-router-dom';
 import {
     changeRequestMasterItemsPending,
     getRequestMasterItemsPendingThunk,
     selectRequestMasterItemsPending
-} from '../app/slice/request/requestMasterItemsPendingSlice';
-import {
-    changeRequestItemsPendingChecked,
-    selectRequestMasterItemsPendingChecked
-} from '../app/slice/request/requestMasterItemsPendingCheckedSlice';
-import { updateRequestMasterItemThunk } from '../app/slice/request/requestMasterItemUpdateSlice';
-import { IRequest, IRequestMaster } from '../app/api/properties/IRequest';
-import { IMaster } from '../app/api/properties/IMaster';
+} from '../../app/slice/request/requestMasterItemsPendingSlice';
+import { selectRequestMasterItemsPendingChecked } from '../../app/slice/request/requestMasterItemsPendingCheckedSlice';
+import { updateRequestMasterItemThunk } from '../../app/slice/request/requestMasterItemUpdateSlice';
+import { IRequest, IRequestMaster } from '../../app/api/properties/IRequest';
+import { IMaster } from '../../app/api/properties/IMaster';
 import { visuallyHidden } from '@mui/utils';
 import FileSaver from 'file-saver';
-import { selectDrawerToggleType, toggleDrawer } from '../app/slice/drawerToggle/drawerToggleTypeSlice';
-import { DRAWER_TOGGLE_TYPE } from '../common/constants';
 import axios from 'axios';
+import { selectRequestDrawer, toggleRequestItemDrawer } from '../../app/slice/drawerToggle/requestDrawerSlice';
 
 const columns: {
     id: keyof IMaster | keyof IRequest;
@@ -182,7 +177,7 @@ const RequestMasterDepartmentPending = () => {
     const [page, setPage] = useState<number>(0);
     const [selectedDepartment, setSelectedDepartment] = useState<string>('extractions');
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
-    const { type } = useAppSelector(selectDrawerToggleType);
+    const { toggleType } = useAppSelector(selectRequestDrawer);
     const location = useLocation();
     const [value, setValue] = useState<number>(0);
     const [order, setOrder] = useState<Order>('asc');
@@ -282,8 +277,9 @@ const RequestMasterDepartmentPending = () => {
 
     const handleAddClick = () => {
         dispatch(
-            toggleDrawer({
-                type: DRAWER_TOGGLE_TYPE.ADD_MASTER_ITEM
+            toggleRequestItemDrawer({
+                toggleType: 'ADD_MASTER_ITEM',
+                requestItem: null
             })
         );
     };
@@ -301,7 +297,7 @@ const RequestMasterDepartmentPending = () => {
     };
 
     const handleReviewClick = () => {
-        dispatch(toggleDrawer({ type: DRAWER_TOGGLE_TYPE.UPDATE_REQUEST_REVIEW }));
+        dispatch(toggleRequestItemDrawer({ toggleType: 'UPDATE_REQUEST_REVIEW', requestItem: null }));
     };
 
     const handleDownloadClick = () => {

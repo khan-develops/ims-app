@@ -16,8 +16,8 @@ import {
 } from '@mui/material';
 import { ChangeEvent, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import { toggleDrawer } from '../../app/slice/drawerToggle/drawerToggleTypeSlice';
-import { CATEGORY, DEPARTMENT } from '../../common/constants';
+import { toggleMasterItemDrawer } from '../../app/slice/drawerToggle/masterDrawerSlice';
+import { DEPARTMENT } from '../../common/constants';
 import { createMasterItemThunk } from '../../app/slice/master/masterItemCreateSlice';
 import { changeMasterItems, selectMasterItems } from '../../app/slice/master/masterItemsSlice';
 import { IMaster } from '../../app/api/properties/IMaster';
@@ -65,14 +65,14 @@ const MasterCreateForm = () => {
                             })
                         )
                     );
-                    dispatch(toggleDrawer({ type: '' }));
+                    dispatch(toggleMasterItemDrawer({ toggleType: '', masterItem: null }));
                 })
                 .catch((error: Error) => console.error(error.message));
         }
     };
 
     const handleCancel = () => {
-        dispatch(toggleDrawer({ type: '' }));
+        dispatch(toggleMasterItemDrawer({ toggleType: '', masterItem: null }));
     };
 
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => {

@@ -1,9 +1,8 @@
 import { Box, Button, Checkbox, FormControlLabel, FormGroup, Grid } from '@mui/material';
 import { useState, ChangeEvent } from 'react';
 import { DEPARTMENT } from '../common/constants';
-import { useDispatch } from 'react-redux';
 import { useAppDispatch } from '../app/hooks';
-import { toggleDrawer } from '../app/slice/drawerToggle/drawerToggleTypeSlice';
+import { toggleMasterItemDrawer } from '../app/slice/drawerToggle/masterDrawerSlice';
 
 const AssignItemForm = () => {
     const dispatch = useAppDispatch();
@@ -23,7 +22,7 @@ const AssignItemForm = () => {
     };
 
     const handleCancel = () => {
-        dispatch(toggleDrawer({ type: '' }));
+        dispatch(toggleMasterItemDrawer({ toggleType: '', masterItem: null }));
     };
 
     return (
@@ -35,8 +34,7 @@ const AssignItemForm = () => {
                 justifyContent: 'space-around',
                 height: '100%',
                 padding: 10
-            }}
-        >
+            }}>
             <FormGroup>
                 {Object.values(DEPARTMENT).map((department, index) => (
                     <FormControlLabel

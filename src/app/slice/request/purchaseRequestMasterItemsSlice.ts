@@ -1,6 +1,6 @@
 import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { RootState } from '../../store';
-import { getRequestMasterItems } from '../../api/request';
+import { getPurchaseRequestMasterItems } from '../../api/request';
 import { RequestMasterItemsState } from '../../api/states/RequestState';
 import { IRequestMaster } from '../../api/properties/IRequest';
 
@@ -19,38 +19,38 @@ const initialState: RequestMasterItemsState = {
     status: 'idle'
 };
 
-export const getRequestMasterItemsThunk = createAsyncThunk(
-    'getRequestMasterItemsThunk',
+export const getPurchaseRequestMasterItemsThunk = createAsyncThunk(
+    'getPurchaseRequestMasterItemsThunk',
     async (params: { state: string, page: number }) => {
-        const response = await getRequestMasterItems(params);
+        const response = await getPurchaseRequestMasterItems(params);
         return response.data;
     }
 );
 
-export const requestMasterItemsSlice = createSlice({
-    name: 'requestItemsSlice',
+export const purchaseRequestMasterItemsSlice = createSlice({
+    name: 'purchaseRequestMasterItemsSlice',
     initialState,
     reducers: {
-        changeRequestMasterItems: (state, action: PayloadAction<IRequestMaster[]>) => {
+        changePurchaseRequestMasterItems: (state, action: PayloadAction<IRequestMaster[]>) => {
             state.response.content = action.payload;
         }
     },
     extraReducers: (builder) => {
         builder
-            .addCase(getRequestMasterItemsThunk.pending, (state) => {
+            .addCase(getPurchaseRequestMasterItemsThunk.pending, (state) => {
                 state.status = 'loading';
             })
-            .addCase(getRequestMasterItemsThunk.fulfilled, (state, action) => {
+            .addCase(getPurchaseRequestMasterItemsThunk.fulfilled, (state, action) => {
                 state.response = action.payload;
             })
-            .addCase(getRequestMasterItemsThunk.rejected, (state) => {
+            .addCase(getPurchaseRequestMasterItemsThunk.rejected, (state) => {
                 state.status = 'failed';
             });
     }
 });
 
-export const selectRequestMasterItems = (state: RootState) => state.requestMasterItemsStore;
+export const selectRequestMasterItems = (state: RootState) => state.purchaseRequestMasterItemsStore;
 
-export const { changeRequestMasterItems } = requestMasterItemsSlice.actions;
+export const { changePurchaseRequestMasterItems } = purchaseRequestMasterItemsSlice.actions;
 
-export default requestMasterItemsSlice.reducer;
+export default purchaseRequestMasterItemsSlice.reducer;

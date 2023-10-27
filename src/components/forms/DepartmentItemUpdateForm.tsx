@@ -1,23 +1,23 @@
 import { Box, Button, Grid, TextField } from '@mui/material';
 import { ChangeEvent, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import { selectDrawerToggleType, toggleDrawer } from '../../app/slice/drawerToggle/drawerToggleTypeSlice';
 import { DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { changeDepartmentItem } from '../../app/slice/department/departmentItemUpdateSlice';
+import { selectDepartmentDrawer, toggleDepartmentItemDrawer } from '../../app/slice/drawerToggle/departmentDrawerSlice';
 
 const UpdateItemForm = () => {
-    const { departmentItem } = useAppSelector(selectDrawerToggleType);
+    const { departmentItem } = useAppSelector(selectDepartmentDrawer);
     const dispatch = useAppDispatch();
 
     useEffect(() => {}, []);
 
     const handleSubmit = () => {
-        dispatch(toggleDrawer({ type: '' }));
+        dispatch(toggleDepartmentItemDrawer({ toggleType: '', departmentItem: null }));
     };
 
     const handleCancel = () => {
-        dispatch(toggleDrawer({ type: '' }));
+        dispatch(toggleDepartmentItemDrawer({ toggleType: '', departmentItem: null }));
     };
 
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => {

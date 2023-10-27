@@ -421,7 +421,7 @@ const Dashboard = () => {
                                         profileDetailsSelector.response.content &&
                                         profileDetailsSelector.response.content.length > 0 &&
                                         profileDetailsSelector.response.content
-                                            .filter((profile) => profile.status === 'ACTIVE')
+                                            .filter((profile) => profile.activeStatus === 'ACTIVE')
                                             .map((profile, index) => (
                                                 <Fragment key={index}>
                                                     <TableRow>
@@ -496,7 +496,7 @@ const Dashboard = () => {
                                                                     size="small"
                                                                     id={profile.userPrincipalName}
                                                                     name="active"
-                                                                    value={profile.status ? 'ACTIVE' : 'INACTIVE'}
+                                                                    value={profile.activeStatus ? 'ACTIVE' : 'INACTIVE'}
                                                                     onChange={(event: SelectChangeEvent) =>
                                                                         handleSelectChange(profile.id, event)
                                                                     }>

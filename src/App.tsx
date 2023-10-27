@@ -9,9 +9,9 @@ import RequestMasterAdmin from './pages/RequestMasterDashboard';
 import Layout from './components/Layout';
 import { Box, ThemeProvider, createTheme } from '@mui/material';
 import Auth from './pages/Auth';
-import RequestMasterItems from './components/RequestMasterItems';
-import RequestMasterComplete from './components/RequestMasterItemsComplete';
-import RequestMasterPending from './components/RequestMasterItemsPending';
+import RequestMasterItems from './components/requests/RequestMasterItemsPurchase';
+import RequestMasterComplete from './components/requests/RequestMasterItemsComplete';
+import RequestMasterPending from './components/requests/RequestMasterItemsPending';
 
 const router = createBrowserRouter(
     createRoutesFromElements(
@@ -24,7 +24,7 @@ const router = createBrowserRouter(
                 <Route path="office-supply-request-dashboard" element={<RequestMasterAdmin />} />
                 <Route path="store-room-request-dashboard" element={<RequestMasterAdmin />} />
             </Route>
-            <Route path='requests'>
+            <Route path="requests">
                 <Route path="general-request" element={<RequestMaster />}>
                     <Route path="list" element={<RequestMasterItems />} />
                     <Route path="confirmation" element={<RequestMasterPending />} />

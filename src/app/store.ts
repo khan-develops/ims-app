@@ -9,10 +9,9 @@ import searchReducer from './search';
 import storeRoomMasterItemsReducer from './slice/storeRoom/storeRoomMasterItemsSlice';
 import storeRoomUpdateReducer from './slice/storeRoom/storeRoomUpdateSlice';
 import requestItemsUpdateReducer from './slice/request/requestMasterItemsUpdateSlice';
-import requestMasterItemsReducer from './slice/request/requestMasterItemsSlice';
+import requestMasterItemsReducer from './slice/request/purchaseRequestMasterItemsSlice';
 import bottomToolbarItemsReducer from './bottomToolbar/bottomToolbarItems';
 import requestMasterItemsCheckedReducer from './slice/request/requestMasterItemsCheckedSlice';
-import drawerToggleTypeReducer from './slice/drawerToggle/drawerToggleTypeSlice';
 import requestMasterItemsCreateReducer from './slice/request/requestMasterItemsCreateSlice';
 import requestMasterItemsCompleteReducer from './slice/request/requestMasterItemsCompleteSlice';
 import requestMasterItemsPendingReducer from './slice/request/requestMasterItemsPendingSlice';
@@ -38,6 +37,11 @@ import departmentNamesReducer from './slice/departmentName/departmentNamesSlice'
 import departmentNameCreateReducer from './slice/departmentName/departmentNameActionSlice';
 import departmentMasterItemAssignReducer from './slice/department/departmentMasterItemAssignSlice';
 import requestMasterItemsDashboardReducer from './slice/request/dashboard/requestMasterItemsDashboardSlice'
+import requestMasterItemsSelectedReducer from './slice/selectedRequests/requestMasterItemsSelectSlice';
+import masterDrawerReducer from './slice/drawerToggle/masterDrawerSlice';
+import departmentDrawerReducer from './slice/drawerToggle/departmentDrawerSlice'
+import requestDrawerReducer from './slice/drawerToggle/requestDrawerSlice'
+import purchaseRequestMasterItemsReducer from './slice/request/purchaseRequestMasterItemsSlice'
 
 export const store = configureStore({
     reducer: {
@@ -55,7 +59,6 @@ export const store = configureStore({
         requestItemsUpdateStore: requestItemsUpdateReducer,
         bottomToolbarItemsStore: bottomToolbarItemsReducer,
         requestMasterItemsCheckedStore: requestMasterItemsCheckedReducer,
-        drawerToggleTypeStore: drawerToggleTypeReducer,
         requestMasterItemsCreateStore: requestMasterItemsCreateReducer,
         requestMasterItemsCompleteStore: requestMasterItemsCompleteReducer,
         requestMasterItemsPendingStore: requestMasterItemsPendingReducer,
@@ -79,7 +82,12 @@ export const store = configureStore({
         departmentNamesStore: departmentNamesReducer,
         departmentNameCreateStore: departmentNameCreateReducer,
         departmentMasterItemAssignStore: departmentMasterItemAssignReducer,
-        requestMasterItemsDashboardStore: requestMasterItemsDashboardReducer
+        requestMasterItemsDashboardStore: requestMasterItemsDashboardReducer,
+        requestMasterItemsSelectedStore: requestMasterItemsSelectedReducer,
+        masterDrawerStore: masterDrawerReducer,
+        departmentDrawerStore: departmentDrawerReducer,
+        requestDrawerStore: requestDrawerReducer,
+        purchaseRequestMasterItemsStore: purchaseRequestMasterItemsReducer
     }
 });
 

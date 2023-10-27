@@ -12,12 +12,12 @@ import {
 } from '@mui/material';
 import { ChangeEvent, useRef } from 'react';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import { toggleDrawer } from '../../app/slice/drawerToggle/drawerToggleTypeSlice';
 import { useLocation } from 'react-router-dom';
 import {
     changeRequestMasterItemsChecked,
     selectRequestMasterItemsChecked
 } from '../../app/slice/request/requestMasterItemsCheckedSlice';
+import { toggleRequestItemDrawer } from '../../app/slice/drawerToggle/requestDrawerSlice';
 
 const columns: { field: string; headerName: string | JSX.Element }[] = [
     { field: 'item', headerName: 'Item' },
@@ -32,7 +32,7 @@ const RequestItemEditForm = () => {
     const dispatch = useAppDispatch();
 
     const handleClose = () => {
-        dispatch(toggleDrawer({ type: '' }));
+        dispatch(toggleRequestItemDrawer({ toggleType: '', requestItem: null }));
     };
     const handleCustomTextChange = (event: ChangeEvent<HTMLInputElement>, request_item_id: number) => {
         dispatch(
@@ -93,7 +93,7 @@ const RequestItemEditForm = () => {
                             requestMasterItemsCheckedSelector.requestMasterItemsChecked.map(
                                 (requestMasterCheckedItem, index) => (
                                     <TableRow key={index}>
-                                        <TableCell>{requestMasterCheckedItem.checked}</TableCell>
+                                        <TableCell>{requestMasterCheckedItem.confirmation}</TableCell>
                                         <TableCell>
                                             <TextField
                                                 ref={inputRef}

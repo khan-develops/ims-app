@@ -28,8 +28,7 @@ import {
     alpha,
     InputBase,
     TableSortLabel,
-    Chip,
-    InputAdornment
+    Button
 } from '@mui/material';
 import { useLocation } from 'react-router-dom';
 import { handlePage } from '../app/common/pageSlice';
@@ -56,15 +55,15 @@ import PreviewIcon from '@mui/icons-material/Preview';
 import EditIcon from '@mui/icons-material/Edit';
 import SendIcon from '@mui/icons-material/Send';
 import UnfoldMoreIcon from '@mui/icons-material/UnfoldMore';
-import { DRAWER_TOGGLE_TYPE } from '../common/constants';
 import axios from 'axios';
 import FileSaver from 'file-saver';
-import { toggleDrawer } from '../app/slice/drawerToggle/drawerToggleTypeSlice';
 import { IOrderDetail } from '../app/api/properties/IOrderDetail';
 import { visuallyHidden } from '@mui/utils';
 import AddBoxIcon from '@mui/icons-material/AddBox';
-import IndeterminateCheckBoxIcon from '@mui/icons-material/IndeterminateCheckBox';
-import DisabledByDefaultIcon from '@mui/icons-material/DisabledByDefault';
+import AddIcon from '@mui/icons-material/Add';
+import RemoveIcon from '@mui/icons-material/Remove';
+import CloseIcon from '@mui/icons-material/Close';
+import { toggleDepartmentItemDrawer } from '../app/slice/drawerToggle/departmentDrawerSlice';
 
 const columns: {
     id: keyof IMaster | keyof IOrderDetail;
@@ -308,6 +307,7 @@ const DepartmentRow = ({
                                     ref.style.backgroundColor = '#FAFAFA';
                                 }
                             }, 700);
+                            ref.blur();
                         }
                     })
                     .catch((error: Error) => {
@@ -395,9 +395,9 @@ const DepartmentRow = ({
     const handleEditClick = (event: MouseEvent<HTMLElement>, masterDepartmentItem: IMasterDepartment) => {
         if (masterDepartmentItem) {
             dispatch(
-                toggleDrawer({
-                    type: DRAWER_TOGGLE_TYPE.UPDATE_STORE_ROOM_ITEM,
-                    storeRoomItem: {
+                toggleDepartmentItemDrawer({
+                    toggleType: 'UPDATE_STORE_ROOM_ITEM',
+                    departmentItem: {
                         id: masterDepartmentItem.id,
                         location: masterDepartmentItem.departmentItems[0].location,
                         quantity: masterDepartmentItem.departmentItems[0].quantity,
@@ -415,79 +415,23 @@ const DepartmentRow = ({
 
     const handleDeleteClick = (event: MouseEvent<HTMLElement>, masterDepartmentItem: IMasterDepartment) => {};
 
-    const updateTotalQuantity = (
-        event: KeyboardEvent<HTMLInputElement>,
-        newMasterDepartmentItem: IMasterDepartment,
-        action: 'received' | 'issued',
-        ref: HTMLDivElement | null
-    ): void => {
-        if (action === 'received') {
-            inputRef.current.received = ref;
-        }
-        if (action === 'issued') {
-            inputRef.current.issued = ref;
-        }
-
-        if (event.key === 'Enter') {
-            dispatch(
-                updateDepartmentItemQuantityThunk({
-                    state: location.state,
-                    departmentItemId: newMasterDepartmentItem.departmentItems[0].id,
-                    quantity: parseInt((event.target as HTMLInputElement).value),
-                    updateAction: action
-                })
-            )
-                .then((response) => {
-                    changeMasterDepartmentItems(
-                        masterDepartmentItemsSelector.response.content.map((masterDepartmentItem) => ({
-                            ...masterDepartmentItem,
-                            departmentItems:
-                                masterDepartmentItem.id === newMasterDepartmentItem.id
-                                    ? masterDepartmentItem.departmentItems.map((departmentItem) => ({
-                                          ...departmentItem,
-                                          quantity:
-                                              response.payload.id === departmentItem.id
-                                                  ? response.payload.quantity
-                                                  : departmentItem.quantity
-                                      }))
-                                    : masterDepartmentItem.departmentItems
-                        }))
-                    );
-                    if (ref) {
-                        ref.style.backgroundColor = '#98FB98';
-                        ref.style.transition = '1s background ease-in, 500ms transform ease-out 1s';
-                        setTimeout(() => {
-                            if (ref) {
-                                ref.style.backgroundColor = '#FAFAFA';
-                            }
-                        }, 700);
-                    }
-                })
-                .catch((error: Error) => {
-                    console.error(error.message);
-                    if (ref) {
-                        ref.style.backgroundColor = '#FF0000';
-                        ref.style.transition = '1s background ease-in, 500ms transform ease-out 1s';
-                        setTimeout(() => {
-                            if (ref) {
-                                ref.style.backgroundColor = '#FAFAFA';
-                            }
-                        }, 700);
-                    }
-                });
-        }
-    };
-
     const handleIssuedReceived = (actionType: 'issued' | 'received' | '') => {
         if (inputRef && inputRef.current && inputRef.current.quantity) {
             inputRef.current.quantity?.focus();
             inputRef.current.quantity.value = '';
         }
-
-        setUpdateAction({
-            action: actionType,
-            position: 'received' ? 'right' : 'left'
-        });
+        if (actionType === 'received') {
+            setUpdateAction({
+                action: actionType,
+                position: 'right'
+            });
+        }
+        if (actionType === 'issued') {
+            setUpdateAction({
+                action: actionType,
+                position: 'left'
+            });
+        }
     };
 
     const closeIssuedReceived = (defaultValue: number) => {
@@ -524,14 +468,14 @@ const DepartmentRow = ({
                                     edge="start"
                                     onClick={() => closeIssuedReceived(departmentItem.quantity)}
                                     color="error">
-                                    <DisabledByDefaultIcon />
+                                    <CloseIcon />
                                 </IconButton>
                             ) : (
                                 <IconButton
                                     edge="start"
                                     onClick={() => handleIssuedReceived('received')}
                                     color="success">
-                                    <AddBoxIcon />
+                                    <AddIcon />
                                 </IconButton>
                             ),
                         endAdornment:
@@ -540,11 +484,11 @@ const DepartmentRow = ({
                                     edge="end"
                                     onClick={() => closeIssuedReceived(departmentItem.quantity)}
                                     color="error">
-                                    <DisabledByDefaultIcon />
+                                    <CloseIcon />
                                 </IconButton>
                             ) : (
                                 <IconButton edge="end" color="warning" onClick={() => handleIssuedReceived('issued')}>
-                                    <IndeterminateCheckBoxIcon />
+                                    <RemoveIcon />
                                 </IconButton>
                             )
                     }}
@@ -630,13 +574,13 @@ const MasterDepartmentRow = ({
             masterDepartmentItem.orderDetail === null ? null : masterDepartmentItem.orderDetail.totalQuantity;
         if (totalQuantity) {
             if (!minimumQuantity || !maximumQuantity) {
-                return '#eded00';
+                return 'warning';
             } else if (minimumQuantity === 1 && maximumQuantity === 1 && totalQuantity < 1) {
-                return '#FF0000';
+                return 'error';
             } else if (totalQuantity < minimumQuantity) {
-                return 'red';
+                return 'error';
             } else {
-                return '#3CB371';
+                return 'success';
             }
         }
     };
@@ -669,76 +613,48 @@ const MasterDepartmentRow = ({
                 <StyledTableCell width={150}>{masterDepartmentItem.recentVendor}</StyledTableCell>
                 <StyledTableCell width={70}>
                     {masterDepartmentItem.orderDetail && masterDepartmentItem.orderDetail.totalQuantity && (
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                justifyContent: 'center',
-                                border: '2px solid #f2f2f2',
-                                paddingTop: 0.5,
-                                paddingBottom: 0.5,
-                                marginRight: 2,
-                                borderRadius: 1,
-                                backgroundColor: '#f2f2f2'
-                            }}>
-                            <Typography sx={{ fontWeight: 900, fontSize: 14 }}>
-                                {masterDepartmentItem.orderDetail.totalQuantity}
-                            </Typography>
-                        </Box>
+                        <Button
+                            fullWidth
+                            variant="outlined"
+                            disableRipple
+                            sx={{ cursor: 'default', fontWeight: '900', fontSize: 14 }}>
+                            {masterDepartmentItem.orderDetail.totalQuantity}
+                        </Button>
                     )}
                 </StyledTableCell>
                 <StyledTableCell width={80}>
                     {masterDepartmentItem.orderDetail && (
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                justifyContent: 'center',
-                                border: `2px solid ${getOrderQuantityColor(masterDepartmentItem)}`,
-                                paddingTop: 0.5,
-                                paddingBottom: 0.5,
-                                marginRight: 2,
-                                borderRadius: 1,
-                                backgroundColor: getOrderQuantityColor(masterDepartmentItem)
-                            }}>
-                            <Typography sx={{ fontWeight: 900, fontSize: 14 }}>
-                                {masterDepartmentItem.orderDetail.totalQuantity}
-                            </Typography>
-                        </Box>
+                        <Button
+                            fullWidth
+                            disableElevation
+                            variant="contained"
+                            color={getOrderQuantityColor(masterDepartmentItem)}
+                            disableRipple
+                            sx={{ cursor: 'default', fontWeight: 900, fontSize: 14 }}>
+                            {masterDepartmentItem.orderDetail.totalQuantity}
+                        </Button>
                     )}
                 </StyledTableCell>
                 <StyledTableCell>
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            justifyContent: 'center',
-                            border: '2px solid #f2f2f2',
-                            paddingTop: 0.5,
-                            paddingBottom: 0.5,
-                            marginRight: 2,
-                            borderRadius: 1,
-                            backgroundColor: '#f2f2f2'
-                        }}>
-                        <Typography sx={{ fontWeight: 700, fontSize: 12 }}>
-                            ${masterDepartmentItem.unitPrice}
-                        </Typography>
-                    </Box>
+                    <Button
+                        fullWidth
+                        variant="outlined"
+                        disableRipple
+                        sx={{ cursor: 'default', fontWeight: 900, fontSize: 14 }}>
+                        <span style={{ marginRight: 1 }}>$</span>
+                        {masterDepartmentItem.unitPrice}
+                    </Button>
                 </StyledTableCell>
                 <StyledTableCell>
                     {masterDepartmentItem.orderDetail && (
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                justifyContent: 'center',
-                                border: '2px solid #f2f2f2',
-                                paddingTop: 0.5,
-                                paddingBottom: 0.5,
-                                marginRight: 2,
-                                borderRadius: 1,
-                                backgroundColor: '#f2f2f2'
-                            }}>
-                            <Typography sx={{ fontWeight: 700, fontSize: 12 }}>
-                                ${masterDepartmentItem.orderDetail.totalPrice}
-                            </Typography>
-                        </Box>
+                        <Button
+                            fullWidth
+                            variant="outlined"
+                            disableRipple
+                            sx={{ cursor: 'default', fontWeight: 900, fontSize: 14 }}>
+                            <span style={{ marginRight: 1 }}>$</span>
+                            {masterDepartmentItem.orderDetail.totalPrice}
+                        </Button>
                     )}
                 </StyledTableCell>
                 <StyledTableCell>{masterDepartmentItem.category}</StyledTableCell>
@@ -888,7 +804,7 @@ const DepartmentsMaster = () => {
     };
 
     const handleReviewClick = () => {
-        dispatch(toggleDrawer({ type: DRAWER_TOGGLE_TYPE.UPDATE_REQUEST_REVIEW }));
+        dispatch(toggleDepartmentItemDrawer({ toggleType: 'UPDATE_REQUEST_REVIEW', departmentItem: null }));
     };
 
     const handleDownloadClick = () => {
@@ -901,7 +817,7 @@ const DepartmentsMaster = () => {
     };
 
     const handleEditClick = () => {
-        dispatch(toggleDrawer({ type: DRAWER_TOGGLE_TYPE.UPDATE_REQUEST_EDIT }));
+        dispatch(toggleDepartmentItemDrawer({ toggleType: 'UPDATE_REQUEST_EDIT', departmentItem: null }));
     };
 
     const handleKeywordChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -910,8 +826,9 @@ const DepartmentsMaster = () => {
 
     const handleAddClick = () => {
         dispatch(
-            toggleDrawer({
-                type: DRAWER_TOGGLE_TYPE.ADD_MASTER_ITEM
+            toggleDepartmentItemDrawer({
+                toggleType: 'ADD_MASTER_ITEM',
+                departmentItem: null
             })
         );
     };

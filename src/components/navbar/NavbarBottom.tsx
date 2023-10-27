@@ -1,8 +1,6 @@
 import { BottomNavigation, BottomNavigationAction, Box, Paper, Switch } from '@mui/material';
 import { useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import { DRAWER_TOGGLE_TYPE } from '../../common/constants';
-import { toggleDrawer } from '../../app/slice/drawerToggle/drawerToggleTypeSlice';
 import { selectRequestMasterItemsChecked } from '../../app/slice/request/requestMasterItemsCheckedSlice';
 import { useLocation } from 'react-router-dom';
 import DownloadIcon from '@mui/icons-material/Download';
@@ -13,6 +11,8 @@ import PreviewIcon from '@mui/icons-material/Preview';
 import { selectRequestMasterItemsPendingChecked } from '../../app/slice/request/requestMasterItemsPendingCheckedSlice';
 import axios from 'axios';
 import FileSaver from 'file-saver';
+import { toggleMasterItemDrawer } from '../../app/slice/drawerToggle/masterDrawerSlice';
+import { toggleRequestItemDrawer } from '../../app/slice/drawerToggle/requestDrawerSlice';
 
 const NavbarBottom = () => {
     const [value, setValue] = useState<number>(0);
@@ -24,14 +24,15 @@ const NavbarBottom = () => {
 
     const handleAddClick = () => {
         dispatch(
-            toggleDrawer({
-                type: DRAWER_TOGGLE_TYPE.ADD_MASTER_ITEM
+            toggleMasterItemDrawer({
+                toggleType: 'ADD_MASTER_ITEM',
+                masterItem: null
             })
         );
     };
 
     const handleReviewClick = () => {
-        dispatch(toggleDrawer({ type: DRAWER_TOGGLE_TYPE.UPDATE_REQUEST_REVIEW }));
+        dispatch(toggleRequestItemDrawer({ toggleType: 'UPDATE_REQUEST_REVIEW', requestItem: null }));
     };
 
     const handleDownloadClick = () => {
@@ -44,7 +45,7 @@ const NavbarBottom = () => {
     };
 
     const handleEditClick = () => {
-        dispatch(toggleDrawer({ type: DRAWER_TOGGLE_TYPE.UPDATE_REQUEST_EDIT }));
+        dispatch(toggleRequestItemDrawer({ toggleType: 'UPDATE_REQUEST_EDIT', requestItem: null }));
     };
 
     return (

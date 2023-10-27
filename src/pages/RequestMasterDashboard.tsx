@@ -33,13 +33,13 @@ import { KeyboardEvent, ChangeEvent, useEffect, useState, MouseEvent } from 'rea
 import moment from 'moment';
 import { useLocation } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
-import { DRAWER_TOGGLE_TYPE, STATUS } from '../common/constants';
+import { STATUS } from '../common/constants';
 import { updateRequestMasterItemThunk } from '../app/slice/request/requestMasterItemUpdateSlice';
 import {
     changeRequestMasterItems,
     getRequestMasterItemsThunk,
     selectRequestMasterItems
-} from '../app/slice/request/requestMasterItemsSlice';
+} from '../app/slice/request/purchaseRequestMasterItemsSlice';
 import { IRequest, IRequestMaster } from '../app/api/properties/IRequest';
 import SearchIcon from '@mui/icons-material/Search';
 import DownloadIcon from '@mui/icons-material/Download';
@@ -48,12 +48,13 @@ import PreviewIcon from '@mui/icons-material/Preview';
 import SendIcon from '@mui/icons-material/Send';
 import EditIcon from '@mui/icons-material/Edit';
 import axios from 'axios';
-import { toggleDrawer } from '../app/slice/drawerToggle/drawerToggleTypeSlice';
 import FileSaver from 'file-saver';
 import { IMaster } from '../app/api/properties/IMaster';
 import { visuallyHidden } from '@mui/utils';
 import { inventoryRequestDepartments } from '../components/common/routes';
 import { getRequestMasterItemsDashboardThunk } from '../app/slice/request/dashboard/requestMasterItemsDashboardSlice';
+import { toggleMasterItemDrawer } from '../app/slice/drawerToggle/masterDrawerSlice';
+import { toggleRequestItemDrawer } from '../app/slice/drawerToggle/requestDrawerSlice';
 
 const baseUrl = process.env.REACT_APP_BASE_URL;
 
@@ -318,18 +319,19 @@ const RequestMasterAdmin = () => {
 
     const handleAddClick = () => {
         dispatch(
-            toggleDrawer({
-                type: DRAWER_TOGGLE_TYPE.ADD_MASTER_ITEM
+            toggleMasterItemDrawer({
+                toggleType: 'ADD_MASTER_ITEM',
+                masterItem: null
             })
         );
     };
 
     const handleEditClick = () => {
-        dispatch(toggleDrawer({ type: DRAWER_TOGGLE_TYPE.UPDATE_REQUEST_EDIT }));
+        dispatch(toggleRequestItemDrawer({ toggleType: 'UPDATE_REQUEST_EDIT', requestItem: null }));
     };
 
     const handleReviewClick = () => {
-        dispatch(toggleDrawer({ type: DRAWER_TOGGLE_TYPE.UPDATE_REQUEST_REVIEW }));
+        dispatch(toggleRequestItemDrawer({ toggleType: 'UPDATE_REQUEST_REVIEW', requestItem: null }));
     };
 
     const handleDownloadClick = () => {

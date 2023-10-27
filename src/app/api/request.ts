@@ -3,7 +3,7 @@ import { IRequestMaster } from './properties/IRequest';
 
 const baseUrl = process.env.REACT_APP_BASE_URL;
 
-export const getRequestMasterItems = (params: { state: string, page: number }) => {
+export const getPurchaseRequestMasterItems = (params: { state: string, page: number }) => {
     return axios.get(`${baseUrl}/requests/${params.state}/list?page=${params.page}`);
 };
 

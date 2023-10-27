@@ -12,16 +12,15 @@ import {
 } from '@mui/material';
 import { ChangeEvent, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import { selectDrawerToggleType, toggleDrawer } from '../../app/slice/drawerToggle/drawerToggleTypeSlice';
 import { DEPARTMENT } from '../../common/constants';
 import { updateMasterItemThunk } from '../../app/slice/master/masterItemUpdateSlice';
 import { changeMasterItems, selectMasterItems } from '../../app/slice/master/masterItemsSlice';
+import { selectMasterDrawer, toggleMasterItemDrawer } from '../../app/slice/drawerToggle/masterDrawerSlice';
 
 const MasterUpdateForm = () => {
     const dispatch = useAppDispatch();
     const masterItemsSelector = useAppSelector(selectMasterItems);
-    const drawer = useAppSelector(selectDrawerToggleType);
-    const { masterItem } = drawer;
+    const { toggleType, masterItem } = useAppSelector(selectMasterDrawer);
 
     const [departments, setDepartments] = useState<string[]>([]);
 
@@ -38,21 +37,21 @@ const MasterUpdateForm = () => {
                             })
                         )
                     );
-                    dispatch(toggleDrawer({ type: '' }));
+                    dispatch(toggleMasterItemDrawer({ toggleType: '', masterItem: null }));
                 })
                 .catch((error: Error) => console.error(error.message));
         }
     };
 
     const handleCancel = () => {
-        dispatch(toggleDrawer({ type: '' }));
+        dispatch(toggleMasterItemDrawer({ toggleType: '', masterItem: null }));
     };
 
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
         masterItem &&
             dispatch(
-                toggleDrawer({
-                    ...drawer,
+                toggleMasterItemDrawer({
+                    toggleType: 'UPDATE_MASTER_ITEM',
                     masterItem: { ...masterItem, [event.target.id]: event.target.value }
                 })
             );

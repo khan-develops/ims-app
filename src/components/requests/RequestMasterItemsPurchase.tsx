@@ -2,7 +2,6 @@ import {
     Box,
     Checkbox,
     Drawer,
-    FormControlLabel,
     Paper,
     Table,
     TableBody,
@@ -15,18 +14,21 @@ import {
     tableCellClasses
 } from '@mui/material';
 import { ChangeEvent, useEffect, useState, MouseEvent } from 'react';
-import { useAppDispatch, useAppSelector } from '../app/hooks';
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { useLocation } from 'react-router-dom';
-import { selectDrawerToggleType, toggleDrawer } from '../app/slice/drawerToggle/drawerToggleTypeSlice';
-import { DRAWER_TOGGLE_TYPE } from '../common/constants';
-import RequestItemReviewForm from './forms/RequestItemReviewForm';
-import { IMaster } from '../app/api/properties/IMaster';
+import RequestItemReviewForm from '../forms/RequestItemReviewForm';
+import { IMaster } from '../../app/api/properties/IMaster';
 import { visuallyHidden } from '@mui/utils';
-import FileSaver from 'file-saver';
-import axios from 'axios';
-import { selectMasterItems } from '../app/slice/master/masterItemsSlice';
-import { getRequestMasterItemsThunk, selectRequestMasterItems } from '../app/slice/request/requestMasterItemsSlice';
-import { IRequest, IRequestMaster } from '../app/api/properties/IRequest';
+import {
+    getPurchaseRequestMasterItemsThunk,
+    selectRequestMasterItems
+} from '../../app/slice/request/purchaseRequestMasterItemsSlice';
+import { IRequest, IRequestMaster } from '../../app/api/properties/IRequest';
+import {
+    handleRequestMasterItemsSelected,
+    selectRequestMasterItemsSelected
+} from '../../app/slice/selectedRequests/requestMasterItemsSelectSlice';
+import { selectRequestDrawer } from '../../app/slice/drawerToggle/requestDrawerSlice';
 
 const columns: {
     id: keyof IMaster | keyof IRequest;
@@ -168,10 +170,10 @@ const EnhancedTableHead = (props: EnhancedTableProps) => {
     );
 };
 
-const RequestMasterItems = () => {
+const RequestMasterItemsPurchase = () => {
     const requestMasterItemsSelector = useAppSelector(selectRequestMasterItems);
-    const [selectedIds, setSelectedIds] = useState<number[]>([]);
-    const { type } = useAppSelector(selectDrawerToggleType);
+    const requestMasterItemsSelectedSelector = useAppSelector(selectRequestMasterItemsSelected);
+    const { toggleType } = useAppSelector(selectRequestDrawer);
     const dispatch = useAppDispatch();
     const [page, setPage] = useState<number>(0);
     const location = useLocation();
@@ -182,59 +184,43 @@ const RequestMasterItems = () => {
     const [dense, setDense] = useState(false);
 
     useEffect(() => {
-        dispatch(getRequestMasterItemsThunk({ state: location.state, page: page }));
+        dispatch(getPurchaseRequestMasterItemsThunk({ state: location.state, page: page }));
     }, [dispatch, page, location]);
 
     const handleCheckboxChange = (event: ChangeEvent<HTMLInputElement>, requestMasterItem: IRequestMaster) => {
         if (event.target.checked) {
-            setSelectedIds([...selectedIds, requestMasterItem.id]);
+            dispatch(
+                handleRequestMasterItemsSelected([
+                    ...requestMasterItemsSelectedSelector.requestMasterItems,
+                    requestMasterItem.id
+                ])
+            );
         } else {
-            setSelectedIds([...selectedIds.filter((id) => id !== requestMasterItem.id)]);
+            dispatch(
+                handleRequestMasterItemsSelected([
+                    ...requestMasterItemsSelectedSelector.requestMasterItems.filter((id) => id !== requestMasterItem.id)
+                ])
+            );
         }
-    };
-
-    const handleDownloadClick = () => {
-        return axios.get(`${baseUrl}/download/${location.state}/list`).then((response) => {
-            const blob = new Blob([response.data], {
-                type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-            });
-            FileSaver.saveAs(blob, `${location.state}.xlsx`);
-        });
-    };
-
-    const handleEditClick = (event: MouseEvent<HTMLElement>) => {
-        // if (masterDepartmentItem) {
-        //     dispatch(
-        //         toggleDrawer({
-        //             type: DRAWER_TOGGLE_TYPE.UPDATE_STORE_ROOM_ITEM,
-        //             storeRoomItem: {
-        //                 id: masterDepartmentItem.id,
-        //                 location: masterDepartmentItem.departmentItems[0].location,
-        //                 quantity: masterDepartmentItem.departmentItems[0].quantity,
-        //                 minimumQuantity: masterDepartmentItem.departmentItems[0].minimumQuantity,
-        //                 maximumQuantity: masterDepartmentItem.departmentItems[0].maximumQuantity,
-        //                 usageLevel: masterDepartmentItem.departmentItems[0].usageLevel,
-        //                 lotNumber: masterDepartmentItem.departmentItems[0].lotNumber,
-        //                 expirationDate: masterDepartmentItem.departmentItems[0].expirationDate,
-        //                 receivedDate: masterDepartmentItem.departmentItems[0].receivedDate
-        //             }
-        //         })
-        //     );
-        // }
     };
 
     const handleRequestSort = (event: MouseEvent<unknown>, property: keyof IMaster | keyof IRequest) => {};
 
     const handleSelectAllClick = (event: ChangeEvent<HTMLInputElement>) => {
-        if (selectedIds.length < requestMasterItemsSelector.response.content.length) {
-            setSelectedIds(
-                requestMasterItemsSelector.response.content.reduce(
-                    (acc: number[], masterItem) => (acc.includes(masterItem.id) ? acc : [...acc, masterItem.id]),
-                    []
+        if (
+            requestMasterItemsSelectedSelector.requestMasterItems.length <
+            requestMasterItemsSelector.response.content.length
+        ) {
+            dispatch(
+                handleRequestMasterItemsSelected(
+                    requestMasterItemsSelector.response.content.reduce(
+                        (acc: number[], masterItem) => (acc.includes(masterItem.id) ? acc : [...acc, masterItem.id]),
+                        []
+                    )
                 )
             );
         } else {
-            setSelectedIds([]);
+            dispatch(handleRequestMasterItemsSelected([]));
         }
     };
 
@@ -244,7 +230,7 @@ const RequestMasterItems = () => {
                 <TableContainer sx={{ height: 600, overflowY: 'auto' }}>
                     <Table stickyHeader>
                         <EnhancedTableHead
-                            selectedIds={selectedIds}
+                            selectedIds={requestMasterItemsSelectedSelector.requestMasterItems}
                             order={order}
                             orderBy={orderBy}
                             onSelectAllClick={handleSelectAllClick}
@@ -260,7 +246,9 @@ const RequestMasterItems = () => {
                                                 onChange={(event: ChangeEvent<HTMLInputElement>) =>
                                                     handleCheckboxChange(event, requestMasterItem)
                                                 }
-                                                checked={selectedIds.includes(requestMasterItem.id)}
+                                                checked={requestMasterItemsSelectedSelector.requestMasterItems.includes(
+                                                    requestMasterItem.id
+                                                )}
                                             />
                                         </StyledTableCell>
                                         <StyledTableCell>{requestMasterItem.masterItem.item}</StyledTableCell>
@@ -273,7 +261,7 @@ const RequestMasterItems = () => {
                         </TableBody>
                     </Table>
                 </TableContainer>
-                <Drawer anchor="bottom" open={type === DRAWER_TOGGLE_TYPE.UPDATE_REQUEST_REVIEW}>
+                <Drawer anchor="bottom" open={toggleType === 'UPDATE_REQUEST_REVIEW'}>
                     <RequestItemReviewForm />
                 </Drawer>
             </Paper>
@@ -281,4 +269,4 @@ const RequestMasterItems = () => {
     );
 };
 
-export default RequestMasterItems;
+export default RequestMasterItemsPurchase;

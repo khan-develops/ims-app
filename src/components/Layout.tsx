@@ -13,7 +13,7 @@ const Layout = () => {
     const profileDetailSelector = useAppSelector(selectProfileDetail);
 
     return (
-        <Grid container sx={{ height: '100%' }} direction="column" border={'1px solid red'}>
+        <Grid container sx={{ height: '100%' }} direction="column">
             <Grid item>
                 {/* <MenuAdmin /> */}
                 <MenuDepartment />
@@ -23,18 +23,6 @@ const Layout = () => {
             </Grid>
             <Drawer />
         </Grid>
-
-        // <Box sx={{ display: 'flex', flexDirection: 'column', height: 'calc(100% - 2px)', border: '1px solid red' }}>
-        //     {/* <Box>
-        //         {profileDetailSelector.profileDetail?.role === ROLE.ADMINISTRATION ? <MenuAdmin /> : <MenuDepartment />}
-        //         <MenuSub />
-        //     </Box> */}
-        //     <Box sx={{ padding: 1, flex: 1 }}>
-        //         <Outlet />
-        //         <Drawer />
-        //     </Box>
-        //     {/* <NavbarBottom /> */}
-        // </Box>
     );
 };
 

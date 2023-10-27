@@ -21,15 +21,8 @@ import {
     TablePagination
 } from '@mui/material';
 import { tableCellClasses } from '@mui/material/TableCell';
-import { toggleDrawer } from '../app/slice/drawerToggle/drawerToggleTypeSlice';
-import { DRAWER_TOGGLE_TYPE } from '../common/constants';
 import { IMaster } from '../app/api/properties/IMaster';
-import {
-    filterMasterItemsThunk,
-    getMasterItemsThunk,
-    selectMasterItems,
-    sortMasterItemsThunk
-} from '../app/slice/master/masterItemsSlice';
+import { filterMasterItemsThunk, getMasterItemsThunk, selectMasterItems } from '../app/slice/master/masterItemsSlice';
 import { selectSearchValue } from '../app/search';
 import { getDepartmentNamesThunk, selectDepartmentNames } from '../app/slice/departmentName/departmentNamesSlice';
 import { BottomNavigation, BottomNavigationAction } from '@mui/material';
@@ -52,6 +45,7 @@ import { getGrandTotalThunk, selectGrandTotal } from '../app/slice/grandTotalSli
 import { filterMasterDepartmentItemsThunk } from '../app/slice/master/masterDepartmentItemsSlice';
 import { getSearchValue } from '../app/search';
 import { deleteMasterItemThunk } from '../app/slice/master/masterItemDeleteSlice';
+import { toggleMasterItemDrawer } from '../app/slice/drawerToggle/masterDrawerSlice';
 
 const headerCell: {
     id: keyof IMaster;
@@ -218,8 +212,8 @@ const MasterCardItem = ({
 
     const handleEditAction = (masterItem: IMaster) => {
         dispatch(
-            toggleDrawer({
-                type: DRAWER_TOGGLE_TYPE.UPDATE_MASTER_ITEM,
+            toggleMasterItemDrawer({
+                toggleType: 'UPDATE_MASTER_ITEM',
                 masterItem: masterItem
             })
         );
@@ -307,18 +301,19 @@ const Master = (): JSX.Element => {
 
     const handleAddClick = () => {
         dispatch(
-            toggleDrawer({
-                type: DRAWER_TOGGLE_TYPE.ADD_MASTER_ITEM
+            toggleMasterItemDrawer({
+                toggleType: 'ADD_MASTER_ITEM',
+                masterItem: null
             })
         );
     };
 
     const handleEditClick = () => {
-        dispatch(toggleDrawer({ type: DRAWER_TOGGLE_TYPE.UPDATE_REQUEST_EDIT }));
+        dispatch(toggleMasterItemDrawer({ toggleType: 'UPDATE_REQUEST_EDIT', masterItem: null }));
     };
 
     const handleReviewClick = () => {
-        dispatch(toggleDrawer({ type: DRAWER_TOGGLE_TYPE.UPDATE_REQUEST_REVIEW }));
+        dispatch(toggleMasterItemDrawer({ toggleType: 'UPDATE_REQUEST_REVIEW', masterItem: null }));
     };
 
     const handleDownloadClick = () => {

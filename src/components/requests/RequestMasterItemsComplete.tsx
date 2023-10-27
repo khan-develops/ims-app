@@ -14,17 +14,17 @@ import {
     tableCellClasses
 } from '@mui/material';
 import { useEffect, useState, MouseEvent, ChangeEvent } from 'react';
-import { useAppDispatch, useAppSelector } from '../app/hooks';
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import moment from 'moment';
 import { useLocation } from 'react-router-dom';
 import {
     getRequestMasterItemsCompleteThunk,
     selectRequestMasterItemsComplete
-} from '../app/slice/request/requestMasterItemsCompleteSlice';
-import { IMaster } from '../app/api/properties/IMaster';
-import { IRequest, IRequestMaster } from '../app/api/properties/IRequest';
+} from '../../app/slice/request/requestMasterItemsCompleteSlice';
+import { IMaster } from '../../app/api/properties/IMaster';
+import { IRequest, IRequestMaster } from '../../app/api/properties/IRequest';
 import { visuallyHidden } from '@mui/utils';
-import { selectDrawerToggleType } from '../app/slice/drawerToggle/drawerToggleTypeSlice';
+import { selectRequestDrawer } from '../../app/slice/drawerToggle/requestDrawerSlice';
 
 const columns: {
     id: keyof IMaster | keyof IRequest;
@@ -188,7 +188,7 @@ const RequestMasterDepartmentComplete = () => {
     const [page, setPage] = useState<number>(0);
     const [selectedDepartment, setSelectedDepartment] = useState<string>('extractions');
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
-    const { type } = useAppSelector(selectDrawerToggleType);
+    const { toggleType } = useAppSelector(selectRequestDrawer);
     const location = useLocation();
     const [value, setValue] = useState<number>(0);
     const [order, setOrder] = useState<Order>('asc');

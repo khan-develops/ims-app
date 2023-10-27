@@ -12,7 +12,6 @@ import {
 } from '@mui/material';
 import { ChangeEvent, useRef } from 'react';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import { toggleDrawer } from '../../app/slice/drawerToggle/drawerToggleTypeSlice';
 import { useLocation } from 'react-router-dom';
 import { createRequestMasterItemsThunk } from '../../app/slice/request/requestMasterItemsCreateSlice';
 import {
@@ -20,6 +19,7 @@ import {
     selectRequestMasterItemsChecked
 } from '../../app/slice/request/requestMasterItemsCheckedSlice';
 import { CONFIRMATION } from '../../common/constants';
+import { toggleRequestItemDrawer } from '../../app/slice/drawerToggle/requestDrawerSlice';
 
 const columns: { field: string; headerName: string | JSX.Element }[] = [
     { field: 'item', headerName: 'Item' },
@@ -34,7 +34,7 @@ const RequestItemReviewForm = () => {
     const dispatch = useAppDispatch();
 
     const handleClose = () => {
-        dispatch(toggleDrawer({ type: '' }));
+        dispatch(toggleRequestItemDrawer({ toggleType: '', requestItem: null }));
     };
     const handleCustomTextChange = (event: ChangeEvent<HTMLInputElement>, request_item_id: number) => {
         dispatch(
@@ -95,7 +95,7 @@ const RequestItemReviewForm = () => {
                             requestMasterItemsCheckedSelector.requestMasterItemsChecked.map(
                                 (requestMasterCheckedItem, index) => (
                                     <TableRow key={index}>
-                                        <TableCell>{requestMasterCheckedItem.checked}</TableCell>
+                                        <TableCell>{requestMasterCheckedItem.confirmation}</TableCell>
                                         <TableCell>
                                             <TextField
                                                 ref={inputRef}
