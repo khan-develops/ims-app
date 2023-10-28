@@ -1,8 +1,9 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit"
 import { RootState } from "../../store"
+import { IRequestMaster } from "../../api/properties/IRequest"
 
 export const initialState: {
-	requestMasterItems: number[]
+	requestMasterItems: IRequestMaster[]
 } = {
 	requestMasterItems: []
 }
@@ -11,7 +12,7 @@ export const requestMasterItemsSelectedSlice = createSlice({
 	name: 'requestMasterItemsSelectedSlice',
 	initialState,
 	reducers: {
-		handleRequestMasterItemsSelected: (state, action: PayloadAction<number[]>) => {
+		handleRequestMasterItemsSelected: (state, action: PayloadAction<IRequestMaster[]>) => {
 			state.requestMasterItems = action.payload
 		}
 	}

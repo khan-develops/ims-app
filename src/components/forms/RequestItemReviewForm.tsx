@@ -1,58 +1,48 @@
 import {
+    Box,
     Button,
-    Paper,
-    Stack,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
+    ButtonGroup,
+    Card,
+    CardActions,
+    CardContent,
+    CardHeader,
+    Divider,
+    Grid,
     TextField
 } from '@mui/material';
-import { ChangeEvent, useRef } from 'react';
+import { ChangeEvent, Fragment, useRef } from 'react';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { useLocation } from 'react-router-dom';
 import { createRequestMasterItemsThunk } from '../../app/slice/request/requestMasterItemsCreateSlice';
-import {
-    changeRequestMasterItemsChecked,
-    selectRequestMasterItemsChecked
-} from '../../app/slice/request/requestMasterItemsCheckedSlice';
-import { CONFIRMATION } from '../../common/constants';
 import { toggleRequestItemDrawer } from '../../app/slice/drawerToggle/requestDrawerSlice';
-
-const columns: { field: string; headerName: string | JSX.Element }[] = [
-    { field: 'item', headerName: 'Item' },
-    { field: 'quantity', headerName: 'Quantity' },
-    { field: 'custom_text', headerName: 'Cutom Text' }
-];
+import {
+    handleRequestMasterItemsPurchaseSelected,
+    selectRequestMasterItemsPurchaseSelected
+} from '../../app/slice/selectedRequests/requestMasterItemsPurchaseSelectedSlice';
+import { selectProfileDetail } from '../../app/slice/profileDetail/profileDetailSlice';
+import { IRequestMaster } from '../../app/api/properties/IRequest';
 
 const RequestItemReviewForm = () => {
+    const profileDetailSelector = useAppSelector(selectProfileDetail);
     const inputRef = useRef<HTMLDivElement | null>(null);
-    const requestMasterItemsCheckedSelector = useAppSelector(selectRequestMasterItemsChecked);
+    const requestMasterItemsPurchaseSelectedSelector = useAppSelector(selectRequestMasterItemsPurchaseSelected);
     const location = useLocation();
     const dispatch = useAppDispatch();
 
     const handleClose = () => {
-        dispatch(toggleRequestItemDrawer({ toggleType: '', requestItem: null }));
+        dispatch(toggleRequestItemDrawer(''));
     };
-    const handleCustomTextChange = (event: ChangeEvent<HTMLInputElement>, request_item_id: number) => {
+    const handleTextFieldChange = (event: ChangeEvent<HTMLInputElement>, requestItemId: number) => {
         dispatch(
-            changeRequestMasterItemsChecked(
-                requestMasterItemsCheckedSelector.requestMasterItemsChecked.map((item) => ({
+            handleRequestMasterItemsPurchaseSelected(
+                requestMasterItemsPurchaseSelectedSelector.requestMasterItems.map((item) => ({
                     ...item,
-                    custom_text: item.id === request_item_id ? event.target.value : item.customText
-                }))
-            )
-        );
-    };
-
-    const handleQuantityChange = (event: ChangeEvent<HTMLInputElement>, id: number) => {
-        dispatch(
-            changeRequestMasterItemsChecked(
-                requestMasterItemsCheckedSelector.requestMasterItemsChecked.map((item) => ({
-                    ...item,
-                    quantity: item.id === id ? parseInt(event.target.value) : item.quantity
+                    [event.target.name]:
+                        item.id === requestItemId
+                            ? event.target.name === 'quantity'
+                                ? parseInt(event.target.value)
+                                : event.target.value
+                            : item[event.target.name as keyof IRequestMaster]
                 }))
             )
         );
@@ -62,81 +52,115 @@ const RequestItemReviewForm = () => {
         dispatch(
             createRequestMasterItemsThunk({
                 state: location.state,
-                requestMasterItems: requestMasterItemsCheckedSelector.requestMasterItemsChecked.map((item) => ({
+                department: profileDetailSelector.profileDetail.department.toLowerCase().replace(' ', '_'),
+                requestMasterItems: requestMasterItemsPurchaseSelectedSelector.requestMasterItems.map((item) => ({
                     ...item,
                     quantity: item.quantity,
-                    department: 'EXTRACTIONS',
-                    user: 'Batsaikhan Ulambayar',
-                    detail: 'detail',
-                    confirmation: CONFIRMATION.WAITING,
-                    customText: 'custom text',
-                    location: 'store room',
-                    id: item.id,
+                    requester: profileDetailSelector.profileDetail.displayName,
+                    customDetail: item.customDetail,
+                    customText: item.customDetail,
+                    location: item.location,
                     itemId: item.masterItem.id
                 }))
             })
+        )
+            .then((response) => {
+                handleRequestMasterItemsPurchaseSelected([]);
+                toggleRequestItemDrawer('');
+            })
+            .catch((error: Error) => console.error(error.message));
+    };
+
+    const handleRemoveSelectedItem = (requestItemId: number) => {
+        dispatch(
+            handleRequestMasterItemsPurchaseSelected([
+                ...requestMasterItemsPurchaseSelectedSelector.requestMasterItems.filter(
+                    (item) => item.id !== requestItemId
+                )
+            ])
         );
     };
 
     return (
-        <Stack direction="column" justifyContent="space-between" sx={{ padding: 2, minHeight: 300 }}>
-            <TableContainer component={Paper}>
-                <Table size="medium">
-                    <TableHead>
-                        <TableRow>
-                            {columns.length > 0 &&
-                                columns.map((column) => <TableCell key={column.field}>{column.headerName}</TableCell>)}
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {requestMasterItemsCheckedSelector &&
-                            requestMasterItemsCheckedSelector.requestMasterItemsChecked &&
-                            requestMasterItemsCheckedSelector.requestMasterItemsChecked.length > 0 &&
-                            requestMasterItemsCheckedSelector.requestMasterItemsChecked.map(
-                                (requestMasterCheckedItem, index) => (
-                                    <TableRow key={index}>
-                                        <TableCell>{requestMasterCheckedItem.confirmation}</TableCell>
-                                        <TableCell>
+        <Grid container direction="column" justifyContent="space-between" sx={{ height: '100%', width: 600 }}>
+            <Grid item padding={1} sx={{ overFlowY: 'auto' }}>
+                <Divider sx={{ marginTop: 1, marginBottom: 1 }} />
+                {requestMasterItemsPurchaseSelectedSelector.requestMasterItems &&
+                    requestMasterItemsPurchaseSelectedSelector.requestMasterItems &&
+                    requestMasterItemsPurchaseSelectedSelector.requestMasterItems.length > 0 &&
+                    requestMasterItemsPurchaseSelectedSelector.requestMasterItems.map((requestMasterItem, index) => (
+                        <Fragment key={index}>
+                            <Card>
+                                <CardHeader
+                                    title={requestMasterItem.masterItem.item}
+                                    titleTypographyProps={{ fontSize: 14 }}
+                                />
+                                <CardContent>
+                                    <Grid container direction="column" spacing={3}>
+                                        <Grid item>
                                             <TextField
+                                                label="Quantity"
+                                                name="quantity"
+                                                InputLabelProps={{ shrink: true }}
+                                                fullWidth
                                                 ref={inputRef}
-                                                sx={{ maxWidth: 120 }}
                                                 type="number"
                                                 InputProps={{
                                                     inputProps: { min: 0 }
                                                 }}
                                                 size="small"
-                                                value={requestMasterCheckedItem.quantity}
                                                 onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                                                    handleQuantityChange(event, requestMasterCheckedItem.id)
+                                                    handleTextFieldChange(event, requestMasterItem.id)
                                                 }
                                             />
-                                        </TableCell>
-                                        <TableCell>
+                                        </Grid>
+                                        <Grid item>
                                             <TextField
+                                                label="Custom Text"
+                                                name="customText"
+                                                InputLabelProps={{ shrink: true }}
+                                                fullWidth
                                                 ref={inputRef}
-                                                sx={{ minWidth: 300 }}
                                                 size="small"
-                                                value={requestMasterCheckedItem.customText}
                                                 onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                                                    handleCustomTextChange(event, requestMasterCheckedItem.id)
+                                                    handleTextFieldChange(event, requestMasterItem.id)
                                                 }
                                             />
-                                        </TableCell>
-                                    </TableRow>
-                                )
-                            )}
-                    </TableBody>
-                </Table>
-            </TableContainer>
-            <Stack
-                direction="row"
-                justifyContent="space-around"
-                alignItems="stretch"
-                sx={{ padding: 2, height: '100%' }}>
-                <Button onClick={handleSubmit}>SUBMIT </Button>
-                <Button onClick={handleClose}>CLOSE </Button>
-            </Stack>
-        </Stack>
+                                        </Grid>
+                                        <Grid item>
+                                            <TextField
+                                                label="Custom Detail"
+                                                name="customDetail"
+                                                InputLabelProps={{ shrink: true }}
+                                                fullWidth
+                                                ref={inputRef}
+                                                size="small"
+                                                onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                                                    handleTextFieldChange(event, requestMasterItem.id)
+                                                }
+                                            />
+                                        </Grid>
+                                    </Grid>
+                                </CardContent>
+                                <Box display="flex" justifyContent="flex-end">
+                                    <CardActions>
+                                        <Button onClick={() => handleRemoveSelectedItem(requestMasterItem.id)}>
+                                            Delete
+                                        </Button>
+                                    </CardActions>
+                                </Box>
+                            </Card>
+                            <Divider sx={{ marginTop: 1, marginBottom: 1 }} />
+                        </Fragment>
+                    ))}
+            </Grid>
+            <Grid item sx={{ padding: 2 }}>
+                <ButtonGroup fullWidth variant="text">
+                    <Button onClick={handleSubmit}>SUBMIT </Button>
+                    <Button onClick={handleClose}>CLOSE </Button>
+                </ButtonGroup>
+            </Grid>
+        </Grid>
     );
 };
 

@@ -39,7 +39,7 @@ import {
     changeRequestMasterItems,
     getRequestMasterItemsThunk,
     selectRequestMasterItems
-} from '../app/slice/request/purchaseRequestMasterItemsSlice';
+} from '../app/slice/request/requestMasterItemsSlice';
 import { IRequest, IRequestMaster } from '../app/api/properties/IRequest';
 import SearchIcon from '@mui/icons-material/Search';
 import DownloadIcon from '@mui/icons-material/Download';
@@ -327,11 +327,11 @@ const RequestMasterAdmin = () => {
     };
 
     const handleEditClick = () => {
-        dispatch(toggleRequestItemDrawer({ toggleType: 'UPDATE_REQUEST_EDIT', requestItem: null }));
+        dispatch(toggleRequestItemDrawer('UPDATE_REQUEST_EDIT'));
     };
 
     const handleReviewClick = () => {
-        dispatch(toggleRequestItemDrawer({ toggleType: 'UPDATE_REQUEST_REVIEW', requestItem: null }));
+        dispatch(toggleRequestItemDrawer('UPDATE_REQUEST_REVIEW'));
     };
 
     const handleDownloadClick = () => {

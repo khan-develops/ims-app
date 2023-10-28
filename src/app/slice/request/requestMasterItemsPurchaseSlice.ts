@@ -1,6 +1,6 @@
 import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { RootState } from '../../store';
-import { getPurchaseRequestMasterItems } from '../../api/request';
+import { getRequestMasterItemsPurchase } from '../../api/request';
 import { RequestMasterItemsState } from '../../api/states/RequestState';
 import { IRequestMaster } from '../../api/properties/IRequest';
 
@@ -22,7 +22,7 @@ const initialState: RequestMasterItemsState = {
 export const getPurchaseRequestMasterItemsThunk = createAsyncThunk(
     'getPurchaseRequestMasterItemsThunk',
     async (params: { state: string, page: number }) => {
-        const response = await getPurchaseRequestMasterItems(params);
+        const response = await getRequestMasterItemsPurchase(params);
         return response.data;
     }
 );

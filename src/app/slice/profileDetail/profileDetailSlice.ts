@@ -4,12 +4,20 @@ import { IProfileDetail } from '../../api/properties/IProfileDetail';
 import { createProfileDetail, getProfileDetail, updateProfileDetail } from '../../api/profileDetail';
 
 export interface ProfileDetailState {
-    profileDetail: IProfileDetail | null;
+    profileDetail: IProfileDetail;
     status: 'idle' | 'loading' | 'success' | 'failed';
 }
 
 const initialState: ProfileDetailState = {
-    profileDetail: null,
+    profileDetail: {
+        id: '',
+        displayName: '',
+        userPrincipalName: '',
+        department: '',
+        role: '',
+        permission: '',
+        activeStatus: ''
+    },
     status: 'idle'
 };
 
@@ -70,6 +78,5 @@ export const profileDetailSlice = createSlice({
     }
 });
 
-export const { } = profileDetailSlice.actions;
 export const selectProfileDetail = (state: RootState) => state.profileDetailStore;
 export default profileDetailSlice.reducer;

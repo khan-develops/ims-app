@@ -32,7 +32,7 @@ const RequestItemEditForm = () => {
     const dispatch = useAppDispatch();
 
     const handleClose = () => {
-        dispatch(toggleRequestItemDrawer({ toggleType: '', requestItem: null }));
+        dispatch(toggleRequestItemDrawer(''));
     };
     const handleCustomTextChange = (event: ChangeEvent<HTMLInputElement>, request_item_id: number) => {
         dispatch(

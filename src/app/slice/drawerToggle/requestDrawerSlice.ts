@@ -18,8 +18,8 @@ export const requestDrawerSlice = createSlice({
     name: 'drawerToggleSlice',
     initialState,
     reducers: {
-        toggleRequestItemDrawer: (state, action: PayloadAction<requestDrawerState>) => {
-            state = action.payload
+        toggleRequestItemDrawer: (state, action: PayloadAction<drawer_toggle_type>) => {
+            state.toggleType = action.payload
         }
     }
 });

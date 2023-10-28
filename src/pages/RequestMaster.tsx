@@ -1,12 +1,5 @@
-import { Button, Drawer, Step, StepButton, Stepper, Tab, Tabs } from '@mui/material';
+import { Button, Drawer, Tab, Tabs } from '@mui/material';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
-import RequestMasterDepartmentPending from '../components/requests/RequestMasterItemsPending';
-import RequestMasterDepartmentComplete from '../components/requests/RequestMasterItemsComplete';
-import RequestMasterDepartmentItems from '../components/requests/RequestMasterItemsPurchase';
-import Filter1Icon from '@mui/icons-material/Filter1';
-import Filter2Icon from '@mui/icons-material/Filter2';
-import Filter3Icon from '@mui/icons-material/Filter3';
-import BorderColorIcon from '@mui/icons-material/BorderColor';
 import {
     AppBar,
     BottomNavigation,
@@ -23,19 +16,17 @@ import {
 import { ChangeEvent, Fragment, useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { useLocation } from 'react-router-dom';
-import { selectRequestMasterItems } from '../app/slice/request/purchaseRequestMasterItemsSlice';
 import { IMaster } from '../app/api/properties/IMaster';
 import SearchIcon from '@mui/icons-material/Search';
-import SendIcon from '@mui/icons-material/Send';
-import EditIcon from '@mui/icons-material/Edit';
-import AddBoxIcon from '@mui/icons-material/AddBox';
 import DownloadIcon from '@mui/icons-material/Download';
 import PreviewIcon from '@mui/icons-material/Preview';
 import FileSaver from 'file-saver';
 import axios from 'axios';
-import { selectRequestMasterItemsSelected } from '../app/slice/selectedRequests/requestMasterItemsSelectSlice';
 import RequestItemReviewForm from '../components/forms/RequestItemReviewForm';
 import { selectRequestDrawer, toggleRequestItemDrawer } from '../app/slice/drawerToggle/requestDrawerSlice';
+import { selectRequestMasterItemsPurchaseSelected } from '../app/slice/selectedRequests/requestMasterItemsPurchaseSelectedSlice';
+import { selectRequestMasterItemsSelected } from '../app/slice/selectedRequests/requestMasterItemsSelectedSlice';
+import { selectRequestMasterItems } from '../app/slice/request/requestMasterItemsSlice';
 
 type Order = 'asc' | 'desc';
 const baseUrl = process.env.REACT_APP_BASE_URL;
@@ -82,8 +73,8 @@ const RequestMasterItems = () => {
     const navigate = useNavigate();
     const [activeStep, setActiveStep] = useState(0);
     const dispatch = useAppDispatch();
+    const requestMasterItemsPurchaseSelectedSelector = useAppSelector(selectRequestMasterItemsPurchaseSelected);
     const requestMasterItemsSelector = useAppSelector(selectRequestMasterItems);
-    const requestMasterItemsSelectedSelector = useAppSelector(selectRequestMasterItemsSelected);
     const [value, setValue] = useState<number>(0);
     const [order, setOrder] = useState<Order>('asc');
     const [orderBy, setOrderBy] = useState<keyof IMaster>('id');
@@ -95,14 +86,14 @@ const RequestMasterItems = () => {
             state: location.state
         });
         setActiveStep(0);
-    }, [location.state]);
+    }, [location.state, toggleType]);
 
     const handleChangePage = (event: any, newPage: number): void => {
         setPage(newPage);
     };
 
     const handleReviewClick = () => {
-        dispatch(toggleRequestItemDrawer({ toggleType: 'UPDATE_REQUEST_REVIEW', requestItem: null }));
+        dispatch(toggleRequestItemDrawer('UPDATE_REQUEST_REVIEW'));
     };
 
     const handleDownloadClick = () => {
@@ -115,7 +106,7 @@ const RequestMasterItems = () => {
     };
 
     const handleEditClick = () => {
-        dispatch(toggleRequestItemDrawer({ toggleType: 'UPDATE_REQUEST_EDIT', requestItem: null }));
+        dispatch(toggleRequestItemDrawer('UPDATE_REQUEST_EDIT'));
     };
 
     const handleKeywordChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -123,13 +114,12 @@ const RequestMasterItems = () => {
     };
 
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-        console.log(location);
         setValue(newValue);
     };
 
     return (
         <Fragment>
-            <Drawer anchor="bottom" open={toggleType === 'UPDATE_REQUEST_REVIEW'}>
+            <Drawer anchor="right" open={toggleType === 'UPDATE_REQUEST_REVIEW'}>
                 <RequestItemReviewForm />
             </Drawer>
             <Grid container height="100%" direction="column" justifyContent="space-between">
@@ -179,15 +169,8 @@ const RequestMasterItems = () => {
                             <Button
                                 variant="text"
                                 sx={{ paddingRight: 4 }}
-                                onClick={() =>
-                                    dispatch(
-                                        toggleRequestItemDrawer({
-                                            toggleType: 'UPDATE_REQUEST_REVIEW',
-                                            requestItem: null
-                                        })
-                                    )
-                                }
-                                disabled={requestMasterItemsSelectedSelector.requestMasterItems.length < 1}>
+                                onClick={() => dispatch(toggleRequestItemDrawer('UPDATE_REQUEST_REVIEW'))}
+                                disabled={requestMasterItemsPurchaseSelectedSelector.requestMasterItems.length < 1}>
                                 REVIEW
                             </Button>
                         </Paper>

@@ -22,12 +22,12 @@ import { visuallyHidden } from '@mui/utils';
 import {
     getPurchaseRequestMasterItemsThunk,
     selectRequestMasterItems
-} from '../../app/slice/request/purchaseRequestMasterItemsSlice';
+} from '../../app/slice/request/requestMasterItemsPurchaseSlice';
 import { IRequest, IRequestMaster } from '../../app/api/properties/IRequest';
 import {
-    handleRequestMasterItemsSelected,
-    selectRequestMasterItemsSelected
-} from '../../app/slice/selectedRequests/requestMasterItemsSelectSlice';
+    handleRequestMasterItemsPurchaseSelected,
+    selectRequestMasterItemsPurchaseSelected
+} from '../../app/slice/selectedRequests/requestMasterItemsPurchaseSelectedSlice';
 import { selectRequestDrawer } from '../../app/slice/drawerToggle/requestDrawerSlice';
 
 const columns: {
@@ -105,12 +105,12 @@ interface EnhancedTableProps {
     onSelectAllClick: (event: ChangeEvent<HTMLInputElement>) => void;
     order: Order;
     orderBy: string;
-    selectedIds: number[];
+    requestMasterItemsPurchaseSelected: IRequestMaster[];
 }
 
 const EnhancedTableHead = (props: EnhancedTableProps) => {
     const requestMasterItemSelector = useAppSelector(selectRequestMasterItems);
-    const { onSelectAllClick, order, orderBy, onRequestSort, selectedIds } = props;
+    const { onSelectAllClick, order, orderBy, onRequestSort, requestMasterItemsPurchaseSelected } = props;
     const createSortHandler = (property: keyof IMaster | keyof IRequest) => (event: MouseEvent<unknown>) => {
         onRequestSort(event, property);
     };
@@ -123,12 +123,14 @@ const EnhancedTableHead = (props: EnhancedTableProps) => {
                         color="default"
                         sx={{ paddingTop: 0, paddingBottom: 0, color: 'white' }}
                         indeterminate={
-                            selectedIds.length > 0 &&
-                            selectedIds.length < requestMasterItemSelector.response.content.length
+                            requestMasterItemsPurchaseSelected.length > 0 &&
+                            requestMasterItemsPurchaseSelected.length <
+                                requestMasterItemSelector.response.content.length
                         }
                         checked={
                             requestMasterItemSelector.response.content.length > 0 &&
-                            selectedIds.length === requestMasterItemSelector.response.content.length
+                            requestMasterItemsPurchaseSelected.length ===
+                                requestMasterItemSelector.response.content.length
                         }
                         onChange={onSelectAllClick}
                     />
@@ -170,9 +172,52 @@ const EnhancedTableHead = (props: EnhancedTableProps) => {
     );
 };
 
+const RequestMasterItemsPurchaseRow = ({ requestMasterItem }: { requestMasterItem: IRequestMaster }): JSX.Element => {
+    const dispatch = useAppDispatch();
+    const requestMasterItemsPurchaseSelectedSelector = useAppSelector(selectRequestMasterItemsPurchaseSelected);
+
+    const handleCheckboxChange = (event: ChangeEvent<HTMLInputElement>, requestMasterItem: IRequestMaster) => {
+        if (event.target.checked) {
+            dispatch(
+                handleRequestMasterItemsPurchaseSelected([
+                    ...requestMasterItemsPurchaseSelectedSelector.requestMasterItems,
+                    requestMasterItem
+                ])
+            );
+        } else {
+            dispatch(
+                handleRequestMasterItemsPurchaseSelected([
+                    ...requestMasterItemsPurchaseSelectedSelector.requestMasterItems.filter(
+                        (item) => item.id !== requestMasterItem.id
+                    )
+                ])
+            );
+        }
+    };
+
+    return (
+        <TableRow>
+            <StyledTableCell padding="checkbox">
+                <Checkbox
+                    color="default"
+                    onChange={(event: ChangeEvent<HTMLInputElement>) => handleCheckboxChange(event, requestMasterItem)}
+                    defaultChecked={requestMasterItemsPurchaseSelectedSelector.requestMasterItems.includes(
+                        requestMasterItem
+                    )}
+                />
+            </StyledTableCell>
+            <StyledTableCell>{requestMasterItem.masterItem.item}</StyledTableCell>
+            <StyledTableCell>{requestMasterItem.recentCN}</StyledTableCell>
+            <StyledTableCell>{requestMasterItem.masterItem.purchaseUnit}</StyledTableCell>
+            <StyledTableCell>{requestMasterItem.masterItem.partNumber}</StyledTableCell>
+            <StyledTableCell>{requestMasterItem.masterItem.comment}</StyledTableCell>
+        </TableRow>
+    );
+};
+
 const RequestMasterItemsPurchase = () => {
     const requestMasterItemsSelector = useAppSelector(selectRequestMasterItems);
-    const requestMasterItemsSelectedSelector = useAppSelector(selectRequestMasterItemsSelected);
+    const requestMasterItemsPurchaseSelectedSelector = useAppSelector(selectRequestMasterItemsPurchaseSelected);
     const { toggleType } = useAppSelector(selectRequestDrawer);
     const dispatch = useAppDispatch();
     const [page, setPage] = useState<number>(0);
@@ -185,42 +230,18 @@ const RequestMasterItemsPurchase = () => {
 
     useEffect(() => {
         dispatch(getPurchaseRequestMasterItemsThunk({ state: location.state, page: page }));
-    }, [dispatch, page, location]);
-
-    const handleCheckboxChange = (event: ChangeEvent<HTMLInputElement>, requestMasterItem: IRequestMaster) => {
-        if (event.target.checked) {
-            dispatch(
-                handleRequestMasterItemsSelected([
-                    ...requestMasterItemsSelectedSelector.requestMasterItems,
-                    requestMasterItem.id
-                ])
-            );
-        } else {
-            dispatch(
-                handleRequestMasterItemsSelected([
-                    ...requestMasterItemsSelectedSelector.requestMasterItems.filter((id) => id !== requestMasterItem.id)
-                ])
-            );
-        }
-    };
+    }, [dispatch, page, location, toggleType]);
 
     const handleRequestSort = (event: MouseEvent<unknown>, property: keyof IMaster | keyof IRequest) => {};
 
     const handleSelectAllClick = (event: ChangeEvent<HTMLInputElement>) => {
         if (
-            requestMasterItemsSelectedSelector.requestMasterItems.length <
+            requestMasterItemsPurchaseSelectedSelector.requestMasterItems.length <
             requestMasterItemsSelector.response.content.length
         ) {
-            dispatch(
-                handleRequestMasterItemsSelected(
-                    requestMasterItemsSelector.response.content.reduce(
-                        (acc: number[], masterItem) => (acc.includes(masterItem.id) ? acc : [...acc, masterItem.id]),
-                        []
-                    )
-                )
-            );
+            dispatch(handleRequestMasterItemsPurchaseSelected(requestMasterItemsSelector.response.content));
         } else {
-            dispatch(handleRequestMasterItemsSelected([]));
+            dispatch(handleRequestMasterItemsPurchaseSelected([]));
         }
     };
 
@@ -230,7 +251,9 @@ const RequestMasterItemsPurchase = () => {
                 <TableContainer sx={{ height: 600, overflowY: 'auto' }}>
                     <Table stickyHeader>
                         <EnhancedTableHead
-                            selectedIds={requestMasterItemsSelectedSelector.requestMasterItems}
+                            requestMasterItemsPurchaseSelected={
+                                requestMasterItemsPurchaseSelectedSelector.requestMasterItems
+                            }
                             order={order}
                             orderBy={orderBy}
                             onSelectAllClick={handleSelectAllClick}
@@ -239,31 +262,11 @@ const RequestMasterItemsPurchase = () => {
                         <TableBody>
                             {requestMasterItemsSelector.response.content.length > 0 &&
                                 requestMasterItemsSelector.response.content.map((requestMasterItem, index) => (
-                                    <TableRow key={index}>
-                                        <StyledTableCell padding="checkbox">
-                                            <Checkbox
-                                                color="default"
-                                                onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                                                    handleCheckboxChange(event, requestMasterItem)
-                                                }
-                                                checked={requestMasterItemsSelectedSelector.requestMasterItems.includes(
-                                                    requestMasterItem.id
-                                                )}
-                                            />
-                                        </StyledTableCell>
-                                        <StyledTableCell>{requestMasterItem.masterItem.item}</StyledTableCell>
-                                        <StyledTableCell>{requestMasterItem.recentCN}</StyledTableCell>
-                                        <StyledTableCell>{requestMasterItem.masterItem.purchaseUnit}</StyledTableCell>
-                                        <StyledTableCell>{requestMasterItem.masterItem.partNumber}</StyledTableCell>
-                                        <StyledTableCell>{requestMasterItem.masterItem.comment}</StyledTableCell>
-                                    </TableRow>
+                                    <RequestMasterItemsPurchaseRow requestMasterItem={requestMasterItem} key={index} />
                                 ))}
                         </TableBody>
                     </Table>
                 </TableContainer>
-                <Drawer anchor="bottom" open={toggleType === 'UPDATE_REQUEST_REVIEW'}>
-                    <RequestItemReviewForm />
-                </Drawer>
             </Paper>
         </Box>
     );

@@ -3,7 +3,11 @@ import { IRequestMaster } from './properties/IRequest';
 
 const baseUrl = process.env.REACT_APP_BASE_URL;
 
-export const getPurchaseRequestMasterItems = (params: { state: string, page: number }) => {
+export const getRequestMasterItemsPurchase = (params: { state: string, page: number }) => {
+    return axios.get(`${baseUrl}/requests/${params.state}/list?page=${params.page}`);
+};
+
+export const getRequestMasterItems = (params: { state: string, page: number }) => {
     return axios.get(`${baseUrl}/requests/${params.state}/list?page=${params.page}`);
 };
 
@@ -30,6 +34,6 @@ export const updateRequestMasterItem = (params: { state: string, department: str
     );
 };
 
-export const createRequestMasterItems = (params: { state: string, requestMasterItems: IRequestMaster[] }) => {
-    return axios.post(`${baseUrl}/request-master/${params.state}/create`, params.requestMasterItems);
+export const createRequestMasterItems = (params: { state: string, department: string, requestMasterItems: IRequestMaster[] }) => {
+    return axios.post(`${baseUrl}/request-master/${params.department}/${params.state}/list/create`, params.requestMasterItems);
 };

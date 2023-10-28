@@ -11,6 +11,7 @@ export interface IRequest {
     timeUpdated: Date;
     requester: string;
     customText: string;
+    location: string;
     customDetail: string;
 }
 
@@ -26,10 +27,6 @@ export interface IRequestMaster {
     requester: string;
     customText: string;
     customDetail: string;
-    masterItem: IMaster
-}
-
-export interface IRequestMaster {
-    id: number;
+    location: string;
     masterItem: IMaster
 }

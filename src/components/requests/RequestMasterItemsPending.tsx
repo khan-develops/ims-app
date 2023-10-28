@@ -13,22 +13,23 @@ import {
     styled,
     tableCellClasses
 } from '@mui/material';
-import { ChangeEvent, useEffect, useState, KeyboardEvent, MouseEvent } from 'react';
+import { ChangeEvent, useEffect, useState, KeyboardEvent, MouseEvent, useRef } from 'react';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { useLocation } from 'react-router-dom';
 import {
-    changeRequestMasterItemsPending,
     getRequestMasterItemsPendingThunk,
     selectRequestMasterItemsPending
 } from '../../app/slice/request/requestMasterItemsPendingSlice';
-import { selectRequestMasterItemsPendingChecked } from '../../app/slice/request/requestMasterItemsPendingCheckedSlice';
 import { updateRequestMasterItemThunk } from '../../app/slice/request/requestMasterItemUpdateSlice';
 import { IRequest, IRequestMaster } from '../../app/api/properties/IRequest';
 import { IMaster } from '../../app/api/properties/IMaster';
 import { visuallyHidden } from '@mui/utils';
-import FileSaver from 'file-saver';
-import axios from 'axios';
-import { selectRequestDrawer, toggleRequestItemDrawer } from '../../app/slice/drawerToggle/requestDrawerSlice';
+import { selectRequestDrawer } from '../../app/slice/drawerToggle/requestDrawerSlice';
+import {
+    handleRequestMasterItemsPendingSelected,
+    selectRequestMasterItemsPendingSelected
+} from '../../app/slice/selectedRequests/requestMasterItemsPendingSelectedSlice';
+import { selectProfileDetail } from '../../app/slice/profileDetail/profileDetailSlice';
 
 const columns: {
     id: keyof IMaster | keyof IRequest;
@@ -105,12 +106,12 @@ interface EnhancedTableProps {
     onSelectAllClick: (event: ChangeEvent<HTMLInputElement>) => void;
     order: Order;
     orderBy: string;
-    selectedIds: number[];
+    requestMasterItemsPendingSelectedSelector: IRequestMaster[];
 }
 
 const EnhancedTableHead = (props: EnhancedTableProps) => {
     const requestMasterItemsPendingSelector = useAppSelector(selectRequestMasterItemsPending);
-    const { onSelectAllClick, order, orderBy, onRequestSort, selectedIds } = props;
+    const { onSelectAllClick, order, orderBy, onRequestSort, requestMasterItemsPendingSelectedSelector } = props;
     const createSortHandler = (property: keyof IMaster | keyof IRequest) => (event: MouseEvent<unknown>) => {
         onRequestSort(event, property);
     };
@@ -123,12 +124,14 @@ const EnhancedTableHead = (props: EnhancedTableProps) => {
                         color="default"
                         sx={{ paddingTop: 0, paddingBottom: 0, color: 'white' }}
                         indeterminate={
-                            selectedIds.length > 0 &&
-                            selectedIds.length < requestMasterItemsPendingSelector.response.content.length
+                            requestMasterItemsPendingSelectedSelector.length > 0 &&
+                            requestMasterItemsPendingSelectedSelector.length <
+                                requestMasterItemsPendingSelector.response.content.length
                         }
-                        checked={
+                        defaultChecked={
                             requestMasterItemsPendingSelector.response.content.length > 0 &&
-                            selectedIds.length === requestMasterItemsPendingSelector.response.content.length
+                            requestMasterItemsPendingSelectedSelector.length ===
+                                requestMasterItemsPendingSelector.response.content.length
                         }
                         onChange={onSelectAllClick}
                     />
@@ -170,12 +173,103 @@ const EnhancedTableHead = (props: EnhancedTableProps) => {
     );
 };
 
+const RequestMasterItemsPendingRow = ({ requestMasterItem }: { requestMasterItem: IRequestMaster }) => {
+    const requestMasterItemsPendingSelectedSelector = useAppSelector(selectRequestMasterItemsPendingSelected);
+    const profileDetailSelector = useAppSelector(selectProfileDetail);
+    const dispatch = useAppDispatch();
+    const location = useLocation();
+    const inputRef = useRef<{ quantity: HTMLDivElement | null; customText: HTMLDivElement | null }>({
+        quantity: null,
+        customText: null
+    });
+
+    const updateRequestMasterItem = (event: KeyboardEvent, requestMasterItem: IRequestMaster) => {
+        if (event.key === 'Enter') {
+            requestMasterItem = {
+                ...requestMasterItem,
+                [(event.target as HTMLInputElement).name]: (event.target as HTMLInputElement).value
+            };
+            dispatch(
+                updateRequestMasterItemThunk({
+                    state: location.state,
+                    department: profileDetailSelector.profileDetail.department.toLowerCase().replace(' ', '_'),
+                    requestMasterItem: requestMasterItem
+                })
+            )
+                .then((response) => {
+                    console.log(response);
+                })
+                .catch((error: Error) => console.error(error.message));
+        }
+    };
+
+    const handleCheckboxChange = (event: ChangeEvent<HTMLInputElement>, requestMasterItem: IRequestMaster) => {
+        if (event.target.checked) {
+            dispatch(
+                handleRequestMasterItemsPendingSelected([
+                    ...requestMasterItemsPendingSelectedSelector.requestMasterItems,
+                    requestMasterItem
+                ])
+            );
+        } else {
+            dispatch(
+                handleRequestMasterItemsPendingSelected([
+                    ...requestMasterItemsPendingSelectedSelector.requestMasterItems.filter(
+                        (item) => item.id !== requestMasterItem.id
+                    )
+                ])
+            );
+        }
+    };
+
+    return (
+        <TableRow>
+            <StyledTableCell padding="checkbox">
+                <Checkbox
+                    color="default"
+                    onChange={(event: ChangeEvent<HTMLInputElement>) => handleCheckboxChange(event, requestMasterItem)}
+                    checked={requestMasterItemsPendingSelectedSelector.requestMasterItems.includes(requestMasterItem)}
+                />
+            </StyledTableCell>
+
+            <StyledTableCell width={600}>{requestMasterItem.masterItem.item}</StyledTableCell>
+            <StyledTableCell width={200}>{requestMasterItem.masterItem.recentCN}</StyledTableCell>
+            <StyledTableCell width={100}>
+                <TextField
+                    name="quantity"
+                    size="small"
+                    type="number"
+                    inputRef={(ref) => (inputRef.current.quantity = ref)}
+                    InputProps={{
+                        inputProps: { min: 0, style: { fontSize: 14 } }
+                    }}
+                    defaultValue={requestMasterItem.quantity}
+                    onKeyDown={(event: KeyboardEvent) => updateRequestMasterItem(event, requestMasterItem)}
+                />
+            </StyledTableCell>
+            <StyledTableCell width={400}>
+                <TextField
+                    name="customText"
+                    size="small"
+                    inputRef={(ref) => (inputRef.current.customText = ref)}
+                    fullWidth
+                    InputProps={{
+                        inputProps: { style: { fontSize: 14 } }
+                    }}
+                    defaultValue={requestMasterItem.customText}
+                    onKeyDown={(event: KeyboardEvent) => updateRequestMasterItem(event, requestMasterItem)}
+                />
+            </StyledTableCell>
+            <StyledTableCell>{requestMasterItem.customDetail}</StyledTableCell>
+        </TableRow>
+    );
+};
+
 const RequestMasterDepartmentPending = () => {
     const requestMasterItemsPendingSelector = useAppSelector(selectRequestMasterItemsPending);
-    const requestMasterItemsPendingCheckedSelector = useAppSelector(selectRequestMasterItemsPendingChecked);
+    const requestMasterItemsPendingSelectedSelector = useAppSelector(selectRequestMasterItemsPendingSelected);
     const dispatch = useAppDispatch();
     const [page, setPage] = useState<number>(0);
-    const [selectedDepartment, setSelectedDepartment] = useState<string>('extractions');
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
     const { toggleType } = useAppSelector(selectRequestDrawer);
     const location = useLocation();
@@ -183,151 +277,20 @@ const RequestMasterDepartmentPending = () => {
     const [order, setOrder] = useState<Order>('asc');
     const [orderBy, setOrderBy] = useState<keyof IMaster>('id');
     const [dense, setDense] = useState(false);
+    const profileDetailSelector = useAppSelector(selectProfileDetail);
 
     useEffect(() => {
         dispatch(
             getRequestMasterItemsPendingThunk({
                 state: location.state,
-                department: selectedDepartment,
+                department: profileDetailSelector.profileDetail.department.toLowerCase().replace(' ', '_'),
                 page: page
             })
         );
-    }, [dispatch, location.pathname, location.state, page]);
-
-    const handleChangePage = (event: any, page: number): void => {
-        setPage(page);
-    };
-
-    // const handleCheckboxChange = (event: ChangeEvent<HTMLInputElement>, departmentMasterItem: IRequestMaster) => {
-    //     const exists = requestMasterItemsPendingCheckedSelector.requestMasterItemsPendingChecked.some(
-    //         (item) => item.id === departmentMasterItem.id
-    //     );
-    //     if (exists) {
-    //         dispatch(
-    //             changeRequestItemsPendingChecked(
-    //                 requestMasterItemsPendingCheckedSelector.requestMasterItemsPendingChecked.filter(
-    //                     (item) => item.id !== departmentMasterItem.id
-    //                 )
-    //             )
-    //         );
-    //     }
-    //     if (!exists) {
-    //         dispatch(
-    //             changeRequestItemsPendingChecked([
-    //                 ...requestMasterItemsPendingCheckedSelector.requestMasterItemsPendingChecked,
-    //                 departmentMasterItem
-    //             ])
-    //         );
-    //     }
-    // };
-
-    const handleChangeQuantity = (event: ChangeEvent<HTMLInputElement>, id: number) => {
-        dispatch(
-            changeRequestMasterItemsPending({
-                ...requestMasterItemsPendingSelector.response,
-                content: requestMasterItemsPendingSelector.response.content.map((requestMasterItemPending) => ({
-                    ...requestMasterItemPending,
-                    quantity:
-                        requestMasterItemPending.id === id
-                            ? parseInt(event.target.value)
-                            : requestMasterItemPending.quantity
-                }))
-            })
-        );
-    };
-
-    const handleUpdateQuantity = (event: KeyboardEvent, requestMasterItem: IRequestMaster) => {
-        if (event.key === 'Enter') {
-            dispatch(
-                updateRequestMasterItemThunk({
-                    state: location.state,
-                    department: selectedDepartment,
-                    requestMasterItem: requestMasterItem
-                })
-            );
-        }
-    };
-
-    const handleChangeCustomText = (event: ChangeEvent<HTMLInputElement>, id: number) => {
-        dispatch(
-            changeRequestMasterItemsPending({
-                ...requestMasterItemsPendingSelector.response,
-                content: requestMasterItemsPendingSelector.response.content.map((requestMasterItemPending) => ({
-                    ...requestMasterItemPending,
-                    custom_text:
-                        requestMasterItemPending.id === id
-                            ? parseInt(event.target.value)
-                            : requestMasterItemPending.customText
-                }))
-            })
-        );
-    };
-
-    const handleUpdateCustomText = (event: KeyboardEvent, requestMasterItem: IRequestMaster) => {
-        if (event.key === 'Enter') {
-            dispatch(
-                updateRequestMasterItemThunk({
-                    state: location.state,
-                    department: selectedDepartment,
-                    requestMasterItem: requestMasterItem
-                })
-            );
-        }
-    };
-
-    const handleAddClick = () => {
-        dispatch(
-            toggleRequestItemDrawer({
-                toggleType: 'ADD_MASTER_ITEM',
-                requestItem: null
-            })
-        );
-    };
-
-    const handleCheckboxChange = (event: ChangeEvent<HTMLInputElement>, masterRequestItem: IRequestMaster) => {
-        if (event.target.checked) {
-            setSelectedIds([...selectedIds, masterRequestItem.id]);
-        } else {
-            setSelectedIds([...selectedIds.filter((id) => id !== masterRequestItem.id)]);
-        }
-    };
+    }, [dispatch, location.pathname, location.state, page, profileDetailSelector.profileDetail.department]);
 
     const handleKeywordChange = (event: ChangeEvent<HTMLInputElement>) => {
         // dispatch(filterMasterDepartmentItemsThunk({ state: state, keyword: event.target.value, page: 0 }));
-    };
-
-    const handleReviewClick = () => {
-        dispatch(toggleRequestItemDrawer({ toggleType: 'UPDATE_REQUEST_REVIEW', requestItem: null }));
-    };
-
-    const handleDownloadClick = () => {
-        return axios.get(`${baseUrl}/download/${location.state}/list`).then((response) => {
-            const blob = new Blob([response.data], {
-                type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-            });
-            FileSaver.saveAs(blob, `${location.state}.xlsx`);
-        });
-    };
-
-    const handleEditClick = (event: MouseEvent<HTMLElement>) => {
-        // if (masterDepartmentItem) {
-        //     dispatch(
-        //         toggleDrawer({
-        //             type: DRAWER_TOGGLE_TYPE.UPDATE_STORE_ROOM_ITEM,
-        //             storeRoomItem: {
-        //                 id: masterDepartmentItem.id,
-        //                 location: masterDepartmentItem.departmentItems[0].location,
-        //                 quantity: masterDepartmentItem.departmentItems[0].quantity,
-        //                 minimumQuantity: masterDepartmentItem.departmentItems[0].minimumQuantity,
-        //                 maximumQuantity: masterDepartmentItem.departmentItems[0].maximumQuantity,
-        //                 usageLevel: masterDepartmentItem.departmentItems[0].usageLevel,
-        //                 lotNumber: masterDepartmentItem.departmentItems[0].lotNumber,
-        //                 expirationDate: masterDepartmentItem.departmentItems[0].expirationDate,
-        //                 receivedDate: masterDepartmentItem.departmentItems[0].receivedDate
-        //             }
-        //         })
-        //     );
-        // }
     };
 
     const handleRequestSort = (event: MouseEvent<unknown>, property: keyof IMaster | keyof IRequest) => {
@@ -370,17 +333,14 @@ const RequestMasterDepartmentPending = () => {
         // }
     };
 
-    const handleSelectAllClick = (event: ChangeEvent<HTMLInputElement>) => {
-        if (selectedIds.length < requestMasterItemsPendingSelector.response.content.length) {
-            setSelectedIds(
-                requestMasterItemsPendingSelector.response.content.reduce(
-                    (acc: number[], requestMasterItem) =>
-                        acc.includes(requestMasterItem.id) ? acc : [...acc, requestMasterItem.id],
-                    []
-                )
-            );
+    const handleSelectAllClick = () => {
+        if (
+            requestMasterItemsPendingSelectedSelector.requestMasterItems.length <
+            requestMasterItemsPendingSelector.response.content.length
+        ) {
+            dispatch(handleRequestMasterItemsPendingSelected(requestMasterItemsPendingSelector.response.content));
         } else {
-            setSelectedIds([]);
+            dispatch(handleRequestMasterItemsPendingSelected([]));
         }
     };
 
@@ -390,60 +350,20 @@ const RequestMasterDepartmentPending = () => {
                 <TableContainer sx={{ height: 600, overflowY: 'auto' }}>
                     <Table stickyHeader>
                         <EnhancedTableHead
-                            selectedIds={selectedIds}
                             order={order}
                             orderBy={orderBy}
                             onSelectAllClick={handleSelectAllClick}
                             onRequestSort={handleRequestSort}
+                            requestMasterItemsPendingSelectedSelector={
+                                requestMasterItemsPendingSelectedSelector.requestMasterItems
+                            }
                         />
                         <TableBody>
-                            {requestMasterItemsPendingSelector.response.content.length > 0 &&
+                            {requestMasterItemsPendingSelector.response &&
+                                requestMasterItemsPendingSelector.response.content &&
+                                requestMasterItemsPendingSelector.response.content.length > 0 &&
                                 requestMasterItemsPendingSelector.response.content.map((requestMasterItem, index) => (
-                                    <TableRow key={index}>
-                                        <StyledTableCell padding="checkbox">
-                                            <Checkbox
-                                                color="default"
-                                                onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                                                    handleCheckboxChange(event, requestMasterItem)
-                                                }
-                                                checked={selectedIds.includes(requestMasterItem.id)}
-                                            />
-                                        </StyledTableCell>
-
-                                        <StyledTableCell>{requestMasterItem.masterItem.item}</StyledTableCell>
-                                        <StyledTableCell>{requestMasterItem.masterItem.recentCN}</StyledTableCell>
-                                        <StyledTableCell>
-                                            <TextField
-                                                size="small"
-                                                type="number"
-                                                InputProps={{
-                                                    inputProps: { min: 0 }
-                                                }}
-                                                id={requestMasterItem.id.toString()}
-                                                value={requestMasterItem.quantity}
-                                                onKeyDown={(event: React.KeyboardEvent) =>
-                                                    handleUpdateQuantity(event, requestMasterItem)
-                                                }
-                                                onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                                                    handleChangeQuantity(event, requestMasterItem.id)
-                                                }
-                                            />
-                                        </StyledTableCell>
-                                        <StyledTableCell>
-                                            <TextField
-                                                size="small"
-                                                id={requestMasterItem.id.toString()}
-                                                value={requestMasterItem.customText}
-                                                onKeyDown={(event: React.KeyboardEvent) =>
-                                                    handleUpdateCustomText(event, requestMasterItem)
-                                                }
-                                                onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                                                    handleChangeCustomText(event, requestMasterItem.id)
-                                                }
-                                            />
-                                        </StyledTableCell>
-                                        <StyledTableCell>{requestMasterItem.customDetail}</StyledTableCell>
-                                    </TableRow>
+                                    <RequestMasterItemsPendingRow requestMasterItem={requestMasterItem} key={index} />
                                 ))}
                         </TableBody>
                     </Table>

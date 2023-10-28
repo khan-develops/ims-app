@@ -583,7 +583,7 @@ const StoreRoomMaster = () => {
     };
 
     const handleReviewClick = () => {
-        dispatch(toggleRequestItemDrawer({ toggleType: 'UPDATE_REQUEST_REVIEW', requestItem: null }));
+        dispatch(toggleRequestItemDrawer('UPDATE_REQUEST_REVIEW'));
     };
 
     const handleDownloadClick = () => {
@@ -596,7 +596,7 @@ const StoreRoomMaster = () => {
     };
 
     const handleEditClick = () => {
-        dispatch(toggleRequestItemDrawer({ toggleType: 'UPDATE_REQUEST_EDIT', requestItem: null }));
+        dispatch(toggleRequestItemDrawer('UPDATE_REQUEST_EDIT'));
     };
 
     const handleKeywordChange = (event: ChangeEvent<HTMLInputElement>) => {

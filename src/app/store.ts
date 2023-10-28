@@ -9,7 +9,7 @@ import searchReducer from './search';
 import storeRoomMasterItemsReducer from './slice/storeRoom/storeRoomMasterItemsSlice';
 import storeRoomUpdateReducer from './slice/storeRoom/storeRoomUpdateSlice';
 import requestItemsUpdateReducer from './slice/request/requestMasterItemsUpdateSlice';
-import requestMasterItemsReducer from './slice/request/purchaseRequestMasterItemsSlice';
+import requestMasterItemsReducer from './slice/request/requestMasterItemsPurchaseSlice';
 import bottomToolbarItemsReducer from './bottomToolbar/bottomToolbarItems';
 import requestMasterItemsCheckedReducer from './slice/request/requestMasterItemsCheckedSlice';
 import requestMasterItemsCreateReducer from './slice/request/requestMasterItemsCreateSlice';
@@ -37,11 +37,13 @@ import departmentNamesReducer from './slice/departmentName/departmentNamesSlice'
 import departmentNameCreateReducer from './slice/departmentName/departmentNameActionSlice';
 import departmentMasterItemAssignReducer from './slice/department/departmentMasterItemAssignSlice';
 import requestMasterItemsDashboardReducer from './slice/request/dashboard/requestMasterItemsDashboardSlice'
-import requestMasterItemsSelectedReducer from './slice/selectedRequests/requestMasterItemsSelectSlice';
+import requestMasterItemsSelectedReducer from './slice/selectedRequests/requestMasterItemsPurchaseSelectedSlice';
 import masterDrawerReducer from './slice/drawerToggle/masterDrawerSlice';
 import departmentDrawerReducer from './slice/drawerToggle/departmentDrawerSlice'
 import requestDrawerReducer from './slice/drawerToggle/requestDrawerSlice'
-import purchaseRequestMasterItemsReducer from './slice/request/purchaseRequestMasterItemsSlice'
+import purchaseRequestMasterItemsReducer from './slice/request/requestMasterItemsPurchaseSlice';
+import requestMasterItemsPurchaseSelectedReducer from './slice/selectedRequests/requestMasterItemsPurchaseSelectedSlice';
+import requestMasterItemsPendingSelectedReducer from './slice/selectedRequests/requestMasterItemsPendingSelectedSlice'
 
 export const store = configureStore({
     reducer: {
@@ -87,7 +89,9 @@ export const store = configureStore({
         masterDrawerStore: masterDrawerReducer,
         departmentDrawerStore: departmentDrawerReducer,
         requestDrawerStore: requestDrawerReducer,
-        purchaseRequestMasterItemsStore: purchaseRequestMasterItemsReducer
+        purchaseRequestMasterItemsStore: purchaseRequestMasterItemsReducer,
+        requestMasterItemsPurchaseSelectedStore: requestMasterItemsPurchaseSelectedReducer,
+        requestMasterItemsPendingSelectedStore: requestMasterItemsPendingSelectedReducer
     }
 });
 
