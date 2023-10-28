@@ -183,7 +183,11 @@ const RequestMasterItemsPendingRow = ({ requestMasterItem }: { requestMasterItem
         customText: null
     });
 
-    const updateRequestMasterItem = (event: KeyboardEvent, requestMasterItem: IRequestMaster) => {
+    const updateRequestMasterItem = (
+        event: KeyboardEvent,
+        requestMasterItem: IRequestMaster,
+        ref: HTMLDivElement | null
+    ) => {
         if (event.key === 'Enter') {
             requestMasterItem = {
                 ...requestMasterItem,
@@ -196,10 +200,37 @@ const RequestMasterItemsPendingRow = ({ requestMasterItem }: { requestMasterItem
                     requestMasterItem: requestMasterItem
                 })
             )
-                .then((response) => {
-                    console.log(response);
+                .then(() => {
+                    if ((event.target as HTMLInputElement).name === 'quantity') {
+                        inputRef.current.quantity = ref;
+                    }
+                    if ((event.target as HTMLInputElement).name === 'customText') {
+                        inputRef.current.customText = ref;
+                    }
+
+                    if (ref) {
+                        ref.style.backgroundColor = '#98FB98';
+                        ref.style.transition = '1s background ease-in, 1000ms transform ease-out 1s';
+                        setTimeout(() => {
+                            if (ref) {
+                                ref.style.backgroundColor = '#FAFAFA';
+                            }
+                        }, 1000);
+                        ref.blur();
+                    }
                 })
-                .catch((error: Error) => console.error(error.message));
+                .catch((error: Error) => {
+                    console.error(error.message);
+                    if (ref) {
+                        ref.style.backgroundColor = '#FF0000';
+                        ref.style.transition = '1s background ease-in, 500ms transform ease-out 1s';
+                        setTimeout(() => {
+                            if (ref) {
+                                ref.style.backgroundColor = '#FAFAFA';
+                            }
+                        }, 700);
+                    }
+                });
         }
     };
 
@@ -244,7 +275,9 @@ const RequestMasterItemsPendingRow = ({ requestMasterItem }: { requestMasterItem
                         inputProps: { min: 0, style: { fontSize: 14 } }
                     }}
                     defaultValue={requestMasterItem.quantity}
-                    onKeyDown={(event: KeyboardEvent) => updateRequestMasterItem(event, requestMasterItem)}
+                    onKeyDown={(event: KeyboardEvent) =>
+                        updateRequestMasterItem(event, requestMasterItem, inputRef.current.quantity)
+                    }
                 />
             </StyledTableCell>
             <StyledTableCell width={400}>
@@ -257,7 +290,9 @@ const RequestMasterItemsPendingRow = ({ requestMasterItem }: { requestMasterItem
                         inputProps: { style: { fontSize: 14 } }
                     }}
                     defaultValue={requestMasterItem.customText}
-                    onKeyDown={(event: KeyboardEvent) => updateRequestMasterItem(event, requestMasterItem)}
+                    onKeyDown={(event: KeyboardEvent) =>
+                        updateRequestMasterItem(event, requestMasterItem, inputRef.current.customText)
+                    }
                 />
             </StyledTableCell>
             <StyledTableCell>{requestMasterItem.customDetail}</StyledTableCell>
