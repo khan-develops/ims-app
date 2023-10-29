@@ -55,6 +55,7 @@ import { inventoryRequestDepartments } from '../components/common/routes';
 import { getRequestMasterItemsDashboardThunk } from '../app/slice/request/dashboard/requestMasterItemsDashboardSlice';
 import { toggleMasterItemDrawer } from '../app/slice/drawerToggle/masterDrawerSlice';
 import { toggleRequestItemDrawer } from '../app/slice/drawerToggle/requestDrawerSlice';
+import { selectProfileDetail } from '../app/slice/profileDetail/profileDetailSlice';
 
 const baseUrl = process.env.REACT_APP_BASE_URL;
 
@@ -258,19 +259,32 @@ const EnhancedTableHead = (props: EnhancedTableProps) => {
 
 const RequestMasterAdmin = () => {
     const requestMasterItemsSelector = useAppSelector(selectRequestMasterItems);
+    const profileDetailSelector = useAppSelector(selectProfileDetail);
     const dispatch = useAppDispatch();
     const [page, setPage] = useState<number>(0);
     const location = useLocation();
     const [value, setValue] = useState<number>(0);
     const [order, setOrder] = useState<Order>('asc');
     const [orderBy, setOrderBy] = useState<keyof IMaster | keyof IRequest>('id');
-    const [selectedDepartment, setSelectedDepartment] = useState<string>('extractions');
+
+    const { state } = location;
 
     useEffect(() => {
         dispatch(
-            getRequestMasterItemsDashboardThunk({ state: location.state, department: selectedDepartment, page: page })
+            getRequestMasterItemsDashboardThunk({
+                department: profileDetailSelector.profileDetail.department,
+                requestCategory: state.requestCategory,
+                page: page
+            })
         );
-    }, [dispatch, location.pathname, location.state, page]);
+    }, [
+        dispatch,
+        location.pathname,
+        location.state,
+        page,
+        profileDetailSelector.profileDetail.department,
+        state.requestCategory
+    ]);
 
     const handleChangePage = (event: any, page: number): void => {
         setPage(page);
@@ -301,8 +315,8 @@ const RequestMasterAdmin = () => {
     const handleEnterKey = (event: KeyboardEvent, requestMasterItem: IRequestMaster) => {
         dispatch(
             updateRequestMasterItemThunk({
-                state: location.state,
-                department: selectedDepartment,
+                department: profileDetailSelector.profileDetail.department,
+                requestCategory: state.requestCategory,
                 requestMasterItem: requestMasterItem
             })
         );
@@ -412,7 +426,7 @@ const RequestMasterAdmin = () => {
                             <RadioGroup
                                 sx={{ display: 'flex', justifyContent: 'space-between' }}
                                 row
-                                defaultValue={selectedDepartment}
+                                defaultValue={profileDetailSelector.profileDetail.department}
                                 name="request-type">
                                 {inventoryRequestDepartments.map((department) => (
                                     <Chip

@@ -1,12 +1,16 @@
 import {
+    BottomNavigation,
+    BottomNavigationAction,
     Box,
     Checkbox,
+    Grid,
     Paper,
     Table,
     TableBody,
     TableCell,
     TableContainer,
     TableHead,
+    TablePagination,
     TableRow,
     TableSortLabel,
     TextField,
@@ -18,18 +22,21 @@ import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { useLocation } from 'react-router-dom';
 import {
     getRequestMasterItemsPendingThunk,
-    selectRequestMasterItemsPending
+    selectRequestMasterItemsPending,
+    sortRequestMasterItemsPendingThunk
 } from '../../app/slice/request/requestMasterItemsPendingSlice';
 import { updateRequestMasterItemThunk } from '../../app/slice/request/requestMasterItemUpdateSlice';
 import { IRequest, IRequestMaster } from '../../app/api/properties/IRequest';
 import { IMaster } from '../../app/api/properties/IMaster';
 import { visuallyHidden } from '@mui/utils';
-import { selectRequestDrawer } from '../../app/slice/drawerToggle/requestDrawerSlice';
 import {
     handleRequestMasterItemsPendingSelected,
     selectRequestMasterItemsPendingSelected
 } from '../../app/slice/selectedRequests/requestMasterItemsPendingSelectedSlice';
 import { selectProfileDetail } from '../../app/slice/profileDetail/profileDetailSlice';
+import DownloadIcon from '@mui/icons-material/Download';
+import axios from 'axios';
+import FileSaver from 'file-saver';
 
 const columns: {
     id: keyof IMaster | keyof IRequest;
@@ -183,6 +190,8 @@ const RequestMasterItemsPendingRow = ({ requestMasterItem }: { requestMasterItem
         customText: null
     });
 
+    const { state } = location;
+
     const updateRequestMasterItem = (
         event: KeyboardEvent,
         requestMasterItem: IRequestMaster,
@@ -195,8 +204,8 @@ const RequestMasterItemsPendingRow = ({ requestMasterItem }: { requestMasterItem
             };
             dispatch(
                 updateRequestMasterItemThunk({
-                    state: location.state,
                     department: profileDetailSelector.profileDetail.department.toLowerCase().replace(' ', '_'),
+                    requestCategory: state.requestCategory,
                     requestMasterItem: requestMasterItem
                 })
             )
@@ -263,9 +272,9 @@ const RequestMasterItemsPendingRow = ({ requestMasterItem }: { requestMasterItem
                 />
             </StyledTableCell>
 
-            <StyledTableCell width={600}>{requestMasterItem.masterItem.item}</StyledTableCell>
-            <StyledTableCell width={200}>{requestMasterItem.masterItem.recentCN}</StyledTableCell>
-            <StyledTableCell width={100}>
+            <StyledTableCell width={'40%'}>{requestMasterItem.masterItem.item}</StyledTableCell>
+            <StyledTableCell width={'10%'}>{requestMasterItem.masterItem.recentCN}</StyledTableCell>
+            <StyledTableCell width={'10%'}>
                 <TextField
                     name="quantity"
                     size="small"
@@ -280,7 +289,7 @@ const RequestMasterItemsPendingRow = ({ requestMasterItem }: { requestMasterItem
                     }
                 />
             </StyledTableCell>
-            <StyledTableCell width={400}>
+            <StyledTableCell width={'20%'}>
                 <TextField
                     name="customText"
                     size="small"
@@ -295,7 +304,7 @@ const RequestMasterItemsPendingRow = ({ requestMasterItem }: { requestMasterItem
                     }
                 />
             </StyledTableCell>
-            <StyledTableCell>{requestMasterItem.customDetail}</StyledTableCell>
+            <StyledTableCell width={'20%'}>{requestMasterItem.customDetail}</StyledTableCell>
         </TableRow>
     );
 };
@@ -305,67 +314,101 @@ const RequestMasterDepartmentPending = () => {
     const requestMasterItemsPendingSelectedSelector = useAppSelector(selectRequestMasterItemsPendingSelected);
     const dispatch = useAppDispatch();
     const [page, setPage] = useState<number>(0);
-    const [selectedIds, setSelectedIds] = useState<number[]>([]);
-    const { toggleType } = useAppSelector(selectRequestDrawer);
     const location = useLocation();
-    const [value, setValue] = useState<number>(0);
     const [order, setOrder] = useState<Order>('asc');
-    const [orderBy, setOrderBy] = useState<keyof IMaster>('id');
-    const [dense, setDense] = useState(false);
+    const [orderBy, setOrderBy] = useState<keyof IMaster | keyof IRequest>('id');
     const profileDetailSelector = useAppSelector(selectProfileDetail);
+
+    const { state } = location;
 
     useEffect(() => {
         dispatch(
             getRequestMasterItemsPendingThunk({
-                state: location.state,
                 department: profileDetailSelector.profileDetail.department.toLowerCase().replace(' ', '_'),
+                requestCategory: state.requestCategory,
                 page: page
             })
         );
-    }, [dispatch, location.pathname, location.state, page, profileDetailSelector.profileDetail.department]);
-
-    const handleKeywordChange = (event: ChangeEvent<HTMLInputElement>) => {
-        // dispatch(filterMasterDepartmentItemsThunk({ state: state, keyword: event.target.value, page: 0 }));
-    };
+    }, [
+        dispatch,
+        location.pathname,
+        location.state,
+        page,
+        profileDetailSelector.profileDetail.department,
+        state.requestCategory
+    ]);
 
     const handleRequestSort = (event: MouseEvent<unknown>, property: keyof IMaster | keyof IRequest) => {
-        // if (order === 'asc' && orderBy === 'id') {
-        //     dispatch(
-        //         sortMasterDepartmentItemsThunk({
-        //             state: location.state,
-        //             page: page,
-        //             column: property,
-        //             direction: order
-        //         })
-        //     )
-        //         .then(() => setOrderBy(property))
-        //         .catch((error: Error) => console.error(error.message));
-        // } else if (order === 'asc' && orderBy === property) {
-        //     dispatch(
-        //         sortMasterDepartmentItemsThunk({
-        //             state: location.state,
-        //             page: page,
-        //             column: property,
-        //             direction: order
-        //         })
-        //     )
-        //         .then(() => setOrder('desc'))
-        //         .catch((error: Error) => console.error(error.message));
-        // } else if (order === 'desc' && orderBy === property) {
-        //     dispatch(
-        //         sortMasterDepartmentItemsThunk({
-        //             state: location.state,
-        //             page: page,
-        //             column: property,
-        //             direction: order
-        //         })
-        //     )
-        //         .then(() => {
-        //             setOrder('asc');
-        //             setOrderBy('id');
-        //         })
-        //         .catch((error: Error) => console.error(error.message));
-        // }
+        if (order === 'asc' && orderBy === 'id') {
+            setOrder('asc');
+            setOrderBy(property);
+            dispatch(
+                sortRequestMasterItemsPendingThunk({
+                    department: state.department,
+                    requestCategory: state.requestCategory,
+                    page: page,
+                    column: property,
+                    direction: 'desc'
+                })
+            )
+                .then()
+                .catch((error: Error) => console.error(error.message));
+        } else if (order === 'asc' && orderBy === property) {
+            setOrder('desc');
+            setOrderBy(property);
+            dispatch(
+                sortRequestMasterItemsPendingThunk({
+                    department: state.department,
+                    requestCategory: state.requestCategory,
+                    page: page,
+                    column: property,
+                    direction: 'desc'
+                })
+            )
+                .then()
+                .catch((error: Error) => console.error(error.message));
+        } else if (order === 'desc' && orderBy === property) {
+            setOrder('asc');
+            setOrderBy('id');
+            dispatch(
+                sortRequestMasterItemsPendingThunk({
+                    department: state.department,
+                    requestCategory: state.requestCategory,
+                    page: page,
+                    column: property,
+                    direction: 'desc'
+                })
+            )
+                .then(() => {})
+                .catch((error: Error) => console.error(error.message));
+        } else {
+            setOrder('asc');
+            setOrderBy(property);
+            dispatch(
+                sortRequestMasterItemsPendingThunk({
+                    department: state.department,
+                    requestCategory: state.requestCategory,
+                    page: page,
+                    column: property,
+                    direction: 'desc'
+                })
+            )
+                .then(() => {})
+                .catch((error: Error) => console.error(error.message));
+        }
+    };
+
+    const handleDownloadClick = () => {
+        return axios.get(`${baseUrl}/download/${location.state}/list`).then((response) => {
+            const blob = new Blob([response.data], {
+                type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            });
+            FileSaver.saveAs(blob, `${location.state}.xlsx`);
+        });
+    };
+
+    const handleChangePage = (event: any, newPage: number): void => {
+        setPage(newPage);
     };
 
     const handleSelectAllClick = () => {
@@ -380,31 +423,69 @@ const RequestMasterDepartmentPending = () => {
     };
 
     return (
-        <Box>
-            <Paper elevation={2} sx={{ padding: 0.5 }}>
-                <TableContainer sx={{ height: 600, overflowY: 'auto' }}>
-                    <Table stickyHeader>
-                        <EnhancedTableHead
-                            order={order}
-                            orderBy={orderBy}
-                            onSelectAllClick={handleSelectAllClick}
-                            onRequestSort={handleRequestSort}
-                            requestMasterItemsPendingSelectedSelector={
-                                requestMasterItemsPendingSelectedSelector.requestMasterItems
-                            }
-                        />
-                        <TableBody>
-                            {requestMasterItemsPendingSelector.response &&
-                                requestMasterItemsPendingSelector.response.content &&
-                                requestMasterItemsPendingSelector.response.content.length > 0 &&
-                                requestMasterItemsPendingSelector.response.content.map((requestMasterItem, index) => (
-                                    <RequestMasterItemsPendingRow requestMasterItem={requestMasterItem} key={index} />
-                                ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-            </Paper>
-        </Box>
+        <Grid container direction="column" justifyContent="space-between" sx={{ height: 'calc(100% - 50px)' }}>
+            <Grid></Grid>
+            <Grid item padding={2}>
+                <Paper elevation={2} sx={{ padding: 0.5 }}>
+                    <TableContainer sx={{ height: 700, overflowY: 'auto' }}>
+                        <Table stickyHeader>
+                            <EnhancedTableHead
+                                order={order}
+                                orderBy={orderBy}
+                                onSelectAllClick={handleSelectAllClick}
+                                onRequestSort={handleRequestSort}
+                                requestMasterItemsPendingSelectedSelector={
+                                    requestMasterItemsPendingSelectedSelector.requestMasterItems
+                                }
+                            />
+                            <TableBody>
+                                {requestMasterItemsPendingSelector.response &&
+                                    requestMasterItemsPendingSelector.response.content &&
+                                    requestMasterItemsPendingSelector.response.content.length > 0 &&
+                                    requestMasterItemsPendingSelector.response.content.map(
+                                        (requestMasterItem, index) => (
+                                            <RequestMasterItemsPendingRow
+                                                requestMasterItem={requestMasterItem}
+                                                key={index}
+                                            />
+                                        )
+                                    )}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                </Paper>
+            </Grid>
+            <Grid item>
+                <Paper variant="elevation" elevation={5} sx={{ height: 70 }}>
+                    <BottomNavigation
+                        sx={{ display: 'flex', justifyContent: 'space-around', width: '100%' }}
+                        showLabels>
+                        <Grid container justifyContent="space-between" paddingLeft={2} paddingRight={2}>
+                            <Grid item>
+                                <BottomNavigationAction
+                                    label="Download"
+                                    onClick={handleDownloadClick}
+                                    icon={<DownloadIcon color="primary" sx={{ fontSize: 40 }} />}
+                                />
+                            </Grid>
+                            <Grid item alignItems="center">
+                                <TablePagination
+                                    sx={{ marginTop: 1 }}
+                                    rowsPerPageOptions={[]}
+                                    component="div"
+                                    count={requestMasterItemsPendingSelector.response.totalElements}
+                                    rowsPerPage={requestMasterItemsPendingSelector.response.size}
+                                    page={requestMasterItemsPendingSelector.response.number}
+                                    onPageChange={handleChangePage}
+                                    showFirstButton={true}
+                                    showLastButton={true}
+                                />
+                            </Grid>
+                        </Grid>
+                    </BottomNavigation>
+                </Paper>
+            </Grid>
+        </Grid>
     );
 };
 

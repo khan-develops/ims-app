@@ -1,13 +1,16 @@
 import {
+    BottomNavigation,
+    BottomNavigationAction,
     Box,
     Checkbox,
-    Drawer,
+    Grid,
     Paper,
     Table,
     TableBody,
     TableCell,
     TableContainer,
     TableHead,
+    TablePagination,
     TableRow,
     TableSortLabel,
     styled,
@@ -16,19 +19,21 @@ import {
 import { ChangeEvent, useEffect, useState, MouseEvent } from 'react';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { useLocation } from 'react-router-dom';
-import RequestItemReviewForm from '../forms/RequestItemReviewForm';
 import { IMaster } from '../../app/api/properties/IMaster';
 import { visuallyHidden } from '@mui/utils';
 import {
     getPurchaseRequestMasterItemsThunk,
-    selectRequestMasterItems
+    selectRequestMasterItems,
+    sortPurchaseRequestMasterItemsThunk
 } from '../../app/slice/request/requestMasterItemsPurchaseSlice';
 import { IRequest, IRequestMaster } from '../../app/api/properties/IRequest';
 import {
     handleRequestMasterItemsPurchaseSelected,
     selectRequestMasterItemsPurchaseSelected
 } from '../../app/slice/selectedRequests/requestMasterItemsPurchaseSelectedSlice';
-import { selectRequestDrawer } from '../../app/slice/drawerToggle/requestDrawerSlice';
+import DownloadIcon from '@mui/icons-material/Download';
+import axios from 'axios';
+import FileSaver from 'file-saver';
 
 const columns: {
     id: keyof IMaster | keyof IRequest;
@@ -206,10 +211,10 @@ const RequestMasterItemsPurchaseRow = ({ requestMasterItem }: { requestMasterIte
                     )}
                 />
             </StyledTableCell>
-            <StyledTableCell>{requestMasterItem.masterItem.item}</StyledTableCell>
-            <StyledTableCell>{requestMasterItem.recentCN}</StyledTableCell>
-            <StyledTableCell>{requestMasterItem.masterItem.purchaseUnit}</StyledTableCell>
-            <StyledTableCell>{requestMasterItem.masterItem.partNumber}</StyledTableCell>
+            <StyledTableCell width={800}>{requestMasterItem.masterItem.item}</StyledTableCell>
+            <StyledTableCell width={150}>{requestMasterItem.recentCN}</StyledTableCell>
+            <StyledTableCell width={150}>{requestMasterItem.masterItem.purchaseUnit}</StyledTableCell>
+            <StyledTableCell width={150}>{requestMasterItem.masterItem.partNumber}</StyledTableCell>
             <StyledTableCell>{requestMasterItem.masterItem.comment}</StyledTableCell>
         </TableRow>
     );
@@ -218,21 +223,17 @@ const RequestMasterItemsPurchaseRow = ({ requestMasterItem }: { requestMasterIte
 const RequestMasterItemsPurchase = () => {
     const requestMasterItemsSelector = useAppSelector(selectRequestMasterItems);
     const requestMasterItemsPurchaseSelectedSelector = useAppSelector(selectRequestMasterItemsPurchaseSelected);
-    const { toggleType } = useAppSelector(selectRequestDrawer);
     const dispatch = useAppDispatch();
-    const [page, setPage] = useState<number>(0);
     const location = useLocation();
-    const [selectedDepartment, setSelectedDepartment] = useState<string>('extractions');
-    const [value, setValue] = useState<number>(0);
+    const [page, setPage] = useState<number>(0);
     const [order, setOrder] = useState<Order>('asc');
-    const [orderBy, setOrderBy] = useState<keyof IMaster>('id');
-    const [dense, setDense] = useState(false);
+    const [orderBy, setOrderBy] = useState<keyof IMaster | keyof IRequest>('id');
+
+    const { state } = location;
 
     useEffect(() => {
-        dispatch(getPurchaseRequestMasterItemsThunk({ state: location.state, page: page }));
-    }, [dispatch, page, location, toggleType]);
-
-    const handleRequestSort = (event: MouseEvent<unknown>, property: keyof IMaster | keyof IRequest) => {};
+        dispatch(getPurchaseRequestMasterItemsThunk({ requestCategory: state.requestCategory, page: page }));
+    }, [dispatch, location, page, state.requestCategory]);
 
     const handleSelectAllClick = (event: ChangeEvent<HTMLInputElement>) => {
         if (
@@ -245,30 +246,135 @@ const RequestMasterItemsPurchase = () => {
         }
     };
 
+    const handleRequestSort = (event: MouseEvent<unknown>, property: keyof IMaster | keyof IRequest) => {
+        if (order === 'asc' && orderBy === 'id') {
+            setOrder('asc');
+            setOrderBy(property);
+            dispatch(
+                sortPurchaseRequestMasterItemsThunk({
+                    requestCategory: state.requestCategory,
+                    page: page,
+                    column: property,
+                    direction: 'asc'
+                })
+            )
+                .then()
+                .catch((error: Error) => console.error(error.message));
+        } else if (order === 'asc' && orderBy === property) {
+            setOrder('desc');
+            setOrderBy(property);
+            dispatch(
+                sortPurchaseRequestMasterItemsThunk({
+                    requestCategory: state.requestCategory,
+                    page: page,
+                    column: property,
+                    direction: 'desc'
+                })
+            )
+                .then()
+                .catch((error: Error) => console.error(error.message));
+        } else if (order === 'desc' && orderBy === property) {
+            setOrder('asc');
+            setOrderBy('id');
+            dispatch(
+                sortPurchaseRequestMasterItemsThunk({
+                    requestCategory: state.requestCategory,
+                    page: page,
+                    column: 'id',
+                    direction: 'asc'
+                })
+            )
+                .then(() => {})
+                .catch((error: Error) => console.error(error.message));
+        } else {
+            setOrder('asc');
+            setOrderBy(property);
+            dispatch(
+                sortPurchaseRequestMasterItemsThunk({
+                    requestCategory: state.requestCategory,
+                    page: page,
+                    column: property,
+                    direction: 'asc'
+                })
+            )
+                .then(() => {})
+                .catch((error: Error) => console.error(error.message));
+        }
+    };
+
+    const handleDownloadClick = () => {
+        return axios.get(`${baseUrl}/download/${location.state}/list`).then((response) => {
+            const blob = new Blob([response.data], {
+                type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            });
+            FileSaver.saveAs(blob, `${location.state}.xlsx`);
+        });
+    };
+
+    const handleChangePage = (event: any, newPage: number): void => {
+        setPage(newPage);
+    };
+
     return (
-        <Box>
-            <Paper elevation={2} sx={{ padding: 0.5 }}>
-                <TableContainer sx={{ height: 600, overflowY: 'auto' }}>
-                    <Table stickyHeader>
-                        <EnhancedTableHead
-                            requestMasterItemsPurchaseSelected={
-                                requestMasterItemsPurchaseSelectedSelector.requestMasterItems
-                            }
-                            order={order}
-                            orderBy={orderBy}
-                            onSelectAllClick={handleSelectAllClick}
-                            onRequestSort={handleRequestSort}
-                        />
-                        <TableBody>
-                            {requestMasterItemsSelector.response.content.length > 0 &&
-                                requestMasterItemsSelector.response.content.map((requestMasterItem, index) => (
-                                    <RequestMasterItemsPurchaseRow requestMasterItem={requestMasterItem} key={index} />
-                                ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-            </Paper>
-        </Box>
+        <Grid container direction="column" justifyContent="space-between" sx={{ height: 'calc(100% - 50px)' }}>
+            <Grid></Grid>
+            <Grid item padding={2}>
+                <Paper elevation={2} sx={{ padding: 0.5 }}>
+                    <TableContainer sx={{ height: 700, overflowY: 'auto' }}>
+                        <Table stickyHeader>
+                            <EnhancedTableHead
+                                requestMasterItemsPurchaseSelected={
+                                    requestMasterItemsPurchaseSelectedSelector.requestMasterItems
+                                }
+                                order={order}
+                                orderBy={orderBy}
+                                onSelectAllClick={handleSelectAllClick}
+                                onRequestSort={handleRequestSort}
+                            />
+                            <TableBody>
+                                {requestMasterItemsSelector.response.content.length > 0 &&
+                                    requestMasterItemsSelector.response.content.map((requestMasterItem, index) => (
+                                        <RequestMasterItemsPurchaseRow
+                                            requestMasterItem={requestMasterItem}
+                                            key={index}
+                                        />
+                                    ))}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                </Paper>
+            </Grid>
+            <Grid item>
+                <Paper variant="elevation" elevation={5} sx={{ height: 70 }}>
+                    <BottomNavigation
+                        sx={{ display: 'flex', justifyContent: 'space-around', width: '100%' }}
+                        showLabels>
+                        <Grid container justifyContent="space-between" paddingLeft={2} paddingRight={2}>
+                            <Grid item>
+                                <BottomNavigationAction
+                                    label="Download"
+                                    onClick={handleDownloadClick}
+                                    icon={<DownloadIcon color="primary" sx={{ fontSize: 40 }} />}
+                                />
+                            </Grid>
+                            <Grid item alignItems="center">
+                                <TablePagination
+                                    sx={{ marginTop: 1 }}
+                                    rowsPerPageOptions={[]}
+                                    component="div"
+                                    count={requestMasterItemsSelector.response.totalElements}
+                                    rowsPerPage={requestMasterItemsSelector.response.size}
+                                    page={requestMasterItemsSelector.response.number}
+                                    onPageChange={handleChangePage}
+                                    showFirstButton={true}
+                                    showLastButton={true}
+                                />
+                            </Grid>
+                        </Grid>
+                    </BottomNavigation>
+                </Paper>
+            </Grid>
+        </Grid>
     );
 };
 

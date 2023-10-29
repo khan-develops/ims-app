@@ -1,6 +1,6 @@
 import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { RootState } from '../../store';
-import { getRequestMasterItemsPurchase } from '../../api/request';
+import { getRequestMasterItemsPurchase, sortRequestMasterItemsPurchase } from '../../api/request';
 import { RequestMasterItemsState } from '../../api/states/RequestState';
 import { IRequestMaster } from '../../api/properties/IRequest';
 
@@ -21,8 +21,16 @@ const initialState: RequestMasterItemsState = {
 
 export const getPurchaseRequestMasterItemsThunk = createAsyncThunk(
     'getPurchaseRequestMasterItemsThunk',
-    async (params: { state: string, page: number }) => {
+    async (params: { requestCategory: string, page: number }) => {
         const response = await getRequestMasterItemsPurchase(params);
+        return response.data;
+    }
+);
+
+export const sortPurchaseRequestMasterItemsThunk = createAsyncThunk(
+    'sortPurchaseRequestMasterItemsThunk',
+    async (params: { requestCategory: string, page: number, column: string, direction: string }) => {
+        const response = await sortRequestMasterItemsPurchase(params);
         return response.data;
     }
 );
@@ -44,6 +52,15 @@ export const purchaseRequestMasterItemsSlice = createSlice({
                 state.response = action.payload;
             })
             .addCase(getPurchaseRequestMasterItemsThunk.rejected, (state) => {
+                state.status = 'failed';
+            })
+            .addCase(sortPurchaseRequestMasterItemsThunk.pending, (state) => {
+                state.status = 'loading';
+            })
+            .addCase(sortPurchaseRequestMasterItemsThunk.fulfilled, (state, action) => {
+                state.response = action.payload;
+            })
+            .addCase(sortPurchaseRequestMasterItemsThunk.rejected, (state) => {
                 state.status = 'failed';
             });
     }

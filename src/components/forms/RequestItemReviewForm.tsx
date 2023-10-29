@@ -29,6 +29,8 @@ const RequestItemReviewForm = () => {
     const location = useLocation();
     const dispatch = useAppDispatch();
 
+    const { state } = location;
+
     const handleClose = () => {
         dispatch(toggleRequestItemDrawer(''));
     };
@@ -51,8 +53,8 @@ const RequestItemReviewForm = () => {
     const handleSubmit = () => {
         dispatch(
             createRequestMasterItemsThunk({
-                state: location.state,
                 department: profileDetailSelector.profileDetail.department.toLowerCase().replace(' ', '_'),
+                requestCategory: state.requestCategory,
                 requestMasterItems: requestMasterItemsPurchaseSelectedSelector.requestMasterItems.map((item) => ({
                     ...item,
                     quantity: item.quantity,

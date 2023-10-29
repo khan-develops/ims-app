@@ -15,7 +15,7 @@ const initialState: RequestMasterItemsCreateState = {
 
 export const createRequestMasterItemsThunk = createAsyncThunk(
     'createRequestMasterItemsThunk',
-    async (params: { state: string; department: string; requestMasterItems: IRequestMaster[] }) => {
+    async (params: { department: string; requestCategory: string, requestMasterItems: IRequestMaster[] }) => {
         const response = await createRequestMasterItems(params);
         return response.data;
     }

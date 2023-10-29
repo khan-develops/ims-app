@@ -606,7 +606,7 @@ const MasterDepartmentRow = ({
                         )}
                     </IconButton>
                 </TableCell>
-                <StyledTableCell width={400}>{masterDepartmentItem.item}</StyledTableCell>
+                <StyledTableCell width={'30%'}>{masterDepartmentItem.item}</StyledTableCell>
                 <StyledTableCell width={100}>{masterDepartmentItem.purchaseUnit}</StyledTableCell>
                 <StyledTableCell width={100}>{masterDepartmentItem.partNumber}</StyledTableCell>
                 <StyledTableCell width={100}>{masterDepartmentItem.recentCN}</StyledTableCell>

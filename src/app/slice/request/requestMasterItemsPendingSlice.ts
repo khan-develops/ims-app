@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { RootState } from '../../store';
-import { getRequestMasterItemsPending } from '../../api/request';
+import { getRequestMasterItemsPending, sortRequestMasterItemsPending } from '../../api/request';
 import { RequestMasterItemsState } from '../../api/states/RequestState';
 
 const initialState: RequestMasterItemsState = {
@@ -20,8 +20,16 @@ const initialState: RequestMasterItemsState = {
 
 export const getRequestMasterItemsPendingThunk = createAsyncThunk(
     'getRequestMasterDepartmentItemsThunk',
-    async (params: { state: string; department: string, page: number }) => {
+    async (params: { department: string, requestCategory: string, page: number }) => {
         const response = await getRequestMasterItemsPending(params);
+        return response.data;
+    }
+);
+
+export const sortRequestMasterItemsPendingThunk = createAsyncThunk(
+    'sortRequestMasterItemsPendingThunk',
+    async (params: { department: string, requestCategory: string, page: number, column: string, direction: string }) => {
+        const response = await sortRequestMasterItemsPending(params);
         return response.data;
     }
 );
@@ -43,6 +51,15 @@ export const requestMasterItemsPendingSlice = createSlice({
                 state.response = action.payload;
             })
             .addCase(getRequestMasterItemsPendingThunk.rejected, (state) => {
+                state.status = 'failed';
+            })
+            .addCase(sortRequestMasterItemsPendingThunk.pending, (state) => {
+                state.status = 'loading';
+            })
+            .addCase(sortRequestMasterItemsPendingThunk.fulfilled, (state, action) => {
+                state.response = action.payload;
+            })
+            .addCase(sortRequestMasterItemsPendingThunk.rejected, (state) => {
                 state.status = 'failed';
             });
     }

@@ -3,37 +3,49 @@ import { IRequestMaster } from './properties/IRequest';
 
 const baseUrl = process.env.REACT_APP_BASE_URL;
 
-export const getRequestMasterItemsPurchase = (params: { state: string, page: number }) => {
-    return axios.get(`${baseUrl}/requests/${params.state}/list?page=${params.page}`);
+export const getRequestMasterItemsPurchase = (params: { requestCategory: string, page: number }) => {
+    return axios.get(`${baseUrl}/requests/${params.requestCategory}/list?page=${params.page}`);
+};
+
+export const sortRequestMasterItemsPurchase = (params: { requestCategory: string, page: number, column: string, direction: string }) => {
+    return axios.get(`${baseUrl}/requests/${params.requestCategory}/sort?page=${params.page}&column=${params.column}&direction=${params.direction}`);
 };
 
 export const getRequestMasterItems = (params: { state: string, page: number }) => {
     return axios.get(`${baseUrl}/requests/${params.state}/list?page=${params.page}`);
 };
 
-export const getRequestMasterItemsDashboard = (params: { state: string, department: string, page: number }) => {
-    return axios.get(`${baseUrl}/request-master/${params.department}/${params.state}/list?page=${params.page}`);
+export const getRequestMasterItemsDashboard = (params: { department: string, requestCategory: string, page: number }) => {
+    return axios.get(`${baseUrl}/request-master/${params.department}/${params.requestCategory}/list?page=${params.page}`);
 };
 
-export const getRequestMasterItemsPending = (params: { state: string, department: string, page: number }) => {
-    return axios.get(`${baseUrl}/request-master/${params.department}/${params.state}/list/pending?page=${params.page}`);
+export const getRequestMasterItemsPending = (params: { department: string, requestCategory: string, page: number }) => {
+    return axios.get(`${baseUrl}/request-master/${params.department}/${params.requestCategory}/list/pending?page=${params.page}`);
 };
 
-export const getRequestMasterItemsComplete = (params: { state: string, department: string, page: number }) => {
-    return axios.get(`${baseUrl}/request-master/${params.department}/${params.state}/list/complete?page=${params.page}`);
+export const sortRequestMasterItemsPending = (params: { department: string, requestCategory: string, page: number, column: string, direction: string }) => {
+    return axios.get(`${baseUrl}/request-master/${params.department}/${params.requestCategory}/sort?page=${params.page}&column=${params.column}&direction=${params.direction}`);
 };
 
-export const updateRequestMasterItems = (params: { state: string, department: string, requestItems: IRequestMaster[] }) => {
-    return axios.patch(`${baseUrl}/request-master/${params.department}/${params.state}/list/update`, params.requestItems);
+export const getRequestMasterItemsComplete = (params: { department: string, requestCategory: string, page: number }) => {
+    return axios.get(`${baseUrl}/request-master/${params.department}/${params.requestCategory}/list/complete?page=${params.page}`);
 };
 
-export const updateRequestMasterItem = (params: { state: string, department: string, requestMasterItem: IRequestMaster }) => {
+export const sortRequestMasterItemsComplete = (params: { department: string, requestCategory: string, page: number, column: string, direction: string }) => {
+    return axios.get(`${baseUrl}/request-master/${params.department}/${params.requestCategory}/sort?page=${params.page}&column=${params.column}&direction=${params.direction}`);
+};
+
+export const updateRequestMasterItems = (params: { department: string, requestCategory: string, requestItems: IRequestMaster[] }) => {
+    return axios.patch(`${baseUrl}/request-master/${params.department}/${params.requestCategory}/list/update`, params.requestItems);
+};
+
+export const updateRequestMasterItem = (params: { department: string, requestCategory: string, requestMasterItem: IRequestMaster }) => {
     return axios.patch(
-        `${baseUrl}/request-master/${params.department}/${params.state}/${params.requestMasterItem.id}/update`,
+        `${baseUrl}/request-master/${params.department}/${params.requestCategory}/${params.requestMasterItem.id}/update`,
         params.requestMasterItem
     );
 };
 
-export const createRequestMasterItems = (params: { state: string, department: string, requestMasterItems: IRequestMaster[] }) => {
-    return axios.post(`${baseUrl}/request-master/${params.department}/${params.state}/list/create`, params.requestMasterItems);
+export const createRequestMasterItems = (params: { department: string, requestCategory: string, requestMasterItems: IRequestMaster[] }) => {
+    return axios.post(`${baseUrl}/request-master/${params.department}/${params.requestCategory}/list/create`, params.requestMasterItems);
 };

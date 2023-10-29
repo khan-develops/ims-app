@@ -43,7 +43,8 @@ import departmentDrawerReducer from './slice/drawerToggle/departmentDrawerSlice'
 import requestDrawerReducer from './slice/drawerToggle/requestDrawerSlice'
 import purchaseRequestMasterItemsReducer from './slice/request/requestMasterItemsPurchaseSlice';
 import requestMasterItemsPurchaseSelectedReducer from './slice/selectedRequests/requestMasterItemsPurchaseSelectedSlice';
-import requestMasterItemsPendingSelectedReducer from './slice/selectedRequests/requestMasterItemsPendingSelectedSlice'
+import requestMasterItemsPendingSelectedReducer from './slice/selectedRequests/requestMasterItemsPendingSelectedSlice';
+import requestMasterItemsCompleteSelectedReducer from './slice/selectedRequests/requestMasterItemsCompleteSelectedSlice';
 
 export const store = configureStore({
     reducer: {
@@ -91,7 +92,8 @@ export const store = configureStore({
         requestDrawerStore: requestDrawerReducer,
         purchaseRequestMasterItemsStore: purchaseRequestMasterItemsReducer,
         requestMasterItemsPurchaseSelectedStore: requestMasterItemsPurchaseSelectedReducer,
-        requestMasterItemsPendingSelectedStore: requestMasterItemsPendingSelectedReducer
+        requestMasterItemsPendingSelectedStore: requestMasterItemsPendingSelectedReducer,
+        requestMasterItemsCompleteSelectedStore: requestMasterItemsCompleteSelectedReducer
     }
 });
 

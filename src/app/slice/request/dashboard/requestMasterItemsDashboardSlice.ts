@@ -21,7 +21,7 @@ const initialState: RequestMasterItemsState = {
 
 export const getRequestMasterItemsDashboardThunk = createAsyncThunk(
     'getRequestMasterItemsDashboardThunk',
-    async (params: { state: string, department: string, page: number }) => {
+    async (params: { department: string, requestCategory: string, page: number }) => {
         const response = await getRequestMasterItemsDashboard(params);
         return response.data;
     }
