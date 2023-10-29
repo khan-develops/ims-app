@@ -35,11 +35,6 @@ import { useLocation } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { STATUS } from '../common/constants';
 import { updateRequestMasterItemThunk } from '../app/slice/request/requestMasterItemUpdateSlice';
-import {
-    changeRequestMasterItems,
-    getRequestMasterItemsThunk,
-    selectRequestMasterItems
-} from '../app/slice/request/dashboard/requestMasterItemsSlice';
 import { IRequest, IRequestMaster } from '../app/api/properties/IRequest';
 import SearchIcon from '@mui/icons-material/Search';
 import DownloadIcon from '@mui/icons-material/Download';
@@ -52,7 +47,12 @@ import FileSaver from 'file-saver';
 import { IMaster } from '../app/api/properties/IMaster';
 import { visuallyHidden } from '@mui/utils';
 import { inventoryRequestDepartments } from '../components/common/routes';
-import { getRequestMasterItemsDashboardThunk } from '../app/slice/request/dashboard/requestMasterItemsDashboardSlice';
+import {
+    changeRequestMasterItemsDashboard,
+    getRequestMasterItemsDashboardThunk,
+    selectRequestMasterDashboardItems,
+    sortRequestMasterItemsDashboardThunk
+} from '../app/slice/request/dashboard/requestMasterItemsDashboardSlice';
 import { toggleMasterItemDrawer } from '../app/slice/drawerToggle/masterDrawerSlice';
 import { toggleRequestItemDrawer } from '../app/slice/drawerToggle/requestDrawerSlice';
 import { selectProfileDetail } from '../app/slice/profileDetail/profileDetailSlice';
@@ -258,7 +258,7 @@ const EnhancedTableHead = (props: EnhancedTableProps) => {
 };
 
 const RequestMasterAdmin = () => {
-    const requestMasterItemsSelector = useAppSelector(selectRequestMasterItems);
+    const requestMasterItemsDashboardSelector = useAppSelector(selectRequestMasterDashboardItems);
     const profileDetailSelector = useAppSelector(selectProfileDetail);
     const dispatch = useAppDispatch();
     const [page, setPage] = useState<number>(0);
@@ -292,8 +292,8 @@ const RequestMasterAdmin = () => {
 
     const handleStatusChange = (event: SelectChangeEvent, id: number) => {
         dispatch(
-            changeRequestMasterItems(
-                requestMasterItemsSelector.response.content.map((item) => ({
+            changeRequestMasterItemsDashboard(
+                requestMasterItemsDashboardSelector.response.content.map((item) => ({
                     ...item,
                     status: item.id === id ? event.target.value : item.confirmation
                 }))
@@ -303,8 +303,8 @@ const RequestMasterAdmin = () => {
 
     const handleDetailChange = (event: ChangeEvent<HTMLInputElement>, id: number) => {
         dispatch(
-            changeRequestMasterItems(
-                requestMasterItemsSelector.response.content.map((item) => ({
+            changeRequestMasterItemsDashboard(
+                requestMasterItemsDashboardSelector.response.content.map((item) => ({
                     ...item,
                     detail: item.id === id ? event.target.value : item.confirmation
                 }))
@@ -359,40 +359,60 @@ const RequestMasterAdmin = () => {
 
     const handleRequestSort = (event: MouseEvent<unknown>, property: keyof IMaster | keyof IRequest) => {
         if (order === 'asc' && orderBy === 'id') {
+            setOrder('asc');
+            setOrderBy(property);
             dispatch(
-                sortRequestMast({
-                    state: location.state,
+                sortRequestMasterItemsDashboardThunk({
+                    department: state.department,
+                    requestCategory: state.requestCategory,
                     page: page,
                     column: property,
-                    direction: order
+                    direction: 'asc'
                 })
             )
-                .then(() => setOrderBy(property))
+                .then()
                 .catch((error: Error) => console.error(error.message));
         } else if (order === 'asc' && orderBy === property) {
+            setOrder('desc');
+            setOrderBy(property);
             dispatch(
-                sortMasterDepartmentItemsThunk({
-                    state: location.state,
+                sortRequestMasterItemsDashboardThunk({
+                    department: state.department,
+                    requestCategory: state.requestCategory,
                     page: page,
                     column: property,
-                    direction: order
+                    direction: 'desc'
                 })
             )
-                .then(() => setOrder('desc'))
+                .then()
                 .catch((error: Error) => console.error(error.message));
         } else if (order === 'desc' && orderBy === property) {
+            setOrder('asc');
+            setOrderBy('id');
             dispatch(
-                sortMasterDepartmentItemsThunk({
-                    state: location.state,
+                sortRequestMasterItemsDashboardThunk({
+                    department: state.department,
+                    requestCategory: state.requestCategory,
                     page: page,
                     column: property,
-                    direction: order
+                    direction: 'asc'
                 })
             )
-                .then(() => {
-                    setOrder('asc');
-                    setOrderBy('id');
+                .then(() => {})
+                .catch((error: Error) => console.error(error.message));
+        } else {
+            setOrder('asc');
+            setOrderBy(property);
+            dispatch(
+                sortRequestMasterItemsDashboardThunk({
+                    department: state.department,
+                    requestCategory: state.requestCategory,
+                    page: page,
+                    column: property,
+                    direction: 'asc'
                 })
+            )
+                .then(() => {})
                 .catch((error: Error) => console.error(error.message));
         }
     };
@@ -446,56 +466,58 @@ const RequestMasterAdmin = () => {
                         <Table stickyHeader>
                             <EnhancedTableHead order={order} orderBy={orderBy} onRequestSort={handleRequestSort} />
                             <TableBody>
-                                {requestMasterItemsSelector.response.content.length > 0 &&
-                                    requestMasterItemsSelector.response.content.map((requestMasterItem, index) => (
-                                        <TableRow key={index}>
-                                            <StyledTableCell>{requestMasterItem.masterItem.item}</StyledTableCell>
-                                            <StyledTableCell>
-                                                {requestMasterItem.recentCN && requestMasterItem.recentCN}
-                                            </StyledTableCell>
-                                            <StyledTableCell>{requestMasterItem.quantity}</StyledTableCell>
-                                            <StyledTableCell>
-                                                <FormControl fullWidth>
-                                                    <Select
+                                {requestMasterItemsDashboardSelector.response.content.length > 0 &&
+                                    requestMasterItemsDashboardSelector.response.content.map(
+                                        (requestMasterItem, index) => (
+                                            <TableRow key={index}>
+                                                <StyledTableCell>{requestMasterItem.masterItem.item}</StyledTableCell>
+                                                <StyledTableCell>
+                                                    {requestMasterItem.recentCN && requestMasterItem.recentCN}
+                                                </StyledTableCell>
+                                                <StyledTableCell>{requestMasterItem.quantity}</StyledTableCell>
+                                                <StyledTableCell>
+                                                    <FormControl fullWidth>
+                                                        <Select
+                                                            size="small"
+                                                            name="confirmation"
+                                                            value={requestMasterItem.confirmation}
+                                                            onChange={(event: SelectChangeEvent) =>
+                                                                handleStatusChange(event, requestMasterItem.id)
+                                                            }>
+                                                            {Object.values(STATUS).map((status, index) => (
+                                                                <MenuItem key={index} value={status}>
+                                                                    <Typography sx={{ fontSize: '10pt' }}>
+                                                                        {status}
+                                                                    </Typography>
+                                                                </MenuItem>
+                                                            ))}
+                                                        </Select>
+                                                    </FormControl>
+                                                </StyledTableCell>
+                                                <StyledTableCell>
+                                                    {moment(requestMasterItem.timeRequested).format('MM/DD/YYYY')}
+                                                </StyledTableCell>
+                                                <StyledTableCell>
+                                                    {moment(requestMasterItem.timeUpdated).format('MM/DD/YYYY')}
+                                                </StyledTableCell>
+                                                <StyledTableCell>{requestMasterItem.department}</StyledTableCell>
+                                                <StyledTableCell>{requestMasterItem.customText}</StyledTableCell>
+                                                <StyledTableCell>
+                                                    <TextField
                                                         size="small"
-                                                        name="confirmation"
-                                                        value={requestMasterItem.confirmation}
-                                                        onChange={(event: SelectChangeEvent) =>
-                                                            handleStatusChange(event, requestMasterItem.id)
-                                                        }>
-                                                        {Object.values(STATUS).map((status, index) => (
-                                                            <MenuItem key={index} value={status}>
-                                                                <Typography sx={{ fontSize: '10pt' }}>
-                                                                    {status}
-                                                                </Typography>
-                                                            </MenuItem>
-                                                        ))}
-                                                    </Select>
-                                                </FormControl>
-                                            </StyledTableCell>
-                                            <StyledTableCell>
-                                                {moment(requestMasterItem.timeRequested).format('MM/DD/YYYY')}
-                                            </StyledTableCell>
-                                            <StyledTableCell>
-                                                {moment(requestMasterItem.timeUpdated).format('MM/DD/YYYY')}
-                                            </StyledTableCell>
-                                            <StyledTableCell>{requestMasterItem.department}</StyledTableCell>
-                                            <StyledTableCell>{requestMasterItem.customText}</StyledTableCell>
-                                            <StyledTableCell>
-                                                <TextField
-                                                    size="small"
-                                                    variant="outlined"
-                                                    value={requestMasterItem.customDetail}
-                                                    onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                                                        handleDetailChange(event, requestMasterItem.id)
-                                                    }
-                                                    onKeyDown={(event: KeyboardEvent) =>
-                                                        handleEnterKey(event, requestMasterItem)
-                                                    }
-                                                />
-                                            </StyledTableCell>
-                                        </TableRow>
-                                    ))}
+                                                        variant="outlined"
+                                                        value={requestMasterItem.customDetail}
+                                                        onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                                                            handleDetailChange(event, requestMasterItem.id)
+                                                        }
+                                                        onKeyDown={(event: KeyboardEvent) =>
+                                                            handleEnterKey(event, requestMasterItem)
+                                                        }
+                                                    />
+                                                </StyledTableCell>
+                                            </TableRow>
+                                        )
+                                    )}
                             </TableBody>
                         </Table>
                     </TableContainer>
@@ -545,9 +567,9 @@ const RequestMasterAdmin = () => {
                                     sx={{ marginTop: 1 }}
                                     rowsPerPageOptions={[]}
                                     component="div"
-                                    count={requestMasterItemsSelector.response.totalElements}
-                                    rowsPerPage={requestMasterItemsSelector.response.size}
-                                    page={requestMasterItemsSelector.response.number}
+                                    count={requestMasterItemsDashboardSelector.response.totalElements}
+                                    rowsPerPage={requestMasterItemsDashboardSelector.response.size}
+                                    page={requestMasterItemsDashboardSelector.response.number}
                                     onPageChange={handleChangePage}
                                     showFirstButton={true}
                                     showLastButton={true}

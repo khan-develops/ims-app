@@ -269,6 +269,7 @@ const RequestMasterDepartmentComplete = () => {
     const { state } = location;
 
     useEffect(() => {
+        console.log(state.department);
         dispatch(
             getRequestMasterItemsCompleteThunk({
                 department: state.department,

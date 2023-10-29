@@ -1,6 +1,6 @@
 import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { RootState } from '../../../store';
-import { getRequestMasterItemsDashboard } from '../../../api/request';
+import { getRequestMasterItemsDashboard, sortRequestMasterItemsDashboard } from '../../../api/request';
 import { RequestMasterItemsState } from '../../../api/states/RequestState';
 import { IRequestMaster } from '../../../api/properties/IRequest';
 
@@ -27,6 +27,14 @@ export const getRequestMasterItemsDashboardThunk = createAsyncThunk(
     }
 );
 
+export const sortRequestMasterItemsDashboardThunk = createAsyncThunk(
+    'sortRequestMasterItemsDashboardThunk',
+    async (params: { department: string, requestCategory: string, page: number, column: string, direction: string }) => {
+        const response = await sortRequestMasterItemsDashboard(params);
+        return response.data;
+    }
+);
+
 export const requestMasterItemsDashboardSlice = createSlice({
     name: 'requestItemsSlice',
     initialState,
@@ -45,11 +53,20 @@ export const requestMasterItemsDashboardSlice = createSlice({
             })
             .addCase(getRequestMasterItemsDashboardThunk.rejected, (state) => {
                 state.status = 'failed';
+            })
+            .addCase(sortRequestMasterItemsDashboardThunk.pending, (state) => {
+                state.status = 'loading';
+            })
+            .addCase(sortRequestMasterItemsDashboardThunk.fulfilled, (state, action) => {
+                state.response = action.payload;
+            })
+            .addCase(sortRequestMasterItemsDashboardThunk.rejected, (state) => {
+                state.status = 'failed';
             });
     }
 });
 
-export const selectRequestMasterItems = (state: RootState) => state.requestMasterItemsDashboardStore;
+export const selectRequestMasterDashboardItems = (state: RootState) => state.requestMasterItemsDashboardStore;
 
 export const { changeRequestMasterItemsDashboard } = requestMasterItemsDashboardSlice.actions;
 

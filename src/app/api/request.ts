@@ -15,6 +15,10 @@ export const getRequestMasterItemsDashboard = (params: { department: string, req
     return axios.get(`${baseUrl}/request-master/${params.department}/${params.requestCategory}/list?page=${params.page}`);
 };
 
+export const sortRequestMasterItemsDashboard = (params: { department: string, requestCategory: string, page: number, column: string, direction: string }) => {
+    return axios.get(`${baseUrl}/request-master/${params.department}/${params.requestCategory}/sort?&page=${params.page}&column=${params.column}&direction=${params.direction}`);
+};
+
 export const getRequestMasterItemsPending = (params: { department: string, requestCategory: string, page: number }) => {
     return axios.get(`${baseUrl}/request-master/${params.department}/${params.requestCategory}/list/pending?page=${params.page}`);
 };
