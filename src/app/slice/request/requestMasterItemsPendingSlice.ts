@@ -28,7 +28,7 @@ export const getRequestMasterItemsPendingThunk = createAsyncThunk(
 
 export const sortRequestMasterItemsPendingThunk = createAsyncThunk(
     'sortRequestMasterItemsPendingThunk',
-    async (params: { department: string, requestCategory: string, page: number, column: string, direction: string }) => {
+    async (params: { confirmation: 'COMPLETE' | 'WAITING', department: string, requestCategory: string, page: number, column: string, direction: string }) => {
         const response = await sortRequestMasterItemsPending(params);
         return response.data;
     }

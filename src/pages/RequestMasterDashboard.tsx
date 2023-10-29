@@ -39,7 +39,7 @@ import {
     changeRequestMasterItems,
     getRequestMasterItemsThunk,
     selectRequestMasterItems
-} from '../app/slice/request/requestMasterItemsSlice';
+} from '../app/slice/request/dashboard/requestMasterItemsSlice';
 import { IRequest, IRequestMaster } from '../app/api/properties/IRequest';
 import SearchIcon from '@mui/icons-material/Search';
 import DownloadIcon from '@mui/icons-material/Download';
@@ -272,7 +272,7 @@ const RequestMasterAdmin = () => {
     useEffect(() => {
         dispatch(
             getRequestMasterItemsDashboardThunk({
-                department: profileDetailSelector.profileDetail.department,
+                department: profileDetailSelector.profileDetail.department.toLowerCase().replace('_', '-'),
                 requestCategory: state.requestCategory,
                 page: page
             })
@@ -315,7 +315,7 @@ const RequestMasterAdmin = () => {
     const handleEnterKey = (event: KeyboardEvent, requestMasterItem: IRequestMaster) => {
         dispatch(
             updateRequestMasterItemThunk({
-                department: profileDetailSelector.profileDetail.department,
+                department: profileDetailSelector.profileDetail.department.toLowerCase().replace('_', '-'),
                 requestCategory: state.requestCategory,
                 requestMasterItem: requestMasterItem
             })
@@ -358,43 +358,43 @@ const RequestMasterAdmin = () => {
     };
 
     const handleRequestSort = (event: MouseEvent<unknown>, property: keyof IMaster | keyof IRequest) => {
-        // if (order === 'asc' && orderBy === 'id') {
-        //     dispatch(
-        //         sortRequestMast({
-        //             state: location.state,
-        //             page: page,
-        //             column: property,
-        //             direction: order
-        //         })
-        //     )
-        //         .then(() => setOrderBy(property))
-        //         .catch((error: Error) => console.error(error.message));
-        // } else if (order === 'asc' && orderBy === property) {
-        //     dispatch(
-        //         sortMasterDepartmentItemsThunk({
-        //             state: location.state,
-        //             page: page,
-        //             column: property,
-        //             direction: order
-        //         })
-        //     )
-        //         .then(() => setOrder('desc'))
-        //         .catch((error: Error) => console.error(error.message));
-        // } else if (order === 'desc' && orderBy === property) {
-        //     dispatch(
-        //         sortMasterDepartmentItemsThunk({
-        //             state: location.state,
-        //             page: page,
-        //             column: property,
-        //             direction: order
-        //         })
-        //     )
-        //         .then(() => {
-        //             setOrder('asc');
-        //             setOrderBy('id');
-        //         })
-        //         .catch((error: Error) => console.error(error.message));
-        // }
+        if (order === 'asc' && orderBy === 'id') {
+            dispatch(
+                sortRequestMast({
+                    state: location.state,
+                    page: page,
+                    column: property,
+                    direction: order
+                })
+            )
+                .then(() => setOrderBy(property))
+                .catch((error: Error) => console.error(error.message));
+        } else if (order === 'asc' && orderBy === property) {
+            dispatch(
+                sortMasterDepartmentItemsThunk({
+                    state: location.state,
+                    page: page,
+                    column: property,
+                    direction: order
+                })
+            )
+                .then(() => setOrder('desc'))
+                .catch((error: Error) => console.error(error.message));
+        } else if (order === 'desc' && orderBy === property) {
+            dispatch(
+                sortMasterDepartmentItemsThunk({
+                    state: location.state,
+                    page: page,
+                    column: property,
+                    direction: order
+                })
+            )
+                .then(() => {
+                    setOrder('asc');
+                    setOrderBy('id');
+                })
+                .catch((error: Error) => console.error(error.message));
+        }
     };
 
     return (
@@ -426,7 +426,9 @@ const RequestMasterAdmin = () => {
                             <RadioGroup
                                 sx={{ display: 'flex', justifyContent: 'space-between' }}
                                 row
-                                defaultValue={profileDetailSelector.profileDetail.department}
+                                defaultValue={profileDetailSelector.profileDetail.department
+                                    .toLowerCase()
+                                    .replace('_', '-')}
                                 name="request-type">
                                 {inventoryRequestDepartments.map((department) => (
                                     <Chip

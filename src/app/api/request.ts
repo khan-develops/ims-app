@@ -11,10 +11,6 @@ export const sortRequestMasterItemsPurchase = (params: { requestCategory: string
     return axios.get(`${baseUrl}/requests/${params.requestCategory}/sort?page=${params.page}&column=${params.column}&direction=${params.direction}`);
 };
 
-export const getRequestMasterItems = (params: { state: string, page: number }) => {
-    return axios.get(`${baseUrl}/requests/${params.state}/list?page=${params.page}`);
-};
-
 export const getRequestMasterItemsDashboard = (params: { department: string, requestCategory: string, page: number }) => {
     return axios.get(`${baseUrl}/request-master/${params.department}/${params.requestCategory}/list?page=${params.page}`);
 };
@@ -23,16 +19,16 @@ export const getRequestMasterItemsPending = (params: { department: string, reque
     return axios.get(`${baseUrl}/request-master/${params.department}/${params.requestCategory}/list/pending?page=${params.page}`);
 };
 
-export const sortRequestMasterItemsPending = (params: { department: string, requestCategory: string, page: number, column: string, direction: string }) => {
-    return axios.get(`${baseUrl}/request-master/${params.department}/${params.requestCategory}/sort?page=${params.page}&column=${params.column}&direction=${params.direction}`);
+export const sortRequestMasterItemsPending = (params: { confirmation: 'COMPLETE' | 'WAITING', department: string, requestCategory: string, page: number, column: string, direction: string }) => {
+    return axios.get(`${baseUrl}/request-master/${params.department}/${params.requestCategory}/sort?confirmation=${params.confirmation}&page=${params.page}&column=${params.column}&direction=${params.direction}`);
 };
 
 export const getRequestMasterItemsComplete = (params: { department: string, requestCategory: string, page: number }) => {
     return axios.get(`${baseUrl}/request-master/${params.department}/${params.requestCategory}/list/complete?page=${params.page}`);
 };
 
-export const sortRequestMasterItemsComplete = (params: { department: string, requestCategory: string, page: number, column: string, direction: string }) => {
-    return axios.get(`${baseUrl}/request-master/${params.department}/${params.requestCategory}/sort?page=${params.page}&column=${params.column}&direction=${params.direction}`);
+export const sortRequestMasterItemsComplete = (params: { confirmation: 'COMPLETE' | 'WAITING', department: string, requestCategory: string, page: number, column: string, direction: string }) => {
+    return axios.get(`${baseUrl}/request-master/${params.department}/${params.requestCategory}/sort?confirmation=${params.confirmation}&page=${params.page}&column=${params.column}&direction=${params.direction}`);
 };
 
 export const updateRequestMasterItems = (params: { department: string, requestCategory: string, requestItems: IRequestMaster[] }) => {

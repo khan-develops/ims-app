@@ -1,5 +1,5 @@
 import { AppBar, Box, Button, Toolbar } from '@mui/material';
-import { Link, Outlet, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import logo from '../../images/logo.png';
 import Profile from '../Profile';
 import { selectProfileDetail } from '../../app/slice/profileDetail/profileDetailSlice';
@@ -124,7 +124,7 @@ const MenuDepartment = () => {
                         to={`/requests/general-request/list`}
                         state={{
                             requestCategory: 'general-request',
-                            department: profileDetailSelector.profileDetail.department
+                            department: profileDetailSelector.profileDetail.department.toLowerCase().replace('_', '-')
                         }}>
                         general request
                     </Button>
@@ -137,7 +137,7 @@ const MenuDepartment = () => {
                         to={`/requests/office-supply-request/list`}
                         state={{
                             requestCategory: 'office-supply-request',
-                            department: profileDetailSelector.profileDetail.department
+                            department: profileDetailSelector.profileDetail.department.toLowerCase().replace('_', '-')
                         }}>
                         office supply request
                     </Button>
@@ -150,12 +150,11 @@ const MenuDepartment = () => {
                         to={`/requests/store-room-request/list`}
                         state={{
                             requestCategory: 'store-room-request',
-                            department: profileDetailSelector.profileDetail.department
+                            department: profileDetailSelector.profileDetail.department.toLowerCase().replace('_', '-')
                         }}>
                         store room request
                     </Button>
                 </Box>
-
                 <Box>
                     <Profile />
                 </Box>

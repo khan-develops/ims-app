@@ -24,23 +24,6 @@ const router = createBrowserRouter(
                 <Route path="office-supply-request-dashboard" element={<RequestMasterAdmin />} />
                 <Route path="store-room-request-dashboard" element={<RequestMasterAdmin />} />
             </Route>
-            {/* <Route path="requests">
-                <Route path="general-request" element={<RequestMaster />}>
-                    <Route path="list" element={<RequestMasterItems />} />
-                    <Route path="confirmation" element={<RequestMasterPending />} />
-                    <Route path="status" element={<RequestMasterComplete />} />
-                </Route>
-                <Route path="office-supply-request" element={<RequestMaster />}>
-                    <Route path="list" element={<RequestMasterItems />} />
-                    <Route path="confirmation" element={<RequestMasterPending />} />
-                    <Route path="status" element={<RequestMasterComplete />} />
-                </Route>
-                <Route path="store-room-request" element={<RequestMaster />}>
-                    <Route path="list" element={<RequestMasterItems />} />
-                    <Route path="confirmation" element={<RequestMasterPending />} />
-                    <Route path="status" element={<RequestMasterComplete />} />
-                </Route>
-            </Route> */}
             <Route path="departments">
                 <Route path="extractions" element={<Departments />} />
                 <Route path="mass-spec" element={<Departments />} />

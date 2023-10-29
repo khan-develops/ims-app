@@ -1,8 +1,8 @@
 import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { RootState } from '../../store';
-import { getRequestMasterItems } from '../../api/request';
-import { RequestMasterItemsState } from '../../api/states/RequestState';
-import { IRequestMaster } from '../../api/properties/IRequest';
+import { RootState } from '../../../store';
+import { getRequestMasterItems } from '../../../api/request';
+import { RequestMasterItemsState } from '../../../api/states/RequestState';
+import { IRequestMaster } from '../../../api/properties/IRequest';
 
 const initialState: RequestMasterItemsState = {
   response: {

@@ -203,7 +203,6 @@ const RequestMasterDepartmentCompleteRow = ({
     requestMasterItem: IRequestMaster;
 }): JSX.Element => {
     const dispatch = useAppDispatch();
-    const requestMasterItemsCompleteSelector = useAppSelector(selectRequestMasterItemsComplete);
     const requestMasterItemsCompleteSelectedSelector = useAppSelector(selectRequestMasterItemsCompleteSelected);
 
     const handleCheckboxChange = (event: ChangeEvent<HTMLInputElement>, requestMasterItem: IRequestMaster) => {
@@ -277,7 +276,7 @@ const RequestMasterDepartmentComplete = () => {
                 page
             })
         );
-    }, [dispatch, location.state, page, state.department]);
+    }, [dispatch, location.state, page, state.department, state.requestCategory]);
 
     const handleRequestSort = (event: MouseEvent<unknown>, property: keyof IMaster | keyof IRequest) => {
         if (order === 'asc' && orderBy === 'id') {
@@ -285,11 +284,12 @@ const RequestMasterDepartmentComplete = () => {
             setOrderBy(property);
             dispatch(
                 sortRequestMasterItemsCompleteThunk({
+                    confirmation: 'COMPLETE',
                     department: state.department,
                     requestCategory: state.requestCategory,
                     page: page,
                     column: property,
-                    direction: 'desc'
+                    direction: 'asc'
                 })
             )
                 .then()
@@ -299,6 +299,7 @@ const RequestMasterDepartmentComplete = () => {
             setOrderBy(property);
             dispatch(
                 sortRequestMasterItemsCompleteThunk({
+                    confirmation: 'COMPLETE',
                     department: state.department,
                     requestCategory: state.requestCategory,
                     page: page,
@@ -313,11 +314,12 @@ const RequestMasterDepartmentComplete = () => {
             setOrderBy('id');
             dispatch(
                 sortRequestMasterItemsCompleteThunk({
+                    confirmation: 'COMPLETE',
                     department: state.department,
                     requestCategory: state.requestCategory,
                     page: page,
                     column: property,
-                    direction: 'desc'
+                    direction: 'asc'
                 })
             )
                 .then(() => {})
@@ -327,11 +329,12 @@ const RequestMasterDepartmentComplete = () => {
             setOrderBy(property);
             dispatch(
                 sortRequestMasterItemsCompleteThunk({
+                    confirmation: 'COMPLETE',
                     department: state.department,
                     requestCategory: state.requestCategory,
                     page: page,
                     column: property,
-                    direction: 'desc'
+                    direction: 'asc'
                 })
             )
                 .then(() => {})

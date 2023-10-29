@@ -344,11 +344,12 @@ const RequestMasterDepartmentPending = () => {
             setOrderBy(property);
             dispatch(
                 sortRequestMasterItemsPendingThunk({
+                    confirmation: 'WAITING',
                     department: state.department,
                     requestCategory: state.requestCategory,
                     page: page,
                     column: property,
-                    direction: 'desc'
+                    direction: 'asc'
                 })
             )
                 .then()
@@ -358,6 +359,7 @@ const RequestMasterDepartmentPending = () => {
             setOrderBy(property);
             dispatch(
                 sortRequestMasterItemsPendingThunk({
+                    confirmation: 'WAITING',
                     department: state.department,
                     requestCategory: state.requestCategory,
                     page: page,
@@ -372,11 +374,12 @@ const RequestMasterDepartmentPending = () => {
             setOrderBy('id');
             dispatch(
                 sortRequestMasterItemsPendingThunk({
+                    confirmation: 'WAITING',
                     department: state.department,
                     requestCategory: state.requestCategory,
                     page: page,
                     column: property,
-                    direction: 'desc'
+                    direction: 'asc'
                 })
             )
                 .then(() => {})
@@ -386,11 +389,12 @@ const RequestMasterDepartmentPending = () => {
             setOrderBy(property);
             dispatch(
                 sortRequestMasterItemsPendingThunk({
+                    confirmation: 'WAITING',
                     department: state.department,
                     requestCategory: state.requestCategory,
                     page: page,
                     column: property,
-                    direction: 'desc'
+                    direction: 'asc'
                 })
             )
                 .then(() => {})

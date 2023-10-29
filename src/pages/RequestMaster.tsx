@@ -48,10 +48,11 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 const RequestMasterItems = () => {
     const location = useLocation();
-    const { state, pathname } = location;
     const [value, setValue] = useState<number>(0);
     const { toggleType } = useAppSelector(selectRequestDrawer);
     const profileDetailSelector = useAppSelector(selectProfileDetail);
+
+    const { state, pathname } = location;
 
     useEffect(() => {
         if (pathname === `/requests/${state.requestCategory}/list`) {
@@ -94,7 +95,9 @@ const RequestMasterItems = () => {
                             to={`/requests/${state.requestCategory}/list`}
                             state={{
                                 requestCategory: state.requestCategory,
-                                department: profileDetailSelector.profileDetail.department,
+                                department: profileDetailSelector.profileDetail.department
+                                    .toLowerCase()
+                                    .replace('_', '-'),
                                 tabIndex: 0
                             }}
                         />
@@ -104,7 +107,9 @@ const RequestMasterItems = () => {
                             to={`/requests/${state.requestCategory}/confirmation`}
                             state={{
                                 requestCategory: state.requestCategory,
-                                department: profileDetailSelector.profileDetail.department,
+                                department: profileDetailSelector.profileDetail.department
+                                    .toLowerCase()
+                                    .replace('_', '-'),
                                 tabIndex: 1
                             }}
                         />
@@ -114,7 +119,9 @@ const RequestMasterItems = () => {
                             to={`/requests/${state.requestCategory}/status`}
                             state={{
                                 requestCategory: state.requestCategory,
-                                department: profileDetailSelector.profileDetail.department,
+                                department: profileDetailSelector.profileDetail.department
+                                    .toLowerCase()
+                                    .replace('_', '-'),
                                 tabIndex: 2
                             }}
                         />
