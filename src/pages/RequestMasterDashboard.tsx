@@ -4,18 +4,16 @@ import {
     BottomNavigation,
     BottomNavigationAction,
     Box,
-    Chip,
+    Button,
     FormControl,
-    FormControlLabel,
     Grid,
     InputBase,
     MenuItem,
     Paper,
-    Radio,
-    RadioGroup,
     Select,
     SelectChangeEvent,
     styled,
+    Tab,
     Table,
     TableBody,
     TableCell,
@@ -25,13 +23,14 @@ import {
     TablePagination,
     TableRow,
     TableSortLabel,
+    Tabs,
     TextField,
     Toolbar,
     Typography
 } from '@mui/material';
 import { KeyboardEvent, ChangeEvent, useEffect, useState, MouseEvent } from 'react';
 import moment from 'moment';
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { STATUS } from '../common/constants';
 import { updateRequestMasterItemThunk } from '../app/slice/request/requestMasterItemUpdateSlice';
@@ -46,7 +45,7 @@ import axios from 'axios';
 import FileSaver from 'file-saver';
 import { IMaster } from '../app/api/properties/IMaster';
 import { visuallyHidden } from '@mui/utils';
-import { inventoryRequestDepartments } from '../components/common/routes';
+import { requestsDashboard } from '../components/common/routes';
 import {
     changeRequestMasterItemsDashboard,
     getRequestMasterItemsDashboardThunk,
@@ -257,38 +256,13 @@ const EnhancedTableHead = (props: EnhancedTableProps) => {
     );
 };
 
-const RequestMasterAdmin = () => {
+const RequestMasterDashboardRow = ({ requestMasterItem }: { requestMasterItem: IRequestMaster }) => {
     const requestMasterItemsDashboardSelector = useAppSelector(selectRequestMasterDashboardItems);
     const profileDetailSelector = useAppSelector(selectProfileDetail);
     const dispatch = useAppDispatch();
-    const [page, setPage] = useState<number>(0);
     const location = useLocation();
-    const [value, setValue] = useState<number>(0);
-    const [order, setOrder] = useState<Order>('asc');
-    const [orderBy, setOrderBy] = useState<keyof IMaster | keyof IRequest>('id');
 
     const { state } = location;
-
-    useEffect(() => {
-        dispatch(
-            getRequestMasterItemsDashboardThunk({
-                department: profileDetailSelector.profileDetail.department.toLowerCase().replace('_', '-'),
-                requestCategory: state.requestCategory,
-                page: page
-            })
-        );
-    }, [
-        dispatch,
-        location.pathname,
-        location.state,
-        page,
-        profileDetailSelector.profileDetail.department,
-        state.requestCategory
-    ]);
-
-    const handleChangePage = (event: any, page: number): void => {
-        setPage(page);
-    };
 
     const handleStatusChange = (event: SelectChangeEvent, id: number) => {
         dispatch(
@@ -320,6 +294,85 @@ const RequestMasterAdmin = () => {
                 requestMasterItem: requestMasterItem
             })
         );
+    };
+    return (
+        <TableRow>
+            <StyledTableCell>{requestMasterItem.masterItem.item}</StyledTableCell>
+            <StyledTableCell>{requestMasterItem.recentCN && requestMasterItem.recentCN}</StyledTableCell>
+            <StyledTableCell>
+                <Button
+                    fullWidth
+                    disableElevation
+                    variant="outlined"
+                    disableRipple
+                    sx={{ cursor: 'default', fontWeight: 900, fontSize: 14 }}>
+                    {requestMasterItem.quantity}
+                </Button>
+            </StyledTableCell>
+            <StyledTableCell>
+                <FormControl fullWidth>
+                    <Select
+                        size="small"
+                        name="confirmation"
+                        value={requestMasterItem.confirmation}
+                        onChange={(event: SelectChangeEvent) => handleStatusChange(event, requestMasterItem.id)}>
+                        {Object.values(STATUS).map((status, index) => (
+                            <MenuItem key={index} value={status}>
+                                <Typography sx={{ fontSize: '10pt' }}>{status}</Typography>
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+            </StyledTableCell>
+            <StyledTableCell>{moment(requestMasterItem.timeRequested).format('MM/DD/YYYY')}</StyledTableCell>
+            <StyledTableCell>{moment(requestMasterItem.timeUpdated).format('MM/DD/YYYY')}</StyledTableCell>
+            <StyledTableCell>{requestMasterItem.department}</StyledTableCell>
+            <StyledTableCell>{requestMasterItem.customText}</StyledTableCell>
+            <StyledTableCell>
+                <TextField
+                    size="small"
+                    variant="outlined"
+                    value={requestMasterItem.customDetail}
+                    onChange={(event: ChangeEvent<HTMLInputElement>) => handleDetailChange(event, requestMasterItem.id)}
+                    onKeyDown={(event: KeyboardEvent) => handleEnterKey(event, requestMasterItem)}
+                />
+            </StyledTableCell>
+        </TableRow>
+    );
+};
+
+const RequestMasterDashboard = () => {
+    const requestMasterItemsDashboardSelector = useAppSelector(selectRequestMasterDashboardItems);
+    const profileDetailSelector = useAppSelector(selectProfileDetail);
+    const dispatch = useAppDispatch();
+    const [page, setPage] = useState<number>(0);
+    const location = useLocation();
+    const [value, setValue] = useState<number>(0);
+    const [order, setOrder] = useState<Order>('asc');
+    const [orderBy, setOrderBy] = useState<keyof IMaster | keyof IRequest>('id');
+
+    const { state } = location;
+
+    useEffect(() => {
+        dispatch(
+            getRequestMasterItemsDashboardThunk({
+                department: state.department,
+                requestCategory: state.requestCategory,
+                page: page
+            })
+        );
+    }, [
+        dispatch,
+        location.pathname,
+        location.state,
+        page,
+        profileDetailSelector.profileDetail.department,
+        state.department,
+        state.requestCategory
+    ]);
+
+    const handleChangePage = (event: any, page: number): void => {
+        setPage(page);
     };
 
     const handleKeywordChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -417,6 +470,10 @@ const RequestMasterAdmin = () => {
         }
     };
 
+    const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+        setValue(newValue);
+    };
+
     return (
         <Grid container height="100%" direction="column" justifyContent="space-between">
             <Grid item>
@@ -441,81 +498,34 @@ const RequestMasterAdmin = () => {
             </Grid>
             <Grid item padding={2}>
                 <Paper elevation={2} sx={{ padding: 0.5 }}>
-                    <Toolbar>
-                        <FormControl sx={{ width: '100%' }}>
-                            <RadioGroup
-                                sx={{ display: 'flex', justifyContent: 'space-between' }}
-                                row
-                                defaultValue={profileDetailSelector.profileDetail.department
-                                    .toLowerCase()
-                                    .replace('_', '-')}
-                                name="request-type">
-                                {inventoryRequestDepartments.map((department) => (
-                                    <Chip
-                                        label={department.label}
-                                        variant="outlined"
-                                        icon={
-                                            <FormControlLabel value={department.value} control={<Radio />} label="" />
-                                        }
-                                    />
-                                ))}
-                            </RadioGroup>
-                        </FormControl>
-                    </Toolbar>
-                    <TableContainer sx={{ height: 700, overflowY: 'auto' }}>
+                    <Box marginBottom={2}>
+                        <Tabs value={value} onChange={handleChange} textColor="inherit">
+                            {requestsDashboard.map((department) => (
+                                <Tab
+                                    label={department.label}
+                                    component={Link}
+                                    to={`/admin/dashboard/requests/${department.value}/${state.requestCategory}`}
+                                    state={{
+                                        requestCategory: state.requestCategory,
+                                        department: department.value,
+                                        tabIndex: 0
+                                    }}
+                                />
+                            ))}
+                        </Tabs>
+                    </Box>
+
+                    <TableContainer sx={{ height: 600, overflowY: 'auto' }}>
                         <Table stickyHeader>
                             <EnhancedTableHead order={order} orderBy={orderBy} onRequestSort={handleRequestSort} />
                             <TableBody>
                                 {requestMasterItemsDashboardSelector.response.content.length > 0 &&
                                     requestMasterItemsDashboardSelector.response.content.map(
                                         (requestMasterItem, index) => (
-                                            <TableRow key={index}>
-                                                <StyledTableCell>{requestMasterItem.masterItem.item}</StyledTableCell>
-                                                <StyledTableCell>
-                                                    {requestMasterItem.recentCN && requestMasterItem.recentCN}
-                                                </StyledTableCell>
-                                                <StyledTableCell>{requestMasterItem.quantity}</StyledTableCell>
-                                                <StyledTableCell>
-                                                    <FormControl fullWidth>
-                                                        <Select
-                                                            size="small"
-                                                            name="confirmation"
-                                                            value={requestMasterItem.confirmation}
-                                                            onChange={(event: SelectChangeEvent) =>
-                                                                handleStatusChange(event, requestMasterItem.id)
-                                                            }>
-                                                            {Object.values(STATUS).map((status, index) => (
-                                                                <MenuItem key={index} value={status}>
-                                                                    <Typography sx={{ fontSize: '10pt' }}>
-                                                                        {status}
-                                                                    </Typography>
-                                                                </MenuItem>
-                                                            ))}
-                                                        </Select>
-                                                    </FormControl>
-                                                </StyledTableCell>
-                                                <StyledTableCell>
-                                                    {moment(requestMasterItem.timeRequested).format('MM/DD/YYYY')}
-                                                </StyledTableCell>
-                                                <StyledTableCell>
-                                                    {moment(requestMasterItem.timeUpdated).format('MM/DD/YYYY')}
-                                                </StyledTableCell>
-                                                <StyledTableCell>{requestMasterItem.department}</StyledTableCell>
-                                                <StyledTableCell>{requestMasterItem.customText}</StyledTableCell>
-                                                <StyledTableCell>
-                                                    <TextField
-                                                        size="small"
-                                                        variant="outlined"
-                                                        value={requestMasterItem.customDetail}
-                                                        onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                                                            handleDetailChange(event, requestMasterItem.id)
-                                                        }
-                                                        onKeyDown={(event: KeyboardEvent) =>
-                                                            handleEnterKey(event, requestMasterItem)
-                                                        }
-                                                    />
-                                                </StyledTableCell>
-                                            </TableRow>
+                                            <RequestMasterDashboardRow
+                                                requestMasterItem={requestMasterItem}
+                                                key={index}
+                                            />
                                         )
                                     )}
                             </TableBody>
@@ -583,4 +593,4 @@ const RequestMasterAdmin = () => {
     );
 };
 
-export default RequestMasterAdmin;
+export default RequestMasterDashboard;

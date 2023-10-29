@@ -1,11 +1,11 @@
-import { AppBar, Box, Button, IconButton, Toolbar } from '@mui/material';
+import { AppBar, Box, Button, Toolbar } from '@mui/material';
 import { Link, useLocation } from 'react-router-dom';
 import logo from '../../images/logo.png';
 import Profile from '../Profile';
-import DashboardIcon from '@mui/icons-material/Dashboard';
 
 const MenuAdmin = () => {
     const location = useLocation();
+    const { state } = location;
 
     return (
         <AppBar position="static" elevation={5} color="primary">
@@ -127,34 +127,34 @@ const MenuAdmin = () => {
                     <Button
                         size="small"
                         sx={{
-                            color: location.pathname === '/admin/request-master/general-request' ? 'yellow' : '#fff',
+                            color: state.requestCategory === 'general-request' ? 'yellow' : '#fff',
                             fontWeight: '700'
                         }}
                         component={Link}
-                        to="/admin/request-master/general-request"
-                        state="general-request">
+                        to="/admin/dashboard/requests/extractions/general-request"
+                        state={{ requestCategory: 'general-request', view: 'admin', department: 'extractions' }}>
                         general
                     </Button>
                     <Button
                         size="small"
                         sx={{
-                            color: location.pathname === '/admin/request-master/office-supply-request' ? 'yellow' : '#fff',
+                            color: state.requestCategory === 'office-supply-request' ? 'yellow' : '#fff',
                             fontWeight: '700'
                         }}
                         component={Link}
-                        to="/admin/request-master/office-supply-request"
-                        state="office-supply-request">
+                        to="/admin/dashboard/requests/extractions/office-supply-request"
+                        state={{ requestCategory: 'office-supply-request', view: 'admin', department: 'extractions' }}>
                         office supply
                     </Button>
                     <Button
                         size="small"
                         sx={{
-                            color: location.pathname === '/admin/request-master/store-room-request' ? 'yellow' : '#fff',
+                            color: state.requestCategory === 'store-room-request' ? 'yellow' : '#fff',
                             fontWeight: '700'
                         }}
                         component={Link}
-                        to="/admin/request-master/store-room"
-                        state="store-room-request">
+                        to="/admin/dashboard/requests/extractions/store-room-request"
+                        state={{ requestCategory: 'store-room-request', view: 'admin', department: 'extractions' }}>
                         store room
                     </Button>
                     <Button
@@ -162,18 +162,15 @@ const MenuAdmin = () => {
                         variant="outlined"
                         color="secondary"
                         sx={{
-                            color: location.pathname === '/admin/dashboard' ? 'yellow' : '#fff',
+                            color: location.pathname === '/admin/dashboard/access-manager' ? 'yellow' : '#fff',
                             fontWeight: '700',
                             border: '1px solid yellow'
                         }}
                         component={Link}
-                        to="/admin/dashboard"
-                        state="store-room">
+                        to="/admin/dashboard/access-manager"
+                        state={{}}>
                         dashboard
                     </Button>
-                    {/* <IconButton>
-                        <DashboardIcon />
-                    </IconButton> */}
                 </Box>
                 <Box>
                     <Profile />

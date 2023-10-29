@@ -24,7 +24,8 @@ import {
     alpha,
     InputBase,
     Typography,
-    TableSortLabel
+    TableSortLabel,
+    Button
 } from '@mui/material';
 import { useLocation } from 'react-router-dom';
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
@@ -401,109 +402,61 @@ const StoreRoomMasterRow = ({
                 <StyledTableCell>{masterDepartmentItem.recentCN}</StyledTableCell>
                 <StyledTableCell>{masterDepartmentItem.departmentItems[0].location}</StyledTableCell>
                 <StyledTableCell width={100}>
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            justifyContent: 'center',
-                            border: '2px solid #f2f2f2',
-                            paddingTop: 0.5,
-                            paddingBottom: 0.5,
-                            marginRight: 2,
-                            borderRadius: 1,
-                            backgroundColor: '#f2f2f2'
-                        }}>
-                        <Typography sx={{ fontWeight: 900, fontSize: 15 }}>
-                            {masterDepartmentItem.departmentItems[0].quantity}
-                        </Typography>
-                    </Box>
+                    <Button
+                        fullWidth
+                        variant="outlined"
+                        disableRipple
+                        sx={{ cursor: 'default', fontWeight: '900', fontSize: 14 }}>
+                        {masterDepartmentItem.departmentItems[0].quantity}
+                    </Button>
                 </StyledTableCell>
                 <StyledTableCell width={100}>
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            justifyContent: 'center',
-                            border: '2px solid #f2f2f2',
-                            paddingTop: 0.5,
-                            paddingBottom: 0.5,
-                            marginRight: 2,
-                            borderRadius: 1,
-                            backgroundColor: '#f2f2f2'
-                        }}>
-                        <Typography sx={{ fontWeight: 900, fontSize: 15 }}>
-                            {masterDepartmentItem.departmentItems[0].minimumQuantity}
-                        </Typography>
-                    </Box>
+                    <Button
+                        fullWidth
+                        variant="outlined"
+                        disableRipple
+                        sx={{ cursor: 'default', fontWeight: '900', fontSize: 14 }}>
+                        {masterDepartmentItem.departmentItems[0].minimumQuantity}
+                    </Button>
                 </StyledTableCell>
                 <StyledTableCell width={100}>
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            justifyContent: 'center',
-                            border: '2px solid #f2f2f2',
-                            paddingTop: 0.5,
-                            paddingBottom: 0.5,
-                            marginRight: 2,
-                            borderRadius: 1,
-                            backgroundColor: '#f2f2f2'
-                        }}>
-                        <Typography sx={{ fontWeight: 900, fontSize: 15 }}>
-                            {masterDepartmentItem.departmentItems[0].maximumQuantity}
-                        </Typography>
-                    </Box>
+                    <Button
+                        fullWidth
+                        variant="outlined"
+                        disableRipple
+                        sx={{ cursor: 'default', fontWeight: '900', fontSize: 14 }}>
+                        {masterDepartmentItem.departmentItems[0].maximumQuantity}
+                    </Button>
                 </StyledTableCell>
                 <StyledTableCell width={100}>
                     {masterDepartmentItem && masterDepartmentItem.orderDetail && (
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                justifyContent: 'center',
-                                border: `2px solid ${getOrderQuantityColor(masterDepartmentItem)}`,
-                                paddingTop: 0.5,
-                                paddingBottom: 0.5,
-                                marginRight: 2,
-                                borderRadius: 1,
-                                backgroundColor: getOrderQuantityColor(masterDepartmentItem)
-                            }}>
-                            <Typography sx={{ fontWeight: 900, fontSize: 15 }}>
-                                {masterDepartmentItem.orderDetail.orderQuantity}
-                            </Typography>
-                        </Box>
+                        <Button
+                            fullWidth
+                            variant="outlined"
+                            disableRipple
+                            sx={{ cursor: 'default', fontWeight: '900', fontSize: 14 }}>
+                            {masterDepartmentItem.orderDetail.orderQuantity}
+                        </Button>
                     )}
                 </StyledTableCell>
                 <StyledTableCell width={100}>
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            justifyContent: 'center',
-                            border: '2px solid #f2f2f2',
-                            paddingTop: 0.5,
-                            paddingBottom: 0.5,
-                            marginRight: 2,
-                            borderRadius: 1,
-                            backgroundColor: '#f2f2f2'
-                        }}>
-                        <Typography sx={{ fontWeight: 900, fontSize: 13 }}>
-                            ${masterDepartmentItem.unitPrice}
-                        </Typography>
-                    </Box>
+                    <Button
+                        fullWidth
+                        variant="outlined"
+                        disableRipple
+                        sx={{ cursor: 'default', fontWeight: '900', fontSize: 14 }}>
+                        ${masterDepartmentItem.unitPrice}
+                    </Button>
                 </StyledTableCell>
                 <StyledTableCell>
                     {masterDepartmentItem && masterDepartmentItem.orderDetail && (
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                justifyContent: 'center',
-                                border: '2px solid #f2f2f2',
-                                paddingTop: 0.5,
-                                paddingBottom: 0.5,
-                                marginRight: 2,
-                                borderRadius: 1,
-                                backgroundColor: '#f2f2f2'
-                            }}>
-                            <Typography sx={{ fontWeight: 900, fontSize: 13 }}>
-                                ${masterDepartmentItem.orderDetail.totalPrice}
-                            </Typography>
-                        </Box>
+                        <Button
+                            fullWidth
+                            variant="outlined"
+                            disableRipple
+                            sx={{ cursor: 'default', fontWeight: '900', fontSize: 14 }}>
+                            ${masterDepartmentItem.orderDetail.totalPrice}
+                        </Button>
                     )}
                 </StyledTableCell>
                 <StyledTableCell width={70}>
