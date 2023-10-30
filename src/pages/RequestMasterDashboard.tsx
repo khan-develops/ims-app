@@ -37,10 +37,6 @@ import { updateRequestMasterItemThunk } from '../app/slice/request/requestMaster
 import { IRequest, IRequestMaster } from '../app/api/properties/IRequest';
 import SearchIcon from '@mui/icons-material/Search';
 import DownloadIcon from '@mui/icons-material/Download';
-import AddBoxIcon from '@mui/icons-material/AddBox';
-import PreviewIcon from '@mui/icons-material/Preview';
-import SendIcon from '@mui/icons-material/Send';
-import EditIcon from '@mui/icons-material/Edit';
 import axios from 'axios';
 import FileSaver from 'file-saver';
 import { IMaster } from '../app/api/properties/IMaster';
@@ -549,28 +545,6 @@ const RequestMasterDashboard = () => {
                                     onClick={handleDownloadClick}
                                     icon={<DownloadIcon color="primary" sx={{ fontSize: 40 }} />}
                                 />
-
-                                <BottomNavigationAction
-                                    label="Review"
-                                    onClick={handleReviewClick}
-                                    icon={<PreviewIcon color="primary" sx={{ fontSize: 40 }} />}
-                                />
-
-                                <BottomNavigationAction
-                                    label="Send"
-                                    onClick={handleEditClick}
-                                    icon={<EditIcon color="primary" sx={{ fontSize: 40 }} />}
-                                />
-
-                                <BottomNavigationAction label="Send" onClick={handleEditClick} icon={<SendIcon />} />
-
-                                <BottomNavigationAction
-                                    label="Add Item"
-                                    onClick={handleAddClick}
-                                    icon={<AddBoxIcon color="primary" sx={{ fontSize: 40 }} />}
-                                />
-
-                                {/* <Switch /> */}
                             </Grid>
                             <Grid item alignItems="center">
                                 <TablePagination

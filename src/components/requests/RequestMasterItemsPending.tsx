@@ -205,7 +205,7 @@ const RequestMasterItemsPendingRow = ({ requestMasterItem }: { requestMasterItem
             dispatch(
                 updateRequestMasterItemThunk({
                     department: profileDetailSelector.profileDetail.department.toLowerCase().replace(' ', '_'),
-                    requestCategory: state.requestCategory,
+                    requestCategory: state && state.requestCategory,
                     requestMasterItem: requestMasterItem
                 })
             )

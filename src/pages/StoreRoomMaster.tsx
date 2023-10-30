@@ -35,9 +35,7 @@ import { selectRequestMasterItemsChecked } from '../app/slice/request/requestMas
 import { selectRequestMasterItemsPendingChecked } from '../app/slice/request/requestMasterItemsPendingCheckedSlice';
 import DownloadIcon from '@mui/icons-material/Download';
 import AddBoxIcon from '@mui/icons-material/AddBox';
-import SendIcon from '@mui/icons-material/Send';
 import EditIcon from '@mui/icons-material/Edit';
-import PreviewIcon from '@mui/icons-material/Preview';
 import axios from 'axios';
 import FileSaver from 'file-saver';
 import SearchIcon from '@mui/icons-material/Search';
@@ -659,12 +657,6 @@ const StoreRoomMaster = () => {
                                     onClick={handleDownloadClick}
                                     icon={<DownloadIcon color="primary" sx={{ fontSize: 40 }} />}
                                 />
-                                <BottomNavigationAction
-                                    label="Review"
-                                    onClick={handleReviewClick}
-                                    icon={<PreviewIcon color="primary" sx={{ fontSize: 40 }} />}
-                                    disabled={requestMasterItemsCheckedSelector.requestMasterItemsChecked.length === 0}
-                                />
                                 {(location.pathname === '/general-request/confirmation' ||
                                     location.pathname === '/office-supply-request/confirmation' ||
                                     location.pathname === '/store-room-request/confirmation') && (
@@ -678,15 +670,6 @@ const StoreRoomMaster = () => {
                                         }
                                     />
                                 )}
-                                <BottomNavigationAction
-                                    label="Send"
-                                    onClick={handleEditClick}
-                                    icon={<SendIcon />}
-                                    disabled={
-                                        requestMasterItemsPendingCheckedSelector.requestMasterItemsPendingChecked
-                                            .length === 0
-                                    }
-                                />
                                 {location.pathname === '/admin/master' && (
                                     <BottomNavigationAction
                                         label="Add Item"

@@ -117,7 +117,7 @@ const MenuDepartment = () => {
                     )}
                     <Button
                         sx={{
-                            color: location.state.requestCategory === 'general-request' ? 'yellow' : '#fff',
+                            color: state && state.requestCategory === 'general-request' ? 'yellow' : '#fff',
                             fontWeight: '700'
                         }}
                         component={Link}
@@ -130,7 +130,7 @@ const MenuDepartment = () => {
                     </Button>
                     <Button
                         sx={{
-                            color: state.requestCategory === 'office-supply-request' ? 'yellow' : '#fff',
+                            color: state && state.requestCategory === 'office-supply-request' ? 'yellow' : '#fff',
                             fontWeight: '700'
                         }}
                         component={Link}
@@ -143,7 +143,7 @@ const MenuDepartment = () => {
                     </Button>
                     <Button
                         sx={{
-                            color: state.requestCategory === 'store-room-request' ? 'yellow' : '#fff',
+                            color: state && state.requestCategory === 'store-room-request' ? 'yellow' : '#fff',
                             fontWeight: '700'
                         }}
                         component={Link}

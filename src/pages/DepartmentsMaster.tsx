@@ -51,15 +51,12 @@ import SearchIcon from '@mui/icons-material/Search';
 import DownloadIcon from '@mui/icons-material/Download';
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import PreviewIcon from '@mui/icons-material/Preview';
 import EditIcon from '@mui/icons-material/Edit';
-import SendIcon from '@mui/icons-material/Send';
 import UnfoldMoreIcon from '@mui/icons-material/UnfoldMore';
 import axios from 'axios';
 import FileSaver from 'file-saver';
 import { IOrderDetail } from '../app/api/properties/IOrderDetail';
 import { visuallyHidden } from '@mui/utils';
-import AddBoxIcon from '@mui/icons-material/AddBox';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import CloseIcon from '@mui/icons-material/Close';
@@ -960,11 +957,6 @@ const DepartmentsMaster = () => {
                                     onClick={handleDownloadClick}
                                     icon={<DownloadIcon color="primary" sx={{ fontSize: 40 }} />}
                                 />
-                                <BottomNavigationAction
-                                    label="Review"
-                                    onClick={handleReviewClick}
-                                    icon={<PreviewIcon color="primary" sx={{ fontSize: 40 }} />}
-                                />
                                 {(location.pathname === '/general-request/confirmation' ||
                                     location.pathname === '/office-supply-request/confirmation' ||
                                     location.pathname === '/store-room-request/confirmation') && (
@@ -974,15 +966,6 @@ const DepartmentsMaster = () => {
                                         icon={<EditIcon color="primary" sx={{ fontSize: 40 }} />}
                                     />
                                 )}
-                                <BottomNavigationAction label="Send" onClick={handleEditClick} icon={<SendIcon />} />
-                                {location.pathname === '/admin/master' && (
-                                    <BottomNavigationAction
-                                        label="Add Item"
-                                        onClick={handleAddClick}
-                                        icon={<AddBoxIcon color="primary" sx={{ fontSize: 40 }} />}
-                                    />
-                                )}
-                                {/* <Switch /> */}
                             </Grid>
                             <Grid item alignItems="center">
                                 <TablePagination

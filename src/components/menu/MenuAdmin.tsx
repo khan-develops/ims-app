@@ -5,7 +5,7 @@ import Profile from '../Profile';
 
 const MenuAdmin = () => {
     const location = useLocation();
-    const { state } = location;
+    const { state, pathname } = location;
 
     return (
         <AppBar position="static" elevation={5} color="primary">
@@ -17,7 +17,7 @@ const MenuAdmin = () => {
                     <Button
                         size="small"
                         sx={{
-                            color: location.pathname === '/admin/master' ? 'yellow' : '#fff',
+                            color: pathname === '/admin/master' ? 'yellow' : '#fff',
                             fontWeight: '700'
                         }}
                         component={Link}
@@ -28,7 +28,7 @@ const MenuAdmin = () => {
                     <Button
                         size="small"
                         sx={{
-                            color: location.pathname === '/admin/store-room' ? 'yellow' : '#fff',
+                            color: pathname === '/admin/store-room' ? 'yellow' : '#fff',
                             fontWeight: '700'
                         }}
                         component={Link}
@@ -39,7 +39,7 @@ const MenuAdmin = () => {
                     <Button
                         size="small"
                         sx={{
-                            color: location.pathname === '/departments/extractions' ? 'yellow' : '#fff',
+                            color: pathname === '/departments/extractions' ? 'yellow' : '#fff',
                             fontWeight: '700'
                         }}
                         component={Link}
@@ -50,7 +50,7 @@ const MenuAdmin = () => {
                     <Button
                         size="small"
                         sx={{
-                            color: location.pathname === '/departments/mass-spec' ? 'yellow' : '#fff',
+                            color: pathname === '/departments/mass-spec' ? 'yellow' : '#fff',
                             fontWeight: '700'
                         }}
                         component={Link}
@@ -61,7 +61,7 @@ const MenuAdmin = () => {
                     <Button
                         size="small"
                         sx={{
-                            color: location.pathname === '/departments/rd' ? 'yellow' : '#fff',
+                            color: pathname === '/departments/rd' ? 'yellow' : '#fff',
                             fontWeight: '700'
                         }}
                         component={Link}
@@ -72,7 +72,7 @@ const MenuAdmin = () => {
                     <Button
                         size="small"
                         sx={{
-                            color: location.pathname === '/departments/screening' ? 'yellow' : '#fff',
+                            color: pathname === '/departments/screening' ? 'yellow' : '#fff',
                             fontWeight: '700'
                         }}
                         component={Link}
@@ -83,7 +83,7 @@ const MenuAdmin = () => {
                     <Button
                         size="small"
                         sx={{
-                            color: location.pathname === '/departments/shipping' ? 'yellow' : '#fff',
+                            color: pathname === '/departments/shipping' ? 'yellow' : '#fff',
                             fontWeight: '700'
                         }}
                         component={Link}
@@ -94,7 +94,7 @@ const MenuAdmin = () => {
                     <Button
                         size="small"
                         sx={{
-                            color: location.pathname === '/departments/processing-lab' ? 'yellow' : '#fff',
+                            color: pathname === '/departments/processing-lab' ? 'yellow' : '#fff',
                             fontWeight: '700'
                         }}
                         component={Link}
@@ -105,7 +105,7 @@ const MenuAdmin = () => {
                     <Button
                         size="small"
                         sx={{
-                            color: location.pathname === '/departments/qc-internal-standards' ? 'yellow' : '#fff',
+                            color: pathname === '/departments/qc-internal-standards' ? 'yellow' : '#fff',
                             fontWeight: '700'
                         }}
                         component={Link}
@@ -116,7 +116,7 @@ const MenuAdmin = () => {
                     <Button
                         size="small"
                         sx={{
-                            color: location.pathname === '/departments/qc-qa' ? 'yellow' : '#fff',
+                            color: pathname === '/departments/qc-qa' ? 'yellow' : '#fff',
                             fontWeight: '700'
                         }}
                         component={Link}
@@ -127,7 +127,7 @@ const MenuAdmin = () => {
                     <Button
                         size="small"
                         sx={{
-                            color: state.requestCategory === 'general-request' ? 'yellow' : '#fff',
+                            color: state && state.requestCategory === 'general-request' ? 'yellow' : '#fff',
                             fontWeight: '700'
                         }}
                         component={Link}
@@ -138,7 +138,7 @@ const MenuAdmin = () => {
                     <Button
                         size="small"
                         sx={{
-                            color: state.requestCategory === 'office-supply-request' ? 'yellow' : '#fff',
+                            color: state && state.requestCategory === 'office-supply-request' ? 'yellow' : '#fff',
                             fontWeight: '700'
                         }}
                         component={Link}
@@ -149,7 +149,7 @@ const MenuAdmin = () => {
                     <Button
                         size="small"
                         sx={{
-                            color: state.requestCategory === 'store-room-request' ? 'yellow' : '#fff',
+                            color: state && state.requestCategory === 'store-room-request' ? 'yellow' : '#fff',
                             fontWeight: '700'
                         }}
                         component={Link}

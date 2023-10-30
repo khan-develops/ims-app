@@ -273,7 +273,7 @@ const RequestMasterDepartmentComplete = () => {
         dispatch(
             getRequestMasterItemsCompleteThunk({
                 department: state.department,
-                requestCategory: state.requestCategory,
+                requestCategory: state && state.requestCategory,
                 page
             })
         );
@@ -287,7 +287,7 @@ const RequestMasterDepartmentComplete = () => {
                 sortRequestMasterItemsCompleteThunk({
                     confirmation: 'COMPLETE',
                     department: state.department,
-                    requestCategory: state.requestCategory,
+                    requestCategory: state && state.requestCategory,
                     page: page,
                     column: property,
                     direction: 'asc'
@@ -302,7 +302,7 @@ const RequestMasterDepartmentComplete = () => {
                 sortRequestMasterItemsCompleteThunk({
                     confirmation: 'COMPLETE',
                     department: state.department,
-                    requestCategory: state.requestCategory,
+                    requestCategory: state && state.requestCategory,
                     page: page,
                     column: property,
                     direction: 'desc'
@@ -317,7 +317,7 @@ const RequestMasterDepartmentComplete = () => {
                 sortRequestMasterItemsCompleteThunk({
                     confirmation: 'COMPLETE',
                     department: state.department,
-                    requestCategory: state.requestCategory,
+                    requestCategory: state && state.requestCategory,
                     page: page,
                     column: property,
                     direction: 'asc'
@@ -332,7 +332,7 @@ const RequestMasterDepartmentComplete = () => {
                 sortRequestMasterItemsCompleteThunk({
                     confirmation: 'COMPLETE',
                     department: state.department,
-                    requestCategory: state.requestCategory,
+                    requestCategory: state && state.requestCategory,
                     page: page,
                     column: property,
                     direction: 'asc'
