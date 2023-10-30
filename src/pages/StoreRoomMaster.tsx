@@ -53,6 +53,7 @@ import { updateDepartmentItemQuantityThunk } from '../app/slice/department/depar
 import { toggleDepartmentItemDrawer } from '../app/slice/drawerToggle/departmentDrawerSlice';
 import { toggleRequestItemDrawer } from '../app/slice/drawerToggle/requestDrawerSlice';
 import { toggleMasterItemDrawer } from '../app/slice/drawerToggle/masterDrawerSlice';
+import { getGrandTotalThunk, selectGrandTotal } from '../app/slice/grandTotalSlice';
 
 const columns: {
     id: keyof IStoreRoom | keyof IMaster | keyof IOrderDetail;
@@ -505,7 +506,7 @@ const StoreRoomMasterRow = ({
 };
 
 const StoreRoomMaster = () => {
-    const requestMasterItemsCheckedSelector = useAppSelector(selectRequestMasterItemsChecked);
+    const { grandTotal } = useAppSelector(selectGrandTotal);
     const requestMasterItemsPendingCheckedSelector = useAppSelector(selectRequestMasterItemsPendingChecked);
     const masterDepartmentItemsSelector = useAppSelector(selectMasterDepartmentItems);
     const [page, setPage] = useState<number>(0);
@@ -531,10 +532,7 @@ const StoreRoomMaster = () => {
                 masterItem: null
             })
         );
-    };
-
-    const handleReviewClick = () => {
-        dispatch(toggleRequestItemDrawer('UPDATE_REQUEST_REVIEW'));
+        dispatch(getGrandTotalThunk(location.state));
     };
 
     const handleDownloadClick = () => {
@@ -609,13 +607,21 @@ const StoreRoomMaster = () => {
                         flexDirection: 'row',
                         alignItems: 'center'
                     }}>
-                    <Toolbar variant="dense" sx={{ flexGrow: 1, justifyContent: 'center' }}>
+                    <Toolbar variant="dense" sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                        <Box width={140}></Box>
                         <Search onChange={handleKeywordChange}>
                             <SearchIconWrapper>
                                 <SearchIcon />
                             </SearchIconWrapper>
                             <StyledInputBase placeholder="Search…" inputProps={{ 'aria-label': 'search' }} />
                         </Search>
+                        <Box width={140}>
+                            {grandTotal && grandTotal !== 0 && (
+                                <Typography sx={{ fontWeight: 600, color: 'yellow' }}>
+                                    ${grandTotal.toLocaleString()}
+                                </Typography>
+                            )}
+                        </Box>
                     </Toolbar>
                 </AppBar>
             </Grid>

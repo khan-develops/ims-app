@@ -61,6 +61,7 @@ import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import CloseIcon from '@mui/icons-material/Close';
 import { toggleDepartmentItemDrawer } from '../app/slice/drawerToggle/departmentDrawerSlice';
+import { getGrandTotalThunk, selectGrandTotal } from '../app/slice/grandTotalSlice';
 
 const columns: {
     id: keyof IMaster | keyof IOrderDetail;
@@ -770,6 +771,7 @@ const EnhancedTableHead = (props: EnhancedTableProps) => {
 
 const DepartmentsMaster = () => {
     const masterDepartmentItemsSelector = useAppSelector(selectMasterDepartmentItems);
+    const { grandTotal } = useAppSelector(selectGrandTotal);
     const [page, setPage] = useState<number>(0);
     const dispatch = useAppDispatch();
     const location = useLocation();
@@ -785,6 +787,7 @@ const DepartmentsMaster = () => {
                 page: page
             })
         );
+        dispatch(getGrandTotalThunk(location.state));
     }, [dispatch, location.state, page]);
 
     const handleChangePage = (event: any, newPage: number): void => {
@@ -800,34 +803,17 @@ const DepartmentsMaster = () => {
         }
     };
 
-    const handleReviewClick = () => {
-        dispatch(toggleDepartmentItemDrawer({ toggleType: 'UPDATE_REQUEST_REVIEW', departmentItem: null }));
-    };
-
     const handleDownloadClick = () => {
         return axios.get(`${baseUrl}/download/${location.state}/list`).then((response) => {
             const blob = new Blob([response.data], {
                 type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
             });
-            FileSaver.saveAs(blob, `${location.state}.xlsx`);
+            FileSaver.saveAs(blob, `${location.state}.xls`);
         });
-    };
-
-    const handleEditClick = () => {
-        dispatch(toggleDepartmentItemDrawer({ toggleType: 'UPDATE_REQUEST_EDIT', departmentItem: null }));
     };
 
     const handleKeywordChange = (event: ChangeEvent<HTMLInputElement>) => {
         dispatch(filterMasterDepartmentItemsThunk({ state: location.state, keyword: event.target.value, page: 0 }));
-    };
-
-    const handleAddClick = () => {
-        dispatch(
-            toggleDepartmentItemDrawer({
-                toggleType: 'ADD_MASTER_ITEM',
-                departmentItem: null
-            })
-        );
     };
 
     const handleRequestSort = (event: MouseEvent<unknown>, property: keyof IMaster | keyof IOrderDetail) => {
@@ -905,13 +891,21 @@ const DepartmentsMaster = () => {
                         flexDirection: 'row',
                         alignItems: 'center'
                     }}>
-                    <Toolbar variant="dense" sx={{ flexGrow: 1, justifyContent: 'center' }}>
+                    <Toolbar variant="dense" sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                        <Box width={140}></Box>
                         <Search onChange={handleKeywordChange}>
                             <SearchIconWrapper>
                                 <SearchIcon />
                             </SearchIconWrapper>
                             <StyledInputBase placeholder="Search…" inputProps={{ 'aria-label': 'search' }} />
                         </Search>
+                        <Box width={140}>
+                            {grandTotal && grandTotal !== 0 && (
+                                <Typography sx={{ fontWeight: 600, color: 'yellow' }}>
+                                    ${grandTotal.toLocaleString()}
+                                </Typography>
+                            )}
+                        </Box>
                     </Toolbar>
                 </AppBar>
             </Grid>
@@ -957,15 +951,6 @@ const DepartmentsMaster = () => {
                                     onClick={handleDownloadClick}
                                     icon={<DownloadIcon color="primary" sx={{ fontSize: 40 }} />}
                                 />
-                                {(location.pathname === '/general-request/confirmation' ||
-                                    location.pathname === '/office-supply-request/confirmation' ||
-                                    location.pathname === '/store-room-request/confirmation') && (
-                                    <BottomNavigationAction
-                                        label="Send"
-                                        onClick={handleEditClick}
-                                        icon={<EditIcon color="primary" sx={{ fontSize: 40 }} />}
-                                    />
-                                )}
                             </Grid>
                             <Grid item alignItems="center">
                                 <TablePagination

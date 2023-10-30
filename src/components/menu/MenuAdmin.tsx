@@ -159,13 +159,9 @@ const MenuAdmin = () => {
                     </Button>
                     <Button
                         size="small"
-                        variant="outlined"
-                        color="secondary"
-                        sx={{
-                            color: location.pathname === '/admin/dashboard/access-manager' ? 'yellow' : '#fff',
-                            fontWeight: '700',
-                            border: '1px solid yellow'
-                        }}
+                        variant="contained"
+                        color="warning"
+                        disableElevation
                         component={Link}
                         to="/admin/dashboard/access-manager"
                         state={{}}>
