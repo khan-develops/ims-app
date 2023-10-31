@@ -803,13 +803,21 @@ const DepartmentsMaster = () => {
         }
     };
 
-    const handleDownloadClick = () => {
-        return axios.get(`${baseUrl}/download/${location.state}/list`).then((response) => {
-            const blob = new Blob([response.data], {
-                type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-            });
-            FileSaver.saveAs(blob, `${location.state}.xls`);
-        });
+    const handleDownloadClick = async (): Promise<void> => {
+        return await axios
+            .get(`${baseUrl}/download/${location.state}/list`, { responseType: 'blob' })
+            .then((response) => {
+                const blob = new Blob([response.data]);
+                const blobUrl = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = blobUrl;
+                a.download = `${location.state}.xlsx`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(blobUrl);
+            })
+            .catch((error: Error) => console.error(error.message));
     };
 
     const handleKeywordChange = (event: ChangeEvent<HTMLInputElement>) => {
