@@ -83,37 +83,44 @@ const router = createBrowserRouter(
                 <Route path="qc-qa" element={<Departments />} />
             </Route>
             <Route path="requests">
-                <Route path="mass-spec">
-                    <Route path="general-request" element={<RequestMaster />}>
-                        <Route path="list" element={<RequestMasterItems />} />
+                <Route path="general-request" element={<RequestMaster />}>
+                    <Route path="mass-spec">
                         <Route path="confirmation" element={<RequestMasterPending />} />
                         <Route path="status" element={<RequestMasterComplete />} />
                     </Route>
-                    <Route path="office-supply-request" element={<RequestMaster />}>
-                        <Route path="list" element={<RequestMasterItems />} />
-                        <Route path="confirmation" element={<RequestMasterPending />} />
-                        <Route path="status" element={<RequestMasterComplete />} />
-                    </Route>
-                    <Route path="store-room-request" element={<RequestMaster />}>
-                        <Route path="list" element={<RequestMasterItems />} />
+                    <Route path="list" element={<RequestMasterItems />} />
+                </Route>
+                <Route path="office-supply-request" element={<RequestMaster />}>
+                    <Route path="list" element={<RequestMasterItems />} />
+                    <Route path="mass-spec">
                         <Route path="confirmation" element={<RequestMasterPending />} />
                         <Route path="status" element={<RequestMasterComplete />} />
                     </Route>
                 </Route>
-                <Route path="processing-lab">
-                    {' '}
-                    <Route path="general-request" element={<RequestMaster />}>
-                        <Route path="list" element={<RequestMasterItems />} />
+                <Route path="store-room-request" element={<RequestMaster />}>
+                    <Route path="list" element={<RequestMasterItems />} />
+                    <Route path="mass-spec">
                         <Route path="confirmation" element={<RequestMasterPending />} />
                         <Route path="status" element={<RequestMasterComplete />} />
                     </Route>
-                    <Route path="office-supply-request" element={<RequestMaster />}>
-                        <Route path="list" element={<RequestMasterItems />} />
+                </Route>
+                <Route path="general-request" element={<RequestMaster />}>
+                    <Route path="list" element={<RequestMasterItems />} />
+                    <Route path="processing-lab">
                         <Route path="confirmation" element={<RequestMasterPending />} />
                         <Route path="status" element={<RequestMasterComplete />} />
                     </Route>
-                    <Route path="store-room-request" element={<RequestMaster />}>
-                        <Route path="list" element={<RequestMasterItems />} />
+                </Route>
+                <Route path="office-supply-request" element={<RequestMaster />}>
+                    <Route path="list" element={<RequestMasterItems />} />
+                    <Route path="processing-lab">
+                        <Route path="confirmation" element={<RequestMasterPending />} />
+                        <Route path="status" element={<RequestMasterComplete />} />
+                    </Route>
+                </Route>
+                <Route path="store-room-request" element={<RequestMaster />}>
+                    <Route path="list" element={<RequestMasterItems />} />
+                    <Route path="processing-lab">
                         <Route path="confirmation" element={<RequestMasterPending />} />
                         <Route path="status" element={<RequestMasterComplete />} />
                     </Route>
