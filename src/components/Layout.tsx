@@ -15,8 +15,8 @@ const Layout = () => {
     return (
         <Grid container sx={{ height: '100%' }} direction="column">
             <Grid item>
-                {/* <MenuAdmin /> */}
-                <MenuDepartment />
+                <MenuAdmin />
+                {/* <MenuDepartment /> */}
             </Grid>
             <Grid item flexGrow={1}>
                 <Outlet />

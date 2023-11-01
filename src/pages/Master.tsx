@@ -18,7 +18,8 @@ import {
     Button,
     CardHeader,
     Grid,
-    TablePagination
+    TablePagination,
+    Box
 } from '@mui/material';
 import { tableCellClasses } from '@mui/material/TableCell';
 import { IMaster } from '../app/api/properties/IMaster';
@@ -221,9 +222,24 @@ const MasterCardItem = ({
         <Card sx={{ marginBottom: 1, padding: 0.5 }}>
             <CardHeader
                 sx={{ backgroundColor: '#ececec', paddingTop: 1, paddingBottom: 1 }}
-                title={masterItem.item}
+                title={
+                    masterItem &&
+                    masterItem.item && (
+                        <Box sx={{ display: 'inline' }}>
+                            <Typography variant="body2">Name:</Typography>
+                            <Typography variant="body2">{masterItem.item}</Typography>
+                        </Box>
+                    )
+                }
                 titleTypographyProps={{ variant: 'button', marginLeft: 1 }}
-                subheader={masterItem.comment}
+                subheader={
+                    masterItem &&
+                    masterItem.comment && (
+                        <span>
+                            <Typography>Name</Typography> <Typography>{masterItem.comment}</Typography>
+                        </span>
+                    )
+                }
                 subheaderTypographyProps={{ variant: 'caption', marginLeft: 1 }}
             />
             <CardContent sx={{ padding: 0.5 }}>
