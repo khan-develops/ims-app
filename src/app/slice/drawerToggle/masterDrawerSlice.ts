@@ -3,12 +3,17 @@ import { RootState } from '../../store';
 import { IMaster } from '../../api/properties/IMaster';
 import { drawer_toggle_type } from '../../../common/types';
 
-interface masterDrawerState {
-    toggleType: drawer_toggle_type;
+export type drawerToggleTypeMaster =
+    'MASTER_ASSIGN' |
+    'MASTER_ADD' |
+    'MASTER_UPDATE' | ''
+
+export interface masterDrawerState {
+    toggleType: drawerToggleTypeMaster;
     masterItem: IMaster | null;
 }
 
-const initialState: masterDrawerState = {
+export const initialState: masterDrawerState = {
     toggleType: '',
     masterItem: null
 };
@@ -18,7 +23,8 @@ export const masterDrawerSlice = createSlice({
     initialState,
     reducers: {
         toggleMasterItemDrawer: (state, action: PayloadAction<masterDrawerState>) => {
-            state = action.payload
+            state.toggleType = action.payload.toggleType
+            state.masterItem = action.payload.masterItem
         }
     }
 });

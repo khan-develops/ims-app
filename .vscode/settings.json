@@ -6,5 +6,8 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "prettier.useTabs": true,
     "prettier.singleAttributePerLine": true,
-    "prettier.requireConfig": true
+    "prettier.requireConfig": true,
+    "[xml]": {
+        "editor.defaultFormatter": "DotJoshJohnson.xml"
+    }
 }

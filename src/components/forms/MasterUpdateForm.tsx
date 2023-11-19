@@ -1,18 +1,6 @@
-import {
-    Box,
-    Button,
-    Checkbox,
-    FormControl,
-    FormControlLabel,
-    FormGroup,
-    Grid,
-    InputAdornment,
-    Paper,
-    TextField
-} from '@mui/material';
-import { ChangeEvent, useState } from 'react';
+import { Box, Button, FormControl, Grid, InputAdornment, TextField } from '@mui/material';
+import { ChangeEvent } from 'react';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import { DEPARTMENT } from '../../common/constants';
 import { updateMasterItemThunk } from '../../app/slice/master/masterItemUpdateSlice';
 import { changeMasterItems, selectMasterItems } from '../../app/slice/master/masterItemsSlice';
 import { selectMasterDrawer, toggleMasterItemDrawer } from '../../app/slice/drawerToggle/masterDrawerSlice';
@@ -20,9 +8,7 @@ import { selectMasterDrawer, toggleMasterItemDrawer } from '../../app/slice/draw
 const MasterUpdateForm = () => {
     const dispatch = useAppDispatch();
     const masterItemsSelector = useAppSelector(selectMasterItems);
-    const { toggleType, masterItem } = useAppSelector(selectMasterDrawer);
-
-    const [departments, setDepartments] = useState<string[]>([]);
+    const { masterItem } = useAppSelector(selectMasterDrawer);
 
     const handleSubmit = () => {
         if (masterItem) {
@@ -51,24 +37,16 @@ const MasterUpdateForm = () => {
         masterItem &&
             dispatch(
                 toggleMasterItemDrawer({
-                    toggleType: 'UPDATE_MASTER_ITEM',
+                    toggleType: 'MASTER_UPDATE',
                     masterItem: { ...masterItem, [event.target.id]: event.target.value }
                 })
             );
     };
 
-    const handleCheckboxChange = (event: ChangeEvent<HTMLInputElement>) => {
-        if (departments.some((department) => department === event.target.name)) {
-            setDepartments(departments.filter((department) => department !== event.target.name));
-        } else {
-            setDepartments([...departments, event.target.name]);
-        }
-    };
-
     return (
         <Box sx={{ padding: 5 }}>
             <Grid container>
-                <Grid item xs={10} sm={10} md={10} lg={10} xl={10}>
+                <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
                     <Grid container>
                         <Grid item xs={12} sm={12} md={6} lg={4} xl={4} sx={{ padding: 1 }}>
                             {' '}
@@ -298,32 +276,6 @@ const MasterUpdateForm = () => {
                             />
                         </Grid>
                     </Grid>
-                </Grid>
-
-                <Grid item xs={2} sm={2} md={2} lg={2} xl={2} sx={{ paddingTop: 1 }}>
-                    <Paper sx={{ paddingLeft: 3, paddingTop: 2, paddingBottom: 2.5 }} variant="outlined">
-                        <FormGroup
-                            sx={{
-                                display: 'flex',
-                                flexDirection: 'column'
-                            }}>
-                            {Object.values(DEPARTMENT).map((department, index) => (
-                                <FormControlLabel
-                                    control={
-                                        <Checkbox
-                                            onChange={handleCheckboxChange}
-                                            checked={departments.some(
-                                                (departmentName) => departmentName === department
-                                            )}
-                                            name={department}
-                                        />
-                                    }
-                                    label={department.split('_').join(' ')}
-                                    key={index}
-                                />
-                            ))}
-                        </FormGroup>
-                    </Paper>
                 </Grid>
             </Grid>
 

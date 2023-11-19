@@ -44,7 +44,7 @@ import { getGrandTotalThunk, selectGrandTotal } from '../app/slice/grandTotalSli
 import { filterMasterDepartmentItemsThunk } from '../app/slice/master/masterDepartmentItemsSlice';
 import { getSearchValue } from '../app/search';
 import { deleteMasterItemThunk } from '../app/slice/master/masterItemDeleteSlice';
-import { toggleMasterItemDrawer } from '../app/slice/drawerToggle/masterDrawerSlice';
+import { selectMasterDrawer, toggleMasterItemDrawer } from '../app/slice/drawerToggle/masterDrawerSlice';
 
 const headerCell: {
     id: keyof IMaster;
@@ -202,7 +202,6 @@ const MasterCardItem = ({
     handleActionClick: (event: MouseEvent<HTMLElement>, masterItem: IMaster, action: 'ASSIGN' | 'DELETE') => void;
 }): JSX.Element => {
     const dispatch = useAppDispatch();
-    const { grandTotal } = useAppSelector(selectGrandTotal);
     const { state } = useLocation();
 
     useEffect(() => {
@@ -212,10 +211,14 @@ const MasterCardItem = ({
     const handleEditAction = (masterItem: IMaster) => {
         dispatch(
             toggleMasterItemDrawer({
-                toggleType: 'UPDATE_MASTER_ITEM',
+                toggleType: 'MASTER_UPDATE',
                 masterItem: masterItem
             })
         );
+    };
+
+    const handleAssign = () => {
+        dispatch(toggleMasterItemDrawer({ toggleType: 'MASTER_ASSIGN', masterItem: null }));
     };
 
     return (
@@ -272,9 +275,7 @@ const MasterCardItem = ({
                 </TableContainer>
             </CardContent>
             <CardActions sx={{ justifyContent: 'flex-end', paddingBottom: 0, paddingTop: 0, paddingRight: 4 }}>
-                <Button
-                    size="small"
-                    onClick={(event: MouseEvent<HTMLElement>) => handleActionClick(event, masterItem, 'ASSIGN')}>
+                <Button size="small" onClick={handleAssign}>
                     Assign
                 </Button>
                 <Button size="small" onClick={() => handleEditAction(masterItem)}>
@@ -291,6 +292,7 @@ const MasterCardItem = ({
 };
 
 const Master = (): JSX.Element => {
+    const masterDrawerSelector = useAppSelector(selectMasterDrawer);
     const searchValueSelector = useAppSelector(selectSearchValue);
     const masterItemsSelector = useAppSelector(selectMasterItems);
     const departmentNamesSelector = useAppSelector(selectDepartmentNames);
@@ -316,18 +318,18 @@ const Master = (): JSX.Element => {
     const handleAddClick = () => {
         dispatch(
             toggleMasterItemDrawer({
-                toggleType: 'ADD_MASTER_ITEM',
+                toggleType: 'MASTER_ADD',
                 masterItem: null
             })
         );
     };
 
     const handleEditClick = () => {
-        dispatch(toggleMasterItemDrawer({ toggleType: 'UPDATE_REQUEST_EDIT', masterItem: null }));
+        dispatch(toggleMasterItemDrawer({ toggleType: 'MASTER_UPDATE', masterItem: null }));
     };
 
     const handleReviewClick = () => {
-        dispatch(toggleMasterItemDrawer({ toggleType: 'UPDATE_REQUEST_REVIEW', masterItem: null }));
+        dispatch(toggleMasterItemDrawer({ toggleType: 'MASTER_UPDATE', masterItem: null }));
     };
 
     const handleDownloadClick = () => {
@@ -340,13 +342,14 @@ const Master = (): JSX.Element => {
     };
 
     useEffect(() => {
+        console.log(masterDrawerSelector);
         dispatch(getDepartmentNamesThunk());
         if (searchValueSelector && searchValueSelector.searchValue) {
             dispatch(filterMasterItemsThunk({ keyword: searchValueSelector.searchValue, page: page }));
         } else {
             dispatch(getMasterItemsThunk(page));
         }
-    }, [dispatch, page]);
+    }, [dispatch, masterDrawerSelector, page, searchValueSelector]);
 
     const handleChangePage = (event: any, newPage: number): void => {
         setPage(newPage);
@@ -386,10 +389,6 @@ const Master = (): JSX.Element => {
 
     const handleDeleteCancel = () => {
         setAnchorElDelete({ anchorEl: null, masterItem: null });
-    };
-
-    const handleAssign = (departmentName: string) => {
-        console.log(departmentName);
     };
 
     const handleKeywordChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -498,29 +497,6 @@ const Master = (): JSX.Element => {
                     </BottomNavigation>
                 </Paper>
             </Grid>
-
-            <Menu
-                key="profile-menu"
-                id="profile-menu"
-                anchorEl={anchorElAssign.anchorEl}
-                anchorOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right'
-                }}
-                transformOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right'
-                }}
-                open={Boolean(anchorElAssign.anchorEl)}
-                onClose={handleCloseMenu}>
-                {departmentNamesSelector.departmentNames
-                    .filter((departmentName) => departmentName.hasInventory)
-                    .map((departmentName, index) => (
-                        <MenuItem key={index} onClick={() => handleAssign(departmentName.name)}>
-                            <Typography textAlign="center">{departmentName.name.split('_').join(' ')}</Typography>
-                        </MenuItem>
-                    ))}
-            </Menu>
             <Menu
                 key="delete-menu"
                 id="delete-menu"

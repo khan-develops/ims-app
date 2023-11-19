@@ -1,7 +1,7 @@
-import { Box, Grid } from '@mui/material';
+import { Grid } from '@mui/material';
 import { selectProfileDetail } from '../app/slice/profileDetail/profileDetailSlice';
 import { useAppSelector } from '../app/hooks';
-import Drawer from './drawers/Drawers';
+import Drawers from './drawers/Drawers';
 import { Outlet } from 'react-router-dom';
 import MenuAdmin from './menu/MenuAdmin';
 import NavbarBottom from './navbar/NavbarBottom';
@@ -21,7 +21,7 @@ const Layout = () => {
             <Grid item flexGrow={1}>
                 <Outlet />
             </Grid>
-            <Drawer />
+            <Drawers />
         </Grid>
     );
 };
