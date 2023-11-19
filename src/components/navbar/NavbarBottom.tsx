@@ -23,7 +23,7 @@ const NavbarBottom = () => {
     const handleAddClick = () => {
         dispatch(
             toggleMasterItemDrawer({
-                toggleType: 'ADD_MASTER_ITEM',
+                toggleType: 'MASTER_ADD',
                 masterItem: null
             })
         );

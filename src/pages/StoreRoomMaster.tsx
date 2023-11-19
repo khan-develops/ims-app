@@ -1,4 +1,4 @@
-import React, { Fragment, useRef, useState } from 'react';
+import { Fragment, useRef, useState } from 'react';
 import { useEffect, MouseEvent, KeyboardEvent, ChangeEvent } from 'react';
 import { useAppSelector, useAppDispatch } from '../app/hooks';
 
@@ -25,22 +25,17 @@ import {
     InputBase,
     Typography,
     TableSortLabel,
-    Button
+    Button,
+    Stack
 } from '@mui/material';
 import { useLocation } from 'react-router-dom';
-import ModeEditIcon from '@mui/icons-material/ModeEdit';
-import DeleteIcon from '@mui/icons-material/Delete';
 import { IStoreRoom } from '../app/api/properties/IStoreRoom';
-import { selectRequestMasterItemsChecked } from '../app/slice/request/requestMasterItemsCheckedSlice';
 import { selectRequestMasterItemsPendingChecked } from '../app/slice/request/requestMasterItemsPendingCheckedSlice';
-import DownloadIcon from '@mui/icons-material/Download';
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import EditIcon from '@mui/icons-material/Edit';
 import axios from 'axios';
 import FileSaver from 'file-saver';
-import SearchIcon from '@mui/icons-material/Search';
 import {
-    changeMasterDepartmentItems,
     filterMasterDepartmentItemsThunk,
     getMasterDepartmentItemsThunk,
     selectMasterDepartmentItems,
@@ -49,11 +44,22 @@ import {
 import { IOrderDetail } from '../app/api/properties/IOrderDetail';
 import { IMaster, IMasterDepartment } from '../app/api/properties/IMaster';
 import { visuallyHidden } from '@mui/utils';
-import { updateDepartmentItemQuantityThunk } from '../app/slice/department/departmentItemUpdateSlice';
+import {
+    updateDepartmentItemQuantityThunk,
+    updateDepartmentItemThunk
+} from '../app/slice/department/departmentItemUpdateSlice';
 import { toggleDepartmentItemDrawer } from '../app/slice/drawerToggle/departmentDrawerSlice';
 import { toggleRequestItemDrawer } from '../app/slice/drawerToggle/requestDrawerSlice';
 import { toggleMasterItemDrawer } from '../app/slice/drawerToggle/masterDrawerSlice';
 import { getGrandTotalThunk, selectGrandTotal } from '../app/slice/grandTotalSlice';
+import SearchIcon from '@mui/icons-material/Search';
+import DownloadIcon from '@mui/icons-material/Download';
+import ModeEditIcon from '@mui/icons-material/ModeEdit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import AddIcon from '@mui/icons-material/Add';
+import RemoveIcon from '@mui/icons-material/Remove';
+import CloseIcon from '@mui/icons-material/Close';
+import { IDepartment } from '../app/api/properties/IDepartment';
 
 const columns: {
     id: keyof IStoreRoom | keyof IMaster | keyof IOrderDetail;
@@ -237,8 +243,6 @@ const EnhancedTableHead = (props: EnhancedTableProps) => {
                         </TableSortLabel>
                     </StyledTableCell>
                 ))}
-                <StyledTableCell align="left">Received</StyledTableCell>
-                <StyledTableCell align="left">Issued</StyledTableCell>
                 <StyledTableCell align="center" sx={{ paddingLeft: 2, paddingRight: 1 }}>
                     Edit
                 </StyledTableCell>
@@ -257,11 +261,10 @@ const StoreRoomMasterRow = ({
     masterDepartmentItem: IMasterDepartment;
     index: number;
 }) => {
-    const masterDepartmentItemsSelector = useAppSelector(selectMasterDepartmentItems);
     const dispatch = useAppDispatch();
     const location = useLocation();
     const inputRef = useRef<{
-        quantity: HTMLDivElement | null;
+        quantity: HTMLInputElement | null;
         received: HTMLDivElement | null;
         issued: HTMLDivElement | null;
     }>({
@@ -270,70 +273,12 @@ const StoreRoomMasterRow = ({
         issued: null
     });
 
+    const [updateAction, setUpdateAction] = useState<{
+        action: 'received' | 'issued' | '';
+        position: 'center' | 'left' | 'right';
+    }>({ action: '', position: 'center' });
+
     const handleDeleteClick = (event: MouseEvent<HTMLElement>, masterDepartmentItem: IMasterDepartment) => {};
-
-    const updateTotalQuantity = (
-        event: KeyboardEvent<HTMLInputElement>,
-        newMasterDepartmentItem: IMasterDepartment,
-        updateAction: 'received' | 'issued',
-        ref: HTMLDivElement | null
-    ): void => {
-        if (updateAction === 'received') {
-            inputRef.current.received = ref;
-        }
-        if (updateAction === 'issued') {
-            inputRef.current.issued = ref;
-        }
-
-        if (event.key === 'Enter') {
-            dispatch(
-                updateDepartmentItemQuantityThunk({
-                    state: location.state,
-                    departmentItemId: newMasterDepartmentItem.departmentItems[0].id,
-                    quantity: parseInt((event.target as HTMLInputElement).value),
-                    updateAction: updateAction
-                })
-            )
-                .then((response) => {
-                    changeMasterDepartmentItems(
-                        masterDepartmentItemsSelector.response.content.map((masterDepartmentItem) => ({
-                            ...masterDepartmentItem,
-                            departmentItems:
-                                masterDepartmentItem.id === newMasterDepartmentItem.id
-                                    ? masterDepartmentItem.departmentItems.map((departmentItem) => ({
-                                          ...departmentItem,
-                                          quantity:
-                                              response.payload.id === departmentItem.id
-                                                  ? response.payload.quantity
-                                                  : departmentItem.quantity
-                                      }))
-                                    : masterDepartmentItem.departmentItems
-                        }))
-                    );
-                    if (ref) {
-                        ref.style.backgroundColor = '#98FB98';
-                        ref.style.transition = '1s background ease-in, 500ms transform ease-out 1s';
-                        setTimeout(() => {
-                            if (ref) {
-                                ref.style.backgroundColor = '#FAFAFA';
-                            }
-                        }, 700);
-                    }
-                })
-                .catch((error: Error) => {
-                    console.error(error.message);
-                    if (ref) {
-                        ref.style.backgroundColor = '#FF0000';
-                        ref.style.transition = '1s background ease-in, 500ms transform ease-out 1s';
-                        setTimeout(() => {
-                            if (ref) {
-                                ref.style.backgroundColor = '#FAFAFA';
-                            }
-                        }, 700);
-                    }
-                });
-        }
-    };
 
     const handleEditClick = (event: MouseEvent<HTMLElement>, masterDepartmentItem: IMasterDepartment) => {
         if (masterDepartmentItem) {
@@ -363,13 +308,119 @@ const StoreRoomMasterRow = ({
             masterDepartmentItem.orderDetail === null ? null : masterDepartmentItem.orderDetail.totalQuantity;
         if (totalQuantity) {
             if (!minimumQuantity || !maximumQuantity) {
-                return '#eded00';
+                return 'warning';
             } else if (minimumQuantity === 1 && maximumQuantity === 1 && totalQuantity < 1) {
-                return '#FF0000';
+                return 'error';
             } else if (totalQuantity < minimumQuantity) {
-                return 'red';
+                return 'error';
             } else {
-                return '#3CB371';
+                return 'success';
+            }
+        }
+    };
+
+    const closeIssuedReceived = (defaultValue: number) => {
+        if (inputRef && inputRef.current && inputRef.current.quantity) {
+            inputRef.current.quantity?.blur();
+        }
+        setUpdateAction({
+            action: '',
+            position: 'center'
+        });
+    };
+
+    const handleIssuedReceived = (actionType: 'issued' | 'received' | '') => {
+        if (inputRef && inputRef.current && inputRef.current.quantity) {
+            inputRef.current.quantity?.focus();
+            inputRef.current.quantity.value = '';
+        }
+        if (actionType === 'received') {
+            setUpdateAction({
+                action: actionType,
+                position: 'right'
+            });
+        }
+        if (actionType === 'issued') {
+            setUpdateAction({
+                action: actionType,
+                position: 'left'
+            });
+        }
+    };
+
+    const updateQuantity = (
+        event: KeyboardEvent<HTMLElement>,
+        departmentItem: IDepartment,
+        ref: HTMLInputElement | null
+    ) => {
+        if (event.key === 'Enter') {
+            departmentItem = {
+                ...departmentItem,
+                [(event.target as HTMLInputElement).name]: (event.target as HTMLInputElement).value
+            };
+            if (updateAction.action === '') {
+                dispatch(
+                    updateDepartmentItemThunk({
+                        state: location.state,
+                        departmentItem: departmentItem
+                    })
+                )
+                    .then(() => {
+                        inputRef.current.quantity = ref;
+                        if (ref) {
+                            ref.style.backgroundColor = '#98FB98';
+                            ref.style.transition = '1s background ease-in, 500ms transform ease-out 1s';
+                            setTimeout(() => {
+                                if (ref) {
+                                    ref.style.backgroundColor = '#FAFAFA';
+                                }
+                            }, 700);
+                            ref.blur();
+                        }
+                    })
+                    .catch((error: Error) => {
+                        console.error(error.message);
+                        if (ref) {
+                            ref.style.backgroundColor = '#FF0000';
+                            ref.style.transition = '1s background ease-in, 500ms transform ease-out 1s';
+                            setTimeout(() => {
+                                if (ref) {
+                                    ref.style.backgroundColor = '#FAFAFA';
+                                }
+                            }, 700);
+                        }
+                    });
+            } else {
+                dispatch(
+                    updateDepartmentItemQuantityThunk({
+                        state: location.state,
+                        departmentItemId: departmentItem.id,
+                        quantity: parseInt((event.target as HTMLInputElement).value),
+                        updateAction: updateAction.action
+                    })
+                )
+                    .then((response) => {
+                        if (inputRef && inputRef.current && inputRef.current.quantity) {
+                            inputRef.current.quantity.value = response.payload.quantity;
+                            inputRef.current.quantity?.blur();
+                        }
+                        setUpdateAction({
+                            action: '',
+                            position: 'center'
+                        });
+                    })
+                    .catch((error: Error) => {
+                        console.error(error.message);
+                        if (ref) {
+                            ref.style.backgroundColor = '#FF0000';
+                            ref.style.transition = '1s background ease-in, 500ms transform ease-out 1s';
+                            setTimeout(() => {
+                                if (ref) {
+                                    ref.style.backgroundColor = '#FAFAFA';
+                                }
+                            }, 700);
+                        }
+                    });
             }
         }
     };
@@ -380,18 +431,29 @@ const StoreRoomMasterRow = ({
                 <StyledTableItemCell colSpan={columns.length + 4}>
                     <Box sx={{ width: '100%' }}>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <Typography variant="body2" sx={{ color: 'GrayText' }}>
-                                {masterDepartmentItem.item}
-                            </Typography>
-                            <Typography variant="body2" sx={{ color: 'GrayText' }}>
-                                {masterDepartmentItem.departmentItems[0].usageLevel}
-                            </Typography>
+                            <Stack direction="row">
+                                <Typography variant="subtitle2" sx={{ marginRight: 1, color: '#E30B5C' }}>
+                                    Name:
+                                </Typography>
+                                <Typography variant="subtitle2"> {masterDepartmentItem.item}</Typography>
+                            </Stack>
+                            <Stack direction="row">
+                                <Typography variant="subtitle2" sx={{ marginRight: 1, color: '#E30B5C' }}>
+                                    Usage level:
+                                </Typography>
+                                <Typography variant="body2" sx={{ color: 'GrayText' }}>
+                                    {masterDepartmentItem.departmentItems[0].usageLevel}
+                                </Typography>
+                            </Stack>
                         </Box>
-                        <Box>
-                            <Typography variant="caption" sx={{ color: 'GrayText' }}>
-                                {masterDepartmentItem.comment}
-                            </Typography>
-                        </Box>
+                        {masterDepartmentItem.comment && (
+                            <Stack direction="row">
+                                <Typography variant="body2" sx={{ marginRight: 1, color: '#E30B5C' }}>
+                                    Comment:
+                                </Typography>{' '}
+                                <Typography variant="body2"> {masterDepartmentItem.comment}</Typography>
+                            </Stack>
+                        )}
                     </Box>
                 </StyledTableItemCell>
             </TableRow>
@@ -400,14 +462,60 @@ const StoreRoomMasterRow = ({
                 <StyledTableCell>{masterDepartmentItem.partNumber}</StyledTableCell>
                 <StyledTableCell>{masterDepartmentItem.recentCN}</StyledTableCell>
                 <StyledTableCell>{masterDepartmentItem.departmentItems[0].location}</StyledTableCell>
-                <StyledTableCell width={100}>
-                    <Button
-                        fullWidth
-                        variant="outlined"
-                        disableRipple
-                        sx={{ cursor: 'default', fontWeight: '900', fontSize: 14 }}>
-                        {masterDepartmentItem.departmentItems[0].quantity}
-                    </Button>
+                <StyledTableCell width={150}>
+                    <TextField
+                        id="quantity"
+                        type="number"
+                        name="quantity"
+                        inputRef={(ref) => (inputRef.current.quantity = ref)}
+                        InputProps={{
+                            inputProps: {
+                                min: 0,
+                                style: { textAlign: updateAction.position, fontWeight: 700, fontSize: 14 }
+                            },
+                            startAdornment:
+                                updateAction.action === 'issued' ? null : updateAction.action === 'received' ? (
+                                    <IconButton
+                                        edge="start"
+                                        onClick={() =>
+                                            closeIssuedReceived(masterDepartmentItem.departmentItems[0].quantity)
+                                        }
+                                        color="error">
+                                        <CloseIcon />
+                                    </IconButton>
+                                ) : (
+                                    <IconButton
+                                        edge="start"
+                                        onClick={() => handleIssuedReceived('received')}
+                                        color="success">
+                                        <AddIcon />
+                                    </IconButton>
+                                ),
+                            endAdornment:
+                                updateAction.action === 'received' ? null : updateAction.action === 'issued' ? (
+                                    <IconButton
+                                        edge="end"
+                                        onClick={() =>
+                                            closeIssuedReceived(masterDepartmentItem.departmentItems[0].quantity)
+                                        }
+                                        color="error">
+                                        <CloseIcon />
+                                    </IconButton>
+                                ) : (
+                                    <IconButton
+                                        edge="end"
+                                        color="warning"
+                                        onClick={() => handleIssuedReceived('issued')}>
+                                        <RemoveIcon />
+                                    </IconButton>
+                                )
+                        }}
+                        size="small"
+                        defaultValue={masterDepartmentItem.departmentItems[0].quantity}
+                        onKeyDown={(event: KeyboardEvent<HTMLElement>) =>
+                            updateQuantity(event, masterDepartmentItem.departmentItems[0], inputRef.current.quantity)
+                        }
+                    />
                 </StyledTableCell>
                 <StyledTableCell width={100}>
                     <Button
@@ -427,14 +535,16 @@ const StoreRoomMasterRow = ({
                         {masterDepartmentItem.departmentItems[0].maximumQuantity}
                     </Button>
                 </StyledTableCell>
-                <StyledTableCell width={100}>
-                    {masterDepartmentItem && masterDepartmentItem.orderDetail && (
+                <StyledTableCell width={80}>
+                    {masterDepartmentItem.orderDetail && (
                         <Button
                             fullWidth
-                            variant="outlined"
+                            disableElevation
+                            variant="contained"
+                            color={getOrderQuantityColor(masterDepartmentItem)}
                             disableRipple
-                            sx={{ cursor: 'default', fontWeight: '900', fontSize: 14 }}>
-                            {masterDepartmentItem.orderDetail.orderQuantity}
+                            sx={{ cursor: 'default', fontWeight: 900, fontSize: 14 }}>
+                            {masterDepartmentItem.orderDetail.totalQuantity}
                         </Button>
                     )}
                 </StyledTableCell>
@@ -457,36 +567,6 @@ const StoreRoomMasterRow = ({
                             ${masterDepartmentItem.orderDetail.totalPrice}
                         </Button>
                     )}
-                </StyledTableCell>
-                <StyledTableCell width={70}>
-                    <TextField
-                        ref={(ref) => (inputRef.current.received = ref)}
-                        size="small"
-                        sx={{
-                            '.MuiInputBase-input': {
-                                padding: 1,
-                                fontSize: 12
-                            }
-                        }}
-                        onKeyDown={(event: KeyboardEvent<HTMLInputElement>) =>
-                            updateTotalQuantity(event, masterDepartmentItem, 'received', inputRef.current.received)
-                        }
-                    />
-                </StyledTableCell>
-                <StyledTableCell width={70}>
-                    <TextField
-                        ref={(ref) => (inputRef.current.issued = ref)}
-                        size="small"
-                        sx={{
-                            '.MuiInputBase-input': {
-                                padding: 1,
-                                fontSize: 12
-                            }
-                        }}
-                        onKeyDown={(event: KeyboardEvent<HTMLInputElement>) =>
-                            updateTotalQuantity(event, masterDepartmentItem, 'issued', inputRef.current.issued)
-                        }
-                    />
                 </StyledTableCell>
                 <StyledTableCell width={20} align="center" padding="none">
                     <IconButton
@@ -528,7 +608,7 @@ const StoreRoomMaster = () => {
     const handleAddClick = () => {
         dispatch(
             toggleMasterItemDrawer({
-                toggleType: 'ADD_MASTER_ITEM',
+                toggleType: 'MASTER_ADD',
                 masterItem: null
             })
         );

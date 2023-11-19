@@ -19,7 +19,9 @@ import {
     CardHeader,
     Grid,
     TablePagination,
-    Box
+    Box,
+    Stack,
+    ButtonGroup
 } from '@mui/material';
 import { tableCellClasses } from '@mui/material/TableCell';
 import { IMaster } from '../app/api/properties/IMaster';
@@ -29,7 +31,6 @@ import { getDepartmentNamesThunk, selectDepartmentNames } from '../app/slice/dep
 import { BottomNavigation, BottomNavigationAction } from '@mui/material';
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import DownloadIcon from '@mui/icons-material/Download';
-import { selectRequestMasterItemsChecked } from '../app/slice/request/requestMasterItemsCheckedSlice';
 import { selectRequestMasterItemsPendingChecked } from '../app/slice/request/requestMasterItemsPendingCheckedSlice';
 import EditIcon from '@mui/icons-material/Edit';
 import axios from 'axios';
@@ -218,19 +219,21 @@ const MasterCardItem = ({
     };
 
     const handleAssign = () => {
-        dispatch(toggleMasterItemDrawer({ toggleType: 'MASTER_ASSIGN', masterItem: null }));
+        dispatch(toggleMasterItemDrawer({ toggleType: 'MASTER_ASSIGN', masterItem: masterItem }));
     };
 
     return (
         <Card sx={{ marginBottom: 1, padding: 0.5 }}>
             <CardHeader
-                sx={{ backgroundColor: '#ececec', paddingTop: 1, paddingBottom: 1 }}
+                sx={{ backgroundColor: '#FAFAFA', paddingTop: 1, paddingBottom: 1 }}
                 title={
                     masterItem &&
                     masterItem.item && (
-                        <Box sx={{ display: 'inline' }}>
-                            <Typography variant="body2">Name:</Typography>
-                            <Typography variant="body2">{masterItem.item}</Typography>
+                        <Box sx={{ display: 'flex', flexDirection: 'row' }}>
+                            <Typography variant="subtitle2" sx={{ marginRight: 1, color: '#E30B5C' }}>
+                                Name:
+                            </Typography>
+                            <Typography variant="subtitle2">{masterItem.item}</Typography>
                         </Box>
                     )
                 }
@@ -238,9 +241,12 @@ const MasterCardItem = ({
                 subheader={
                     masterItem &&
                     masterItem.comment && (
-                        <span>
-                            <Typography>Name</Typography> <Typography>{masterItem.comment}</Typography>
-                        </span>
+                        <Stack direction="row">
+                            <Typography variant="body2" sx={{ marginRight: 1, color: '#E30B5C' }}>
+                                Comment:
+                            </Typography>{' '}
+                            <Typography variant="body2">{masterItem.comment}</Typography>
+                        </Stack>
                     )
                 }
                 subheaderTypographyProps={{ variant: 'caption', marginLeft: 1 }}
@@ -295,21 +301,14 @@ const Master = (): JSX.Element => {
     const masterDrawerSelector = useAppSelector(selectMasterDrawer);
     const searchValueSelector = useAppSelector(selectSearchValue);
     const masterItemsSelector = useAppSelector(selectMasterItems);
-    const departmentNamesSelector = useAppSelector(selectDepartmentNames);
     const dispatch = useAppDispatch();
     const [page, setPage] = useState<number>(0);
-    const [anchorElAssign, setAnchorElAssign] = useState<{ anchorEl: null | HTMLElement; masterItem: IMaster | null }>({
-        anchorEl: null,
-        masterItem: null
-    });
 
     const [anchorElDelete, setAnchorElDelete] = useState<{ anchorEl: null | HTMLElement; masterItem: IMaster | null }>({
         anchorEl: null,
         masterItem: null
     });
-    const [sort, setSort] = useState<{ column: string; direction: '' | 'ASC' | 'DESC' }>({ column: '', direction: '' });
     const [value, setValue] = useState<number>(0);
-    const requestMasterItemsCheckedSelector = useAppSelector(selectRequestMasterItemsChecked);
     const requestMasterItemsPendingCheckedSelector = useAppSelector(selectRequestMasterItemsPendingChecked);
     const location = useLocation();
     const baseUrl = process.env.REACT_APP_BASE_URL;
@@ -325,10 +324,6 @@ const Master = (): JSX.Element => {
     };
 
     const handleEditClick = () => {
-        dispatch(toggleMasterItemDrawer({ toggleType: 'MASTER_UPDATE', masterItem: null }));
-    };
-
-    const handleReviewClick = () => {
         dispatch(toggleMasterItemDrawer({ toggleType: 'MASTER_UPDATE', masterItem: null }));
     };
 
@@ -363,16 +358,12 @@ const Master = (): JSX.Element => {
         masterItem: IMaster,
         action: 'ASSIGN' | 'EDIT' | 'DELETE'
     ) => {
-        if (action === 'ASSIGN') {
-            setAnchorElAssign({ anchorEl: event.currentTarget, masterItem: masterItem });
-        }
         if (action === 'DELETE') {
             setAnchorElDelete({ anchorEl: event.currentTarget, masterItem: masterItem });
         }
     };
 
     const handleCloseMenu = () => {
-        setAnchorElAssign({ anchorEl: null, masterItem: null });
         setAnchorElDelete({ anchorEl: null, masterItem: null });
     };
 
@@ -444,41 +435,32 @@ const Master = (): JSX.Element => {
                         }}>
                         <Grid container justifyContent="space-between" paddingLeft={2} paddingRight={2}>
                             <Grid item>
-                                {' '}
-                                {(location.pathname === '/departments/extractions' ||
-                                    location.pathname === '/departments/mass-spec' ||
-                                    location.pathname === '/departments/processing-lab' ||
-                                    location.pathname === '/departments/rd' ||
-                                    location.pathname === '/departments/screening' ||
-                                    location.pathname === '/departments/shipping' ||
-                                    location.pathname === '/departments/qc-qa') && (
-                                    <BottomNavigationAction
-                                        label="Download"
-                                        onClick={handleDownloadClick}
-                                        icon={<DownloadIcon color="primary" sx={{ fontSize: 40 }} />}
-                                    />
-                                )}
-                                {(location.pathname === '/general-request/confirmation' ||
-                                    location.pathname === '/office-supply-request/confirmation' ||
-                                    location.pathname === '/store-room-request/confirmation') && (
-                                    <BottomNavigationAction
-                                        label="Send"
-                                        onClick={handleEditClick}
-                                        icon={<EditIcon color="primary" sx={{ fontSize: 40 }} />}
-                                        disabled={
-                                            requestMasterItemsPendingCheckedSelector.requestMasterItemsPendingChecked
-                                                .length === 0
-                                        }
-                                    />
-                                )}
-                                {location.pathname === '/admin/master' && (
-                                    <BottomNavigationAction
-                                        label="Add Item"
-                                        onClick={handleAddClick}
-                                        icon={<AddBoxIcon color="primary" sx={{ fontSize: 40 }} />}
-                                    />
-                                )}
-                                {/* <Switch /> */}
+                                <BottomNavigationAction
+                                    label="Download"
+                                    onClick={handleDownloadClick}
+                                    icon={<DownloadIcon color="primary" sx={{ fontSize: 40 }} />}
+                                />
+                                <BottomNavigationAction
+                                    label="Add Item"
+                                    onClick={handleAddClick}
+                                    icon={<AddBoxIcon color="primary" sx={{ fontSize: 40 }} />}
+                                />
+                            </Grid>
+                            <Grid item paddingTop={2} paddingBottom={2}>
+                                <ButtonGroup size="small" variant="text">
+                                    <Button>Purchase Unit</Button>
+                                    <Button>Manufacturer</Button>
+                                    <Button>Recent Vendor</Button>
+                                    <Button>Recent CN</Button>
+                                    <Button>Part Number</Button>
+                                    <Button>Fisher CN</Button>
+                                    <Button>VWR CN</Button>
+                                    <Button>Lab Source CN</Button>
+                                    <Button>Other CN</Button>
+                                    <Button>Unit Price</Button>
+                                    <Button>Category</Button>
+                                    <Button>Drug Class</Button>
+                                </ButtonGroup>
                             </Grid>
                             <Grid item alignItems="center">
                                 <TablePagination

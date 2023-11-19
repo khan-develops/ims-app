@@ -1,47 +1,62 @@
-import { Box, Checkbox, FormControlLabel, FormGroup } from '@mui/material';
-import { useAppSelector } from '../../app/hooks';
+import { Box, Button, ButtonGroup, Checkbox, Divider, FormControlLabel, FormGroup } from '@mui/material';
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { selectDepartmentNames } from '../../app/slice/departmentName/departmentNamesSlice';
-import { ChangeEvent, useEffect, useState } from 'react';
+import { ChangeEvent, useState } from 'react';
+import { selectMasterDrawer, toggleMasterItemDrawer } from '../../app/slice/drawerToggle/masterDrawerSlice';
+import { useLocation } from 'react-router-dom';
+import { departmentMasterItemAssignThunk } from '../../app/slice/department/departmentMasterItemAssignSlice';
 
 const MasterAssignForm = () => {
     const departmentNamesSelector = useAppSelector(selectDepartmentNames);
-    const [departments, setDepartments] = useState<string[]>([]);
-
-    useEffect(() => {
-        departmentNamesSelector.departmentNames.map((departmentName) =>
-            setDepartments((prevDepartment) => [...prevDepartment, departmentName.name])
-        );
-    }, [departmentNamesSelector.departmentNames]);
+    const masterDrawerSelector = useAppSelector(selectMasterDrawer);
+    const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]);
+    const location = useLocation();
+    const dispatch = useAppDispatch();
 
     const handleCheckboxChange = (event: ChangeEvent<HTMLInputElement>) => {
-        if (departments.some((department) => department === event.target.name)) {
-            setDepartments(departments.filter((department) => department !== event.target.name));
+        if (selectedDepartments.some((department) => department === event.target.name)) {
+            setSelectedDepartments(selectedDepartments.filter((department) => department !== event.target.name));
         } else {
-            setDepartments([...departments, event.target.name]);
+            setSelectedDepartments([...selectedDepartments, event.target.name]);
+        }
+    };
+
+    const handleSubmit = (): void => {
+        if (masterDrawerSelector.masterItem) {
+            dispatch(
+                departmentMasterItemAssignThunk({
+                    state: location.state,
+                    masterItemId: masterDrawerSelector.masterItem.id
+                })
+            )
+                .then(() => dispatch(toggleMasterItemDrawer({ toggleType: '', masterItem: null })))
+                .catch((error: Error) => console.error(error.message));
         }
     };
 
     return (
-        <Box>
+        <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', flexDirection: 'column' }}>
             <FormGroup
                 sx={{
                     display: 'flex',
-                    flexDirection: 'column'
+                    flexDirection: 'column',
+                    padding: 4
                 }}>
                 {departmentNamesSelector.departmentNames.map((department, index) => (
                     <FormControlLabel
-                        control={
-                            <Checkbox
-                                onChange={handleCheckboxChange}
-                                checked={departments.some((departmentName) => departmentName === department.name)}
-                                name={department.name}
-                            />
-                        }
+                        control={<Checkbox onChange={handleCheckboxChange} name={department.name} />}
                         label={department.name.split('_').join(' ')}
                         key={index}
                     />
                 ))}
             </FormGroup>
+            <Divider variant="middle" />
+            <ButtonGroup variant="text" fullWidth sx={{ marginTop: 2 }}>
+                <Button onClick={handleSubmit}>Submit</Button>
+                <Button onClick={() => dispatch(toggleMasterItemDrawer({ toggleType: '', masterItem: null }))}>
+                    Cancel
+                </Button>
+            </ButtonGroup>
         </Box>
     );
 };
