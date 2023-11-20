@@ -495,13 +495,16 @@ const Master = (): JSX.Element => {
                                     icon={<AddBoxIcon color="primary" sx={{ fontSize: 40 }} />}
                                 />
                             </Grid>
-                            <Grid item paddingTop={2} paddingBottom={2}>
+                            <Grid item paddingTop={3}>
                                 {headerCell.map((cell) => (
                                     <TableSortLabel
                                         active={orderBy === cell.id}
                                         direction={orderBy === cell.id ? order : 'asc'}
                                         onClick={() => handleSort(cell.id)}>
-                                        {cell.label}
+                                        <Button size="small" sx={{ margin: 0, padding: 0 }}>
+                                            {cell.label}
+                                        </Button>
+
                                         {orderBy === cell.id ? (
                                             <Box component="span" sx={visuallyHidden}>
                                                 {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
