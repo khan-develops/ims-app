@@ -444,12 +444,12 @@ const StoreRoomMasterRow = ({
             <TableRow>
                 <StyledTableItemCell colSpan={columns.length + 4}>
                     <Box sx={{ width: '100%' }}>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                             <Stack direction="row">
-                                <Typography variant="subtitle2" sx={{ marginRight: 1, color: '#E30B5C' }}>
+                                <Typography variant="body2" sx={{ marginRight: 1, color: '#E30B5C' }}>
                                     Name:
                                 </Typography>
-                                <Typography variant="subtitle2"> {masterDepartmentItem.item}</Typography>
+                                <Typography variant="body2"> {masterDepartmentItem.item}</Typography>
                             </Stack>
                             {masterDepartmentItem.comment && (
                                 <Stack direction="row">
@@ -461,7 +461,7 @@ const StoreRoomMasterRow = ({
                             )}
                             {masterDepartmentItem.departmentItems[0].usageLevel && (
                                 <Stack direction="row">
-                                    <Typography variant="subtitle2" sx={{ marginRight: 1, color: '#E30B5C' }}>
+                                    <Typography variant="body2" sx={{ marginRight: 1, color: '#E30B5C' }}>
                                         Usage level:
                                     </Typography>
                                     <Typography variant="body2" sx={{ color: 'GrayText' }}>
@@ -470,14 +470,6 @@ const StoreRoomMasterRow = ({
                                 </Stack>
                             )}
                         </Box>
-                        {masterDepartmentItem.comment && (
-                            <Stack direction="row">
-                                <Typography variant="body2" sx={{ marginRight: 1, color: '#E30B5C' }}>
-                                    Comment:
-                                </Typography>{' '}
-                                <Typography variant="body2"> {masterDepartmentItem.comment}</Typography>
-                            </Stack>
-                        )}
                     </Box>
                 </StyledTableItemCell>
             </TableRow>
