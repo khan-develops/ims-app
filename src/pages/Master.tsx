@@ -21,18 +21,23 @@ import {
     TablePagination,
     Box,
     Stack,
-    ButtonGroup
+    ButtonGroup,
+    TableSortLabel
 } from '@mui/material';
 import { tableCellClasses } from '@mui/material/TableCell';
 import { IMaster } from '../app/api/properties/IMaster';
-import { filterMasterItemsThunk, getMasterItemsThunk, selectMasterItems } from '../app/slice/master/masterItemsSlice';
+import {
+    filterMasterItemsThunk,
+    getMasterItemsThunk,
+    selectMasterItems,
+    sortMasterItemsThunk
+} from '../app/slice/master/masterItemsSlice';
 import { selectSearchValue } from '../app/search';
-import { getDepartmentNamesThunk, selectDepartmentNames } from '../app/slice/departmentName/departmentNamesSlice';
+import { getDepartmentNamesThunk } from '../app/slice/departmentName/departmentNamesSlice';
 import { BottomNavigation, BottomNavigationAction } from '@mui/material';
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import DownloadIcon from '@mui/icons-material/Download';
-import { selectRequestMasterItemsPendingChecked } from '../app/slice/request/requestMasterItemsPendingCheckedSlice';
-import EditIcon from '@mui/icons-material/Edit';
+import { visuallyHidden } from '@mui/utils';
 import axios from 'axios';
 import FileSaver from 'file-saver';
 import InputBase from '@mui/material/InputBase';
@@ -41,8 +46,11 @@ import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import SearchIcon from '@mui/icons-material/Search';
 import { useLocation } from 'react-router-dom';
-import { getGrandTotalThunk, selectGrandTotal } from '../app/slice/grandTotalSlice';
-import { filterMasterDepartmentItemsThunk } from '../app/slice/master/masterDepartmentItemsSlice';
+import { getGrandTotalThunk } from '../app/slice/grandTotalSlice';
+import {
+    filterMasterDepartmentItemsThunk,
+    sortMasterDepartmentItemsThunk
+} from '../app/slice/master/masterDepartmentItemsSlice';
 import { getSearchValue } from '../app/search';
 import { deleteMasterItemThunk } from '../app/slice/master/masterItemDeleteSlice';
 import { selectMasterDrawer, toggleMasterItemDrawer } from '../app/slice/drawerToggle/masterDrawerSlice';
@@ -297,22 +305,24 @@ const MasterCardItem = ({
     );
 };
 
+type Order = 'asc' | 'desc';
+
 const Master = (): JSX.Element => {
     const masterDrawerSelector = useAppSelector(selectMasterDrawer);
     const searchValueSelector = useAppSelector(selectSearchValue);
     const masterItemsSelector = useAppSelector(selectMasterItems);
     const dispatch = useAppDispatch();
     const [page, setPage] = useState<number>(0);
-
     const [anchorElDelete, setAnchorElDelete] = useState<{ anchorEl: null | HTMLElement; masterItem: IMaster | null }>({
         anchorEl: null,
         masterItem: null
     });
     const [value, setValue] = useState<number>(0);
-    const requestMasterItemsPendingCheckedSelector = useAppSelector(selectRequestMasterItemsPendingChecked);
     const location = useLocation();
     const baseUrl = process.env.REACT_APP_BASE_URL;
     const { state } = useLocation();
+    const [order, setOrder] = useState<Order>('asc');
+    const [orderBy, setOrderBy] = useState<string>('id');
 
     const handleAddClick = () => {
         dispatch(
@@ -337,14 +347,13 @@ const Master = (): JSX.Element => {
     };
 
     useEffect(() => {
-        console.log(masterDrawerSelector);
         dispatch(getDepartmentNamesThunk());
         if (searchValueSelector && searchValueSelector.searchValue) {
             dispatch(filterMasterItemsThunk({ keyword: searchValueSelector.searchValue, page: page }));
         } else {
-            dispatch(getMasterItemsThunk(page));
+            dispatch(sortMasterItemsThunk({ page: page, column: orderBy, direction: order }));
         }
-    }, [dispatch, masterDrawerSelector, page, searchValueSelector]);
+    }, [dispatch, masterDrawerSelector, order, orderBy, page, searchValueSelector]);
 
     const handleChangePage = (event: any, newPage: number): void => {
         setPage(newPage);
@@ -388,6 +397,46 @@ const Master = (): JSX.Element => {
             dispatch(filterMasterItemsThunk({ keyword: event.target.value, page: 0 }));
         } else {
             dispatch(filterMasterDepartmentItemsThunk({ state: state, keyword: event.target.value, page: 0 }));
+        }
+    };
+
+    const handleSort = (field: string) => {
+        if (order === 'asc' && orderBy === 'id') {
+            setOrder('asc');
+            setOrderBy(field);
+            dispatch(
+                sortMasterItemsThunk({
+                    page: page,
+                    column: field,
+                    direction: 'asc'
+                })
+            )
+                .then()
+                .catch((error: Error) => console.error(error.message));
+        } else if (order === 'asc' && orderBy === field) {
+            setOrder('desc');
+            setOrderBy(field);
+            dispatch(
+                sortMasterItemsThunk({
+                    page: page,
+                    column: field,
+                    direction: 'asc'
+                })
+            )
+                .then()
+                .catch((error: Error) => console.error(error.message));
+        } else if (order === 'desc' && orderBy === field) {
+            setOrder('asc');
+            setOrderBy('id');
+            dispatch(
+                sortMasterItemsThunk({
+                    page: page,
+                    column: 'id',
+                    direction: 'asc'
+                })
+            )
+                .then(() => {})
+                .catch((error: Error) => console.error(error.message));
         }
     };
 
@@ -447,20 +496,19 @@ const Master = (): JSX.Element => {
                                 />
                             </Grid>
                             <Grid item paddingTop={2} paddingBottom={2}>
-                                <ButtonGroup size="small" variant="text">
-                                    <Button>Purchase Unit</Button>
-                                    <Button>Manufacturer</Button>
-                                    <Button>Recent Vendor</Button>
-                                    <Button>Recent CN</Button>
-                                    <Button>Part Number</Button>
-                                    <Button>Fisher CN</Button>
-                                    <Button>VWR CN</Button>
-                                    <Button>Lab Source CN</Button>
-                                    <Button>Other CN</Button>
-                                    <Button>Unit Price</Button>
-                                    <Button>Category</Button>
-                                    <Button>Drug Class</Button>
-                                </ButtonGroup>
+                                {headerCell.map((cell) => (
+                                    <TableSortLabel
+                                        active={orderBy === cell.id}
+                                        direction={orderBy === cell.id ? order : 'asc'}
+                                        onClick={() => handleSort(cell.id)}>
+                                        {cell.label}
+                                        {orderBy === cell.id ? (
+                                            <Box component="span" sx={visuallyHidden}>
+                                                {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                                            </Box>
+                                        ) : null}
+                                    </TableSortLabel>
+                                ))}
                             </Grid>
                             <Grid item alignItems="center">
                                 <TablePagination

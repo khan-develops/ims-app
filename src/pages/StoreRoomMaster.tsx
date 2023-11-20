@@ -231,6 +231,20 @@ const EnhancedTableHead = (props: EnhancedTableProps) => {
                         align={headCell.align}
                         sortDirection={orderBy === headCell.id ? order : false}>
                         <TableSortLabel
+                            sx={{
+                                '&.MuiTableSortLabel-root': {
+                                    color: 'white'
+                                },
+                                '&.MuiTableSortLabel-root:hover': {
+                                    color: 'white'
+                                },
+                                '&.Mui-active': {
+                                    color: 'white'
+                                },
+                                '& .MuiTableSortLabel-icon': {
+                                    color: 'white !important'
+                                }
+                            }}
                             active={orderBy === headCell.id}
                             direction={orderBy === headCell.id ? order : 'asc'}
                             onClick={createSortHandler(headCell.id)}>
@@ -437,14 +451,24 @@ const StoreRoomMasterRow = ({
                                 </Typography>
                                 <Typography variant="subtitle2"> {masterDepartmentItem.item}</Typography>
                             </Stack>
-                            <Stack direction="row">
-                                <Typography variant="subtitle2" sx={{ marginRight: 1, color: '#E30B5C' }}>
-                                    Usage level:
-                                </Typography>
-                                <Typography variant="body2" sx={{ color: 'GrayText' }}>
-                                    {masterDepartmentItem.departmentItems[0].usageLevel}
-                                </Typography>
-                            </Stack>
+                            {masterDepartmentItem.comment && (
+                                <Stack direction="row">
+                                    <Typography variant="body2" sx={{ marginRight: 1, color: '#E30B5C' }}>
+                                        Comment:
+                                    </Typography>{' '}
+                                    <Typography variant="body2"> {masterDepartmentItem.comment}</Typography>
+                                </Stack>
+                            )}
+                            {masterDepartmentItem.departmentItems[0].usageLevel && (
+                                <Stack direction="row">
+                                    <Typography variant="subtitle2" sx={{ marginRight: 1, color: '#E30B5C' }}>
+                                        Usage level:
+                                    </Typography>
+                                    <Typography variant="body2" sx={{ color: 'GrayText' }}>
+                                        {masterDepartmentItem.departmentItems[0].usageLevel}
+                                    </Typography>
+                                </Stack>
+                            )}
                         </Box>
                         {masterDepartmentItem.comment && (
                             <Stack direction="row">
@@ -518,22 +542,26 @@ const StoreRoomMasterRow = ({
                     />
                 </StyledTableCell>
                 <StyledTableCell width={100}>
-                    <Button
-                        fullWidth
-                        variant="outlined"
-                        disableRipple
-                        sx={{ cursor: 'default', fontWeight: '900', fontSize: 14 }}>
-                        {masterDepartmentItem.departmentItems[0].minimumQuantity}
-                    </Button>
+                    {masterDepartmentItem.departmentItems[0].minimumQuantity && (
+                        <Button
+                            fullWidth
+                            variant="outlined"
+                            disableRipple
+                            sx={{ cursor: 'default', fontWeight: '900', fontSize: 14 }}>
+                            {masterDepartmentItem.departmentItems[0].minimumQuantity}
+                        </Button>
+                    )}
                 </StyledTableCell>
                 <StyledTableCell width={100}>
-                    <Button
-                        fullWidth
-                        variant="outlined"
-                        disableRipple
-                        sx={{ cursor: 'default', fontWeight: '900', fontSize: 14 }}>
-                        {masterDepartmentItem.departmentItems[0].maximumQuantity}
-                    </Button>
+                    {masterDepartmentItem.departmentItems[0].maximumQuantity && (
+                        <Button
+                            fullWidth
+                            variant="outlined"
+                            disableRipple
+                            sx={{ cursor: 'default', fontWeight: '900', fontSize: 14 }}>
+                            {masterDepartmentItem.departmentItems[0].maximumQuantity}
+                        </Button>
+                    )}
                 </StyledTableCell>
                 <StyledTableCell width={80}>
                     {masterDepartmentItem.orderDetail && (
