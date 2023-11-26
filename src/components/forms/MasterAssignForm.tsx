@@ -1,16 +1,14 @@
-import { Box, Button, ButtonGroup, Checkbox, Divider, FormControlLabel, FormGroup } from '@mui/material';
+import { Box, Button, ButtonGroup, Checkbox, Divider, FormControlLabel, FormGroup, Grid } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { selectDepartmentNames } from '../../app/slice/departmentName/departmentNamesSlice';
 import { ChangeEvent, useState } from 'react';
 import { selectMasterDrawer, toggleMasterItemDrawer } from '../../app/slice/drawerToggle/masterDrawerSlice';
-import { useLocation } from 'react-router-dom';
-import { departmentMasterItemAssignThunk } from '../../app/slice/department/departmentMasterItemAssignSlice';
+import { assignMasterItemThunk } from '../../app/slice/master/masterItemAssignSlice';
 
 const MasterAssignForm = () => {
     const departmentNamesSelector = useAppSelector(selectDepartmentNames);
     const masterDrawerSelector = useAppSelector(selectMasterDrawer);
     const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]);
-    const location = useLocation();
     const dispatch = useAppDispatch();
 
     const handleCheckboxChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -24,9 +22,9 @@ const MasterAssignForm = () => {
     const handleSubmit = (): void => {
         if (masterDrawerSelector.masterItem) {
             dispatch(
-                departmentMasterItemAssignThunk({
-                    state: location.state,
-                    masterItemId: masterDrawerSelector.masterItem.id
+                assignMasterItemThunk({
+                    departments: selectedDepartments,
+                    id: masterDrawerSelector.masterItem.id
                 })
             )
                 .then(() => dispatch(toggleMasterItemDrawer({ toggleType: '', masterItem: null })))
@@ -35,29 +33,33 @@ const MasterAssignForm = () => {
     };
 
     return (
-        <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', flexDirection: 'column' }}>
-            <FormGroup
-                sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    padding: 4
-                }}>
-                {departmentNamesSelector.departmentNames.map((department, index) => (
-                    <FormControlLabel
-                        control={<Checkbox onChange={handleCheckboxChange} name={department.name} />}
-                        label={department.name.split('_').join(' ')}
-                        key={index}
-                    />
-                ))}
-            </FormGroup>
-            <Divider variant="middle" />
-            <ButtonGroup variant="text" fullWidth sx={{ marginTop: 2 }}>
-                <Button onClick={handleSubmit}>Submit</Button>
-                <Button onClick={() => dispatch(toggleMasterItemDrawer({ toggleType: '', masterItem: null }))}>
-                    Cancel
-                </Button>
-            </ButtonGroup>
-        </Box>
+        <Grid container direction="column" padding={1} justifyContent="space-between">
+            <Grid item sx={{ overflowY: 'auto', height: 850 }}>
+                <FormGroup
+                    sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        padding: 3,
+                        overflowY: 'scroll'
+                    }}>
+                    {departmentNamesSelector.departmentNames.map((department, index) => (
+                        <FormControlLabel
+                            control={<Checkbox onChange={handleCheckboxChange} name={department.name} />}
+                            label={department.name.split('_').join(' ')}
+                            key={index}
+                        />
+                    ))}
+                </FormGroup>
+            </Grid>
+            <Grid item>
+                <ButtonGroup variant="text" fullWidth sx={{ marginTop: 4 }}>
+                    <Button onClick={handleSubmit}>Submit</Button>
+                    <Button onClick={() => dispatch(toggleMasterItemDrawer({ toggleType: '', masterItem: null }))}>
+                        Cancel
+                    </Button>
+                </ButtonGroup>
+            </Grid>
+        </Grid>
     );
 };
 

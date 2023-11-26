@@ -60,6 +60,14 @@ export const sortMasterDepartmentItemsThunk = createAsyncThunk(
     }
 );
 
+export const getMasterDepartmentItemsMinMaxThunk = createAsyncThunk(
+    'sortMasterDepartmentItemsThunk',
+    async (params: { state: string, page: number; column: string, direction: string }) => {
+        const response = await sortMasterDepartmentItems(params);
+        return response.data;
+    }
+);
+
 export const masterDepartmentItemsSlice = createSlice({
     name: 'masterDepartmentItemsSlice',
     initialState,

@@ -35,7 +35,6 @@ import grandTotalReducer from './slice/grandTotalSlice';
 import masterItemDeleteReducer from './slice/master/masterItemDeleteSlice';
 import departmentNamesReducer from './slice/departmentName/departmentNamesSlice';
 import departmentNameCreateReducer from './slice/departmentName/departmentNameActionSlice';
-import departmentMasterItemAssignReducer from './slice/department/departmentMasterItemAssignSlice';
 import requestMasterItemsDashboardReducer from './slice/request/dashboard/requestMasterItemsDashboardSlice'
 import requestMasterItemsSelectedReducer from './slice/selectedRequests/requestMasterItemsPurchaseSelectedSlice';
 import masterDrawerReducer from './slice/drawerToggle/masterDrawerSlice';
@@ -45,6 +44,7 @@ import purchaseRequestMasterItemsReducer from './slice/request/requestMasterItem
 import requestMasterItemsPurchaseSelectedReducer from './slice/selectedRequests/requestMasterItemsPurchaseSelectedSlice';
 import requestMasterItemsPendingSelectedReducer from './slice/selectedRequests/requestMasterItemsPendingSelectedSlice';
 import requestMasterItemsCompleteSelectedReducer from './slice/selectedRequests/requestMasterItemsCompleteSelectedSlice';
+import masterItemAssignReducer from './slice/master/masterItemAssignSlice'
 
 export const store = configureStore({
     reducer: {
@@ -84,7 +84,6 @@ export const store = configureStore({
         masterItemDeleteStore: masterItemDeleteReducer,
         departmentNamesStore: departmentNamesReducer,
         departmentNameCreateStore: departmentNameCreateReducer,
-        departmentMasterItemAssignStore: departmentMasterItemAssignReducer,
         requestMasterItemsDashboardStore: requestMasterItemsDashboardReducer,
         requestMasterItemsSelectedStore: requestMasterItemsSelectedReducer,
         masterDrawerStore: masterDrawerReducer,
@@ -93,7 +92,8 @@ export const store = configureStore({
         purchaseRequestMasterItemsStore: purchaseRequestMasterItemsReducer,
         requestMasterItemsPurchaseSelectedStore: requestMasterItemsPurchaseSelectedReducer,
         requestMasterItemsPendingSelectedStore: requestMasterItemsPendingSelectedReducer,
-        requestMasterItemsCompleteSelectedStore: requestMasterItemsCompleteSelectedReducer
+        requestMasterItemsCompleteSelectedStore: requestMasterItemsCompleteSelectedReducer,
+        masterItemAssignStore: masterItemAssignReducer
     }
 });
 

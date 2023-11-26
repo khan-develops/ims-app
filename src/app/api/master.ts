@@ -19,6 +19,10 @@ export const createMasterItem = (params: { masterItem: IMaster; departments: str
     return axios.post(`${baseUrl}/master/create`, params);
 };
 
+export const assignMasterItem = (params: { id: number; departments: string[] }) => {
+    return axios.post(`${baseUrl}/master/${params.id}/assign`, params.departments);
+};
+
 export const updateMasterItem = (masterItem: IMaster) => {
     return axios.patch(`${baseUrl}/master/${masterItem.id}/update`, masterItem);
 };
@@ -37,6 +41,10 @@ export const sortMasterDepartmentItems = (params: { state: string, page: number,
 
 export const getMasterDepartmentItem = (params: { state: string; id: number }) => {
     return axios.get(`${baseUrl}/master-department/${params.state}/${params.id}`);
+};
+
+export const getMinMax = (params: { state: string; }) => {
+    return axios.get(`${baseUrl}/master-department/${params.state}/min-max`);
 };
 
 export const deleteMasterItem = (id: number) => {

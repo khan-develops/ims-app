@@ -1,11 +1,31 @@
-import { AppBar, Box, Button, Toolbar } from '@mui/material';
-import { Link, useLocation } from 'react-router-dom';
+import { AppBar, Box, Button, Menu, MenuItem, Toolbar } from '@mui/material';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import logo from '../../images/logo.png';
 import Profile from '../Profile';
+import { useState, MouseEvent } from 'react';
 
 const MenuAdmin = () => {
     const location = useLocation();
-    const { state, pathname } = location;
+    const navigate = useNavigate();
+    const { pathname } = location;
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const [currentRequest, setCurrentRequest] = useState<
+        'request' | 'general-request' | 'office-supply-request' | 'store-room-request'
+    >('request');
+    const open = Boolean(anchorEl);
+    const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = (request: 'general-request' | 'office-supply-request' | 'store-room-request') => {
+        if (request === 'general-request' || request === 'office-supply-request' || request === 'store-room-request') {
+            setCurrentRequest(request);
+            navigate(`/admin/dashboard/requests/extractions/${request}`, {
+                state: { requestCategory: 'store-room-request', view: 'admin', department: 'extractions' }
+            });
+        }
+        setAnchorEl(null);
+    };
 
     return (
         <AppBar position="static" elevation={5} color="primary">
@@ -124,39 +144,35 @@ const MenuAdmin = () => {
                         state="qc-qa">
                         qc-qa
                     </Button>
-                    <Button
-                        size="small"
-                        sx={{
-                            color: state && state.requestCategory === 'general-request' ? 'yellow' : '#fff',
-                            fontWeight: '700'
-                        }}
-                        component={Link}
-                        to="/admin/dashboard/requests/extractions/general-request"
-                        state={{ requestCategory: 'general-request', view: 'admin', department: 'extractions' }}>
-                        general
-                    </Button>
-                    <Button
-                        size="small"
-                        sx={{
-                            color: state && state.requestCategory === 'office-supply-request' ? 'yellow' : '#fff',
-                            fontWeight: '700'
-                        }}
-                        component={Link}
-                        to="/admin/dashboard/requests/extractions/office-supply-request"
-                        state={{ requestCategory: 'office-supply-request', view: 'admin', department: 'extractions' }}>
-                        office supply
-                    </Button>
-                    <Button
-                        size="small"
-                        sx={{
-                            color: state && state.requestCategory === 'store-room-request' ? 'yellow' : '#fff',
-                            fontWeight: '700'
-                        }}
-                        component={Link}
-                        to="/admin/dashboard/requests/extractions/store-room-request"
-                        state={{ requestCategory: 'store-room-request', view: 'admin', department: 'extractions' }}>
-                        store room
-                    </Button>
+                    <div>
+                        <Button
+                            color="inherit"
+                            sx={{
+                                fontWeight: '700'
+                            }}
+                            size="small"
+                            id="basic-button"
+                            aria-controls={anchorEl ? 'basic-menu' : undefined}
+                            aria-haspopup="true"
+                            aria-expanded={anchorEl ? 'true' : undefined}
+                            onClick={handleClick}>
+                            {currentRequest}
+                        </Button>
+                        <Menu
+                            id="basic-menu"
+                            anchorEl={anchorEl}
+                            open={open}
+                            onClose={handleClose}
+                            MenuListProps={{
+                                'aria-labelledby': 'basic-button'
+                            }}>
+                            <MenuItem onClick={() => handleClose('general-request')}>General Request</MenuItem>
+                            <MenuItem onClick={() => handleClose('office-supply-request')}>
+                                Office Supply Request
+                            </MenuItem>
+                            <MenuItem onClick={() => handleClose('store-room-request')}>Store Room Request</MenuItem>
+                        </Menu>
+                    </div>
                     <Button
                         size="small"
                         variant="contained"

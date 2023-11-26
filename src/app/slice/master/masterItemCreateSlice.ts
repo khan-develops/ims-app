@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../../store';
 import { IMaster } from '../../api/properties/IMaster';
 import { createMasterItem } from '../../api/master';
@@ -30,9 +30,9 @@ export const masterItemCreateSlice = createSlice({
             .addCase(createMasterItemThunk.pending, (state) => {
                 state.status = 'loading';
             })
-            .addCase(createMasterItemThunk.fulfilled, (state, action) => {
+            .addCase(createMasterItemThunk.fulfilled, (state, action: PayloadAction<MasterItemState>) => {
                 state.status = 'success';
-                state.masterItem = action.payload;
+                state.masterItem = action.payload.masterItem;
             })
             .addCase(createMasterItemThunk.rejected, (state) => {
                 state.status = 'failed';

@@ -27,9 +27,9 @@ export const getDepartmentMasterItems = (params: { state: string; page: number }
     return axios.get(`${baseUrl}/department-master/${params.state}/list?page=${params.page}`);
 };
 
-export const assignDepartmentMasterItem = (params: { state: string; masterItemId: number }) => {
-    return axios.post(`${baseUrl}/department-master/${params.state}/${params.masterItemId}/assign`);
-};
+// export const assignDepartmentMasterItem = (params: { departments: string[]; masterItemId: number }) => {
+//     return axios.post(`${baseUrl}/department-master/${params.masterItemId}/assign`, params.departments);
+// };
 
 export const getGrandTotal = (state: string) => {
     return axios.get(`${baseUrl}/department-master/${state}/grand-total`);
