@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { RootState } from '../../store';
 import { IMasterDepartment } from '../../api/properties/IMaster';
-import { getMasterDepartmentItem } from '../../api/master';
+import { getMasterDepartmentItem, updateQuantityDepartmentItem } from '../../api/master';
 
 export interface MasterDepartmentItemState {
     response: IMasterDepartment | null;
@@ -17,6 +17,14 @@ export const getMasterDepartmentItemThunk = createAsyncThunk(
     'getMasterDepartmentItemThunk',
     async (params: { state: string; id: number }) => {
         const response = await getMasterDepartmentItem(params);
+        return response.data;
+    }
+);
+
+export const updateQuantityDepartmentItemThunk = createAsyncThunk(
+    'updateQuantityDepartmentItemThunk',
+    async (params: { department: string; quantity: number, masterId: number, departmentId: number, updateAction: string }) => {
+        const response = await updateQuantityDepartmentItem(params);
         return response.data;
     }
 );
@@ -38,6 +46,15 @@ export const masterDepartmentItemSlice = createSlice({
                 state.response = action.payload;
             })
             .addCase(getMasterDepartmentItemThunk.rejected, (state) => {
+                state.status = 'failed';
+            })
+            .addCase(updateQuantityDepartmentItemThunk.pending, (state) => {
+                state.status = 'loading';
+            })
+            .addCase(updateQuantityDepartmentItemThunk.fulfilled, (state, action) => {
+                state.response = action.payload;
+            })
+            .addCase(updateQuantityDepartmentItemThunk.rejected, (state) => {
                 state.status = 'failed';
             });
     }

@@ -40,10 +40,7 @@ import {
     sortMasterDepartmentItemsThunk
 } from '../app/slice/master/masterDepartmentItemsSlice';
 import { IDepartment } from '../app/api/properties/IDepartment';
-import {
-    updateDepartmentItemQuantityThunk,
-    updateDepartmentItemThunk
-} from '../app/slice/department/departmentItemUpdateSlice';
+import { updateDepartmentItemThunk } from '../app/slice/department/departmentItemUpdateSlice';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { IMaster, IMasterDepartment } from '../app/api/properties/IMaster';
@@ -60,6 +57,7 @@ import { IOrderDetail } from '../app/api/properties/IOrderDetail';
 import { visuallyHidden } from '@mui/utils';
 import { toggleDepartmentItemDrawer } from '../app/slice/drawerToggle/departmentDrawerSlice';
 import { getGrandTotalThunk, selectGrandTotal } from '../app/slice/grandTotalSlice';
+import { updateQuantityDepartmentItemThunk } from '../app/slice/master/masterDepartmentItemSlice';
 
 const columns: {
     id: keyof IMaster | keyof IOrderDetail;
@@ -288,9 +286,12 @@ const DepartmentRow = ({
             };
             if (updateAction.action === '') {
                 dispatch(
-                    updateDepartmentItemThunk({
-                        state: location.state,
-                        departmentItem: departmentItem
+                    updateQuantityDepartmentItemThunk({
+                        department: location.state,
+                        quantity: departmentItem.quantity,
+                        masterId: masterDepartmentItem.id,
+                        departmentId: departmentItem.id,
+                        updateAction: ''
                     })
                 )
                     .then(() => {
@@ -320,10 +321,11 @@ const DepartmentRow = ({
                     });
             } else {
                 dispatch(
-                    updateDepartmentItemQuantityThunk({
-                        state: location.state,
-                        departmentItemId: departmentItem.id,
+                    updateQuantityDepartmentItemThunk({
+                        department: location.state,
                         quantity: parseInt((event.target as HTMLInputElement).value),
+                        masterId: masterDepartmentItem.id,
+                        departmentId: departmentItem.id,
                         updateAction: updateAction.action
                     })
                 )
@@ -619,7 +621,7 @@ const MasterDepartmentRow = ({
                     )}
                 </StyledTableCell>
                 <StyledTableCell width={80}>
-                    {masterDepartmentItem.orderDetail && (
+                    {masterDepartmentItem.departmentItems[0].maximumQuantity !== null ? (
                         <Button
                             fullWidth
                             disableElevation
@@ -627,9 +629,19 @@ const MasterDepartmentRow = ({
                             color={getOrderQuantityColor(masterDepartmentItem)}
                             disableRipple
                             sx={{ cursor: 'default', fontWeight: 900, fontSize: 14 }}>
-                            {masterDepartmentItem.orderDetail.totalQuantity}
+                            {masterDepartmentItem.orderDetail.orderQuantity}
                         </Button>
+                    ) : (
+                        <Typography>No</Typography>
                     )}
+
+                    {/* {(masterDepartmentItem.departmentItems[0].maximumQuantity &&
+                    masterDepartmentItem.departmentItems[0].minimumQuantity &&
+                    masterDepartmentItem.orderDetail) ? 
+                      
+                     : 
+                        <Box>NO<Box/>
+                        } */}
                 </StyledTableCell>
                 <StyledTableCell>
                     <Button

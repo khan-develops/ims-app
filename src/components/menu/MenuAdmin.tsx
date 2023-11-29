@@ -10,8 +10,8 @@ const MenuAdmin = () => {
     const { pathname } = location;
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [currentRequest, setCurrentRequest] = useState<
-        'request' | 'general-request' | 'office-supply-request' | 'store-room-request'
-    >('request');
+        'requests' | 'general-request' | 'office-supply-request' | 'store-room-request'
+    >('requests');
     const open = Boolean(anchorEl);
     const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
         setAnchorEl(event.currentTarget);
@@ -144,6 +144,17 @@ const MenuAdmin = () => {
                         state="qc-qa">
                         qc-qa
                     </Button>
+                    <Button
+                        size="small"
+                        sx={{
+                            color: pathname === '/departments/min-max' ? 'yellow' : '#fff',
+                            fontWeight: '700'
+                        }}
+                        component={Link}
+                        to="/admin/dashboard/min-max"
+                        state="min-max">
+                        min/max
+                    </Button>
                     <div>
                         <Button
                             color="inherit"
@@ -174,6 +185,7 @@ const MenuAdmin = () => {
                         </Menu>
                     </div>
                     <Button
+                        sx={{ marginLeft: 2 }}
                         size="small"
                         variant="contained"
                         color="warning"

@@ -12,12 +12,14 @@ import Auth from './pages/Auth';
 import RequestMasterItems from './components/requests/RequestMasterItemsPurchase';
 import RequestMasterComplete from './components/requests/RequestMasterItemsComplete';
 import RequestMasterPending from './components/requests/RequestMasterItemsPending';
+import MinMaxItems from './pages/MinMaxItems';
 
 const router = createBrowserRouter(
     createRoutesFromElements(
         <Route path="/" element={<Layout />}>
             <Route path="admin">
                 <Route path="dashboard">
+                    <Route path="min-max" element={<MinMaxItems />} />
                     <Route path="access-manager" element={<Dashboard />} />
                     <Route path="requests">
                         <Route path="mass-spec">
