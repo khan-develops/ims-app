@@ -7,6 +7,10 @@ export const getRequestMasterItemsPurchase = (params: { requestCategory: string,
     return axios.get(`${baseUrl}/requests/${params.requestCategory}/list?page=${params.page}`);
 };
 
+export const getMinmaxOrders = (params: { department: string, page: number }) => {
+    return axios.get(`${baseUrl}/master-department/minmaxorder-${params.department}/list?page=${params.page}`);
+};
+
 export const sortRequestMasterItemsPurchase = (params: { requestCategory: string, page: number, column: string, direction: string }) => {
     return axios.get(`${baseUrl}/requests/${params.requestCategory}/sort?page=${params.page}&column=${params.column}&direction=${params.direction}`);
 };

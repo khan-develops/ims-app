@@ -247,9 +247,9 @@ const DepartmentRow = ({
     const dispatch = useAppDispatch();
     const location = useLocation();
     const [updateAction, setUpdateAction] = useState<{
-        action: 'received' | 'issued' | '';
+        action: 'received' | 'issued' | 'direct';
         position: 'center' | 'left' | 'right';
-    }>({ action: '', position: 'center' });
+    }>({ action: 'direct', position: 'center' });
     const inputRef = useRef<{
         location: HTMLDivElement | null;
         maximumQuantity: HTMLDivElement | null;
@@ -284,17 +284,30 @@ const DepartmentRow = ({
                 ...departmentItem,
                 [(event.target as HTMLInputElement).name]: (event.target as HTMLInputElement).value
             };
-            if (updateAction.action === '') {
+            if (updateAction.action === 'direct') {
                 dispatch(
                     updateQuantityDepartmentItemThunk({
                         department: location.state,
                         quantity: departmentItem.quantity,
                         masterId: masterDepartmentItem.id,
                         departmentId: departmentItem.id,
-                        updateAction: ''
+                        updateAction: 'direct'
                     })
                 )
-                    .then(() => {
+                    .then((response) => {
+                        console.log(response);
+                        dispatch(
+                            changeMasterDepartmentItems(
+                                masterDepartmentItemsSelector.response.content.map((originalMasterDepartmentItem) => ({
+                                    ...originalMasterDepartmentItem,
+                                    orderDetail:
+                                        originalMasterDepartmentItem.id === masterDepartmentItem.id
+                                            ? response.payload.orderDetail
+                                            : originalMasterDepartmentItem.orderDetail
+                                }))
+                            )
+                        );
+
                         inputRef.current.quantity = ref;
                         if (ref) {
                             ref.style.backgroundColor = '#98FB98';
@@ -330,12 +343,28 @@ const DepartmentRow = ({
                     })
                 )
                     .then((response) => {
+                        dispatch(
+                            changeMasterDepartmentItems(
+                                masterDepartmentItemsSelector.response.content.map((originalMasterDepartmentItem) => ({
+                                    ...originalMasterDepartmentItem,
+                                    departmentItems:
+                                        originalMasterDepartmentItem.id === masterDepartmentItem.id
+                                            ? originalMasterDepartmentItem.departmentItems.map(
+                                                  (originalDepartmentItem) => ({
+                                                      ...originalDepartmentItem,
+                                                      quantity: departmentItem.quantity
+                                                  })
+                                              )
+                                            : originalMasterDepartmentItem.departmentItems
+                                }))
+                            )
+                        );
                         if (inputRef && inputRef.current && inputRef.current.quantity) {
                             inputRef.current.quantity.value = response.payload.quantity;
                             inputRef.current.quantity?.blur();
                         }
                         setUpdateAction({
-                            action: '',
+                            action: 'direct',
                             position: 'center'
                         });
                     })
@@ -413,7 +442,7 @@ const DepartmentRow = ({
 
     const handleDeleteClick = (event: MouseEvent<HTMLElement>, masterDepartmentItem: IMasterDepartment) => {};
 
-    const handleIssuedReceived = (actionType: 'issued' | 'received' | '') => {
+    const handleIssuedReceived = (actionType: 'issued' | 'received' | 'direct') => {
         if (inputRef && inputRef.current && inputRef.current.quantity) {
             inputRef.current.quantity?.focus();
             inputRef.current.quantity.value = '';
@@ -437,7 +466,7 @@ const DepartmentRow = ({
             inputRef.current.quantity?.blur();
         }
         setUpdateAction({
-            action: '',
+            action: 'direct',
             position: 'center'
         });
     };

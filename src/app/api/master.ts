@@ -29,29 +29,29 @@ export const updateMasterItem = (masterItem: IMaster) => {
 
 
 export const updateQuantityDepartmentItem = (params: { department: string, quantity: number, masterId: number, departmentId: number, updateAction: string }) => {
-    return axios.patch(`${baseUrl}/master-department/${params.department}/update-quantity?quantity=${params.quantity}&masterIte=${params.masterId}&departmentId=${params.departmentId}&updateAction=${params.updateAction}`);
+    return axios.patch(`${baseUrl}/master-department/${params.department}/update-quantity?quantity=${params.quantity}&masterId=${params.masterId}&departmentId=${params.departmentId}&updateAction=${params.updateAction}`);
 };
 
 export const getMasterDepartmentItems = (params: { state: string; page: number }) => {
-    return axios.get(`${baseUrl} / master - department / ${params.state} / list ? page = ${params.page}`);
+    return axios.get(`${baseUrl}/master-department/${params.state}/list?page=${params.page}`);
 };
 
 export const filterMasterDepartmentItems = (params: { state: string, keyword: string; page: number }) => {
-    return axios.get(`${baseUrl} / master - department / ${params.state} / filter ? keyword = ${params.keyword} & page=${params.page}`);
+    return axios.get(`${baseUrl}/master-department/${params.state}/filter?keyword=${params.keyword}&page=${params.page}`);
 };
 
 export const sortMasterDepartmentItems = (params: { state: string, page: number, column: string, direction: string }) => {
-    return axios.get(`${baseUrl} / master - department / ${params.state} / sort ? page = ${params.page} & column=${params.column} & direction=${params.direction}`);
+    return axios.get(`${baseUrl}/master-department/${params.state}/sort?page = ${params.page}&column=${params.column}&direction=${params.direction}`);
 };
 
 export const getMasterDepartmentItem = (params: { state: string; id: number }) => {
-    return axios.get(`${baseUrl} / master - department / ${params.state} / ${params.id}`);
+    return axios.get(`${baseUrl}/master - department/${params.state}/${params.id}`);
 };
 
 export const getMinMax = (params: { state: string; }) => {
-    return axios.get(`${baseUrl} / master - department / ${params.state} / min - max`);
+    return axios.get(`${baseUrl}/master-department/${params.state}/min-max`);
 };
 
 export const deleteMasterItem = (id: number) => {
-    return axios.delete(`${baseUrl} / master / ${id} / delete `)
+    return axios.delete(`${baseUrl}/master/${id}/delete `)
 }

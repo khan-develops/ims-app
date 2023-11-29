@@ -45,6 +45,7 @@ import requestMasterItemsPurchaseSelectedReducer from './slice/selectedRequests/
 import requestMasterItemsPendingSelectedReducer from './slice/selectedRequests/requestMasterItemsPendingSelectedSlice';
 import requestMasterItemsCompleteSelectedReducer from './slice/selectedRequests/requestMasterItemsCompleteSelectedSlice';
 import masterItemAssignReducer from './slice/master/masterItemAssignSlice'
+import minMaxOrdersReducer from './slice/orders/minMaxOrdersSlice'
 
 export const store = configureStore({
     reducer: {
@@ -93,7 +94,8 @@ export const store = configureStore({
         requestMasterItemsPurchaseSelectedStore: requestMasterItemsPurchaseSelectedReducer,
         requestMasterItemsPendingSelectedStore: requestMasterItemsPendingSelectedReducer,
         requestMasterItemsCompleteSelectedStore: requestMasterItemsCompleteSelectedReducer,
-        masterItemAssignStore: masterItemAssignReducer
+        masterItemAssignStore: masterItemAssignReducer,
+        minMaxOrdersStore: minMaxOrdersReducer
     }
 });
 

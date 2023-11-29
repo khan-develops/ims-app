@@ -51,6 +51,8 @@ import {
 import { toggleMasterItemDrawer } from '../app/slice/drawerToggle/masterDrawerSlice';
 import { toggleRequestItemDrawer } from '../app/slice/drawerToggle/requestDrawerSlice';
 import { selectProfileDetail } from '../app/slice/profileDetail/profileDetailSlice';
+import { getMinMaxOrdersThunk, selectMinMaxOrders } from '../app/slice/orders/minMaxOrdersSlice';
+import { IMinMaxMasterOrder } from '../app/api/properties/IMinMaxOrder';
 
 const baseUrl = process.env.REACT_APP_BASE_URL;
 
@@ -125,17 +127,17 @@ const columns: {
         size: 100
     },
     {
-        id: 'quantity',
-        numeric: true,
-        label: 'Quantity',
-        align: 'center',
+        id: 'recentVendor',
+        numeric: false,
+        label: 'Recent Vendor',
+        align: 'left',
         padding: 'normal',
-        size: 80
+        size: 100
     },
     {
-        id: 'confirmation',
+        id: 'quantity',
         numeric: true,
-        label: 'Confirmation',
+        label: 'Order Quantity',
         align: 'center',
         padding: 'normal',
         size: 80
@@ -173,14 +175,6 @@ const columns: {
         size: 80
     },
     {
-        id: 'requester',
-        numeric: true,
-        label: 'Requester',
-        align: 'center',
-        padding: 'normal',
-        size: 80
-    },
-    {
         id: 'customText',
         numeric: true,
         label: 'Custom Text',
@@ -192,6 +186,14 @@ const columns: {
         id: 'customDetail',
         numeric: true,
         label: 'Detail',
+        align: 'center',
+        padding: 'normal',
+        size: 80
+    },
+    {
+        id: 'comment',
+        numeric: true,
+        label: 'Comment',
         align: 'center',
         padding: 'normal',
         size: 80
@@ -252,8 +254,8 @@ const EnhancedTableHead = (props: EnhancedTableProps) => {
     );
 };
 
-const RequestMasterDashboardRow = ({ requestMasterItem }: { requestMasterItem: IRequestMaster }) => {
-    const requestMasterItemsDashboardSelector = useAppSelector(selectRequestMasterDashboardItems);
+const RequestMasterDashboardRow = ({ minMaxOrder }: { minMaxOrder: IMinMaxMasterOrder }) => {
+    const minMaxOrdersSelector = useAppSelector(selectMinMaxOrders);
     const profileDetailSelector = useAppSelector(selectProfileDetail);
     const dispatch = useAppDispatch();
     const location = useLocation();
@@ -261,40 +263,39 @@ const RequestMasterDashboardRow = ({ requestMasterItem }: { requestMasterItem: I
     const { state } = location;
 
     const handleStatusChange = (event: SelectChangeEvent, id: number) => {
-        dispatch(
-            changeRequestMasterItemsDashboard(
-                requestMasterItemsDashboardSelector.response.content.map((item) => ({
-                    ...item,
-                    status: item.id === id ? event.target.value : item.confirmation
-                }))
-            )
-        );
+        // dispatch(
+        //     changeRequestMasterItemsDashboard(
+        //         minMaxOrdersSelector.response.content.map((item) => ({
+        //             ...item,
+        //             status: item.id === id ? event.target.value : item.confirmation
+        //         }))
+        //     )
+        // );
     };
 
     const handleDetailChange = (event: ChangeEvent<HTMLInputElement>, id: number) => {
-        dispatch(
-            changeRequestMasterItemsDashboard(
-                requestMasterItemsDashboardSelector.response.content.map((item) => ({
-                    ...item,
-                    detail: item.id === id ? event.target.value : item.confirmation
-                }))
-            )
-        );
+        // dispatch(
+        //     changeRequestMasterItemsDashboard(
+        //         minMaxOrdersSelector.response.content.map((item) => ({
+        //             ...item,
+        //             detail: item.id === id ? event.target.value : item.confirmation
+        //         }))
+        //     )
+        // );
     };
 
-    const handleEnterKey = (event: KeyboardEvent, requestMasterItem: IRequestMaster) => {
-        dispatch(
-            updateRequestMasterItemThunk({
-                department: profileDetailSelector.profileDetail.department.toLowerCase().replace('_', '-'),
-                requestCategory: state.requestCategory,
-                requestMasterItem: requestMasterItem
-            })
-        );
+    const handleEnterKey = (event: KeyboardEvent, minMaxOrder: IMinMaxMasterOrder) => {
+        // dispatch(
+        //     updateRequestMasterItemThunk({
+        //         department: profileDetailSelector.profileDetail.department.toLowerCase().replace('_', '-'),
+        //         requestCategory: state.requestCategory,
+        //         requestMasterItem: requestMasterItem
+        //     })
+        // );
     };
     return (
         <TableRow>
-            <StyledTableCell>{requestMasterItem.masterItem.item}</StyledTableCell>
-            <StyledTableCell>{requestMasterItem.recentCN && requestMasterItem.recentCN}</StyledTableCell>
+            <StyledTableCell>{minMaxOrder.masterItem.item}</StyledTableCell>
             <StyledTableCell>
                 <Button
                     fullWidth
@@ -302,35 +303,20 @@ const RequestMasterDashboardRow = ({ requestMasterItem }: { requestMasterItem: I
                     variant="outlined"
                     disableRipple
                     sx={{ cursor: 'default', fontWeight: 900, fontSize: 14 }}>
-                    {requestMasterItem.quantity}
+                    {minMaxOrder.quantity}
                 </Button>
             </StyledTableCell>
-            <StyledTableCell>
-                <FormControl fullWidth>
-                    <Select
-                        size="small"
-                        name="confirmation"
-                        value={requestMasterItem.confirmation}
-                        onChange={(event: SelectChangeEvent) => handleStatusChange(event, requestMasterItem.id)}>
-                        {Object.values(STATUS).map((status, index) => (
-                            <MenuItem key={index} value={status}>
-                                <Typography sx={{ fontSize: '10pt' }}>{status}</Typography>
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
-            </StyledTableCell>
-            <StyledTableCell>{moment(requestMasterItem.timeRequested).format('MM/DD/YYYY')}</StyledTableCell>
-            <StyledTableCell>{moment(requestMasterItem.timeUpdated).format('MM/DD/YYYY')}</StyledTableCell>
-            <StyledTableCell>{requestMasterItem.department}</StyledTableCell>
-            <StyledTableCell>{requestMasterItem.customText}</StyledTableCell>
+            <StyledTableCell>{moment(minMaxOrder.timeRequested).format('MM/DD/YYYY')}</StyledTableCell>
+            <StyledTableCell>{moment(minMaxOrder.timeUpdated).format('MM/DD/YYYY')}</StyledTableCell>
+            <StyledTableCell>{minMaxOrder.department}</StyledTableCell>
+            <StyledTableCell>{minMaxOrder.customText}</StyledTableCell>
             <StyledTableCell>
                 <TextField
                     size="small"
                     variant="outlined"
-                    value={requestMasterItem.customDetail}
-                    onChange={(event: ChangeEvent<HTMLInputElement>) => handleDetailChange(event, requestMasterItem.id)}
-                    onKeyDown={(event: KeyboardEvent) => handleEnterKey(event, requestMasterItem)}
+                    value={minMaxOrder.customDetail}
+                    onChange={(event: ChangeEvent<HTMLInputElement>) => handleDetailChange(event, minMaxOrder.id)}
+                    onKeyDown={(event: KeyboardEvent) => handleEnterKey(event, minMaxOrder)}
                 />
             </StyledTableCell>
         </TableRow>
@@ -338,7 +324,7 @@ const RequestMasterDashboardRow = ({ requestMasterItem }: { requestMasterItem: I
 };
 
 const MinMaxItems = (): JSX.Element => {
-    const requestMasterItemsDashboardSelector = useAppSelector(selectRequestMasterDashboardItems);
+    const minMaxOrdersSelector = useAppSelector(selectMinMaxOrders);
     const profileDetailSelector = useAppSelector(selectProfileDetail);
     const dispatch = useAppDispatch();
     const [page, setPage] = useState<number>(0);
@@ -351,9 +337,8 @@ const MinMaxItems = (): JSX.Element => {
 
     useEffect(() => {
         dispatch(
-            getRequestMasterItemsDashboardThunk({
+            getMinMaxOrdersThunk({
                 department: state.department,
-                requestCategory: state.requestCategory,
                 page: page
             })
         );
@@ -515,15 +500,10 @@ const MinMaxItems = (): JSX.Element => {
                         <Table stickyHeader>
                             <EnhancedTableHead order={order} orderBy={orderBy} onRequestSort={handleRequestSort} />
                             <TableBody>
-                                {requestMasterItemsDashboardSelector.response.content.length > 0 &&
-                                    requestMasterItemsDashboardSelector.response.content.map(
-                                        (requestMasterItem, index) => (
-                                            <RequestMasterDashboardRow
-                                                requestMasterItem={requestMasterItem}
-                                                key={index}
-                                            />
-                                        )
-                                    )}
+                                {minMaxOrdersSelector.response.content.length > 0 &&
+                                    minMaxOrdersSelector.response.content.map((minMaxOrder, index) => (
+                                        <RequestMasterDashboardRow minMaxOrder={minMaxOrder} key={index} />
+                                    ))}
                             </TableBody>
                         </Table>
                     </TableContainer>
@@ -551,9 +531,9 @@ const MinMaxItems = (): JSX.Element => {
                                     sx={{ marginTop: 1 }}
                                     rowsPerPageOptions={[]}
                                     component="div"
-                                    count={requestMasterItemsDashboardSelector.response.totalElements}
-                                    rowsPerPage={requestMasterItemsDashboardSelector.response.size}
-                                    page={requestMasterItemsDashboardSelector.response.number}
+                                    count={minMaxOrdersSelector.response.totalElements}
+                                    rowsPerPage={minMaxOrdersSelector.response.size}
+                                    page={minMaxOrdersSelector.response.number}
                                     onPageChange={handleChangePage}
                                     showFirstButton={true}
                                     showLastButton={true}
