@@ -147,12 +147,12 @@ const MenuAdmin = () => {
                     <Button
                         size="small"
                         sx={{
-                            color: pathname === '/departments/min-max' ? 'yellow' : '#fff',
+                            color: pathname === '/departments/min-max-order/extractions' ? 'yellow' : '#fff',
                             fontWeight: '700'
                         }}
                         component={Link}
-                        to="/admin/dashboard/min-max"
-                        state="min-max">
+                        to="/admin/dashboard/min-max-order/extractions"
+                        state={{ department: 'extractions' }}>
                         min/max
                     </Button>
                     <div>

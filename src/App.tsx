@@ -19,7 +19,17 @@ const router = createBrowserRouter(
         <Route path="/" element={<Layout />}>
             <Route path="admin">
                 <Route path="dashboard">
-                    <Route path="min-max" element={<MinMaxItems />} />
+                    <Route path="min-max-order">
+                        <Route path="extractions" element={<MinMaxItems />} />
+                        <Route path="mass-spec" element={<MinMaxItems />} />
+                        <Route path="processing-lab" element={<MinMaxItems />} />
+                        <Route path="rd" element={<MinMaxItems />} />
+                        <Route path="screening" element={<MinMaxItems />} />
+                        <Route path="shipping" element={<MinMaxItems />} />
+                        <Route path="shipping" element={<MinMaxItems />} />
+                        <Route path="qc-internal-standards" element={<MinMaxItems />} />
+                        <Route path="qc-qa" element={<MinMaxItems />} />
+                    </Route>
                     <Route path="access-manager" element={<Dashboard />} />
                     <Route path="requests">
                         <Route path="mass-spec">

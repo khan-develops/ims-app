@@ -658,7 +658,7 @@ const MasterDepartmentRow = ({
                             color={getOrderQuantityColor(masterDepartmentItem)}
                             disableRipple
                             sx={{ cursor: 'default', fontWeight: 900, fontSize: 14 }}>
-                            {masterDepartmentItem.orderDetail.orderQuantity}
+                            {masterDepartmentItem.orderDetail && masterDepartmentItem.orderDetail.orderQuantity}
                         </Button>
                     ) : (
                         <Typography>No</Typography>

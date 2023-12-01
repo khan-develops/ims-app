@@ -485,9 +485,8 @@ const MinMaxItems = (): JSX.Element => {
                                 <Tab
                                     label={department.label}
                                     component={Link}
-                                    to={`/admin/dashboard/requests/${department.value}/${state.requestCategory}`}
+                                    to={`/admin/dashboard/min-max-order/${department.value}`}
                                     state={{
-                                        requestCategory: state.requestCategory,
                                         department: department.value,
                                         tabIndex: 0
                                     }}
