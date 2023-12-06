@@ -21,7 +21,6 @@ import {
     TablePagination,
     Box,
     Stack,
-    ButtonGroup,
     TableSortLabel
 } from '@mui/material';
 import { tableCellClasses } from '@mui/material/TableCell';
@@ -47,10 +46,7 @@ import Toolbar from '@mui/material/Toolbar';
 import SearchIcon from '@mui/icons-material/Search';
 import { useLocation } from 'react-router-dom';
 import { getGrandTotalThunk } from '../app/slice/grandTotalSlice';
-import {
-    filterMasterDepartmentItemsThunk,
-    sortMasterDepartmentItemsThunk
-} from '../app/slice/master/masterDepartmentItemsSlice';
+import { filterMasterDepartmentItemsThunk } from '../app/slice/master/masterDepartmentItemsSlice';
 import { getSearchValue } from '../app/search';
 import { deleteMasterItemThunk } from '../app/slice/master/masterItemDeleteSlice';
 import { selectMasterDrawer, toggleMasterItemDrawer } from '../app/slice/drawerToggle/masterDrawerSlice';
