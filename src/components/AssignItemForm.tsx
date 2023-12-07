@@ -2,7 +2,7 @@ import { Box, Button, Checkbox, FormControlLabel, FormGroup, Grid } from '@mui/m
 import { useState, ChangeEvent } from 'react';
 import { DEPARTMENT } from '../common/constants';
 import { useAppDispatch } from '../app/hooks';
-import { toggleMasterItemDrawer } from '../app/slice/drawerToggle/masterDrawerSlice';
+import { toggleMasterDrawer } from '../app/slice/drawerToggle/masterDrawerSlice';
 
 const AssignItemForm = () => {
     const dispatch = useAppDispatch();
@@ -22,7 +22,7 @@ const AssignItemForm = () => {
     };
 
     const handleCancel = () => {
-        dispatch(toggleMasterItemDrawer({ toggleType: '', masterItem: null }));
+        dispatch(toggleMasterDrawer({ drawerType: '', masterItem: null }));
     };
 
     return (

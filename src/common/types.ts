@@ -1,10 +1,10 @@
-export type drawer_toggle_type =
+export type DrawerType =
   'UPDATE_QUANTITY' |
   'UPDATE_REQUEST_REVIEW' |
   'UPDATE_REQUEST_EDIT' |
   'ADD_MASTER_ITEM' |
   'UPDATE_MASTER_ITEM' |
-  'ASSIGN_MASTER_ITE' |
+  'ASSIGN_MASTER_ITEM' |
   'UPDATE_DEPARTMENT_ITEM' |
   'UPDATE_STORE_ROOM_ITEM' |
   ''

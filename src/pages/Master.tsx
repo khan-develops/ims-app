@@ -49,7 +49,7 @@ import { getGrandTotalThunk } from '../app/slice/grandTotalSlice';
 import { filterMasterDepartmentItemsThunk } from '../app/slice/master/masterDepartmentItemsSlice';
 import { getSearchValue } from '../app/search';
 import { deleteMasterItemThunk } from '../app/slice/master/masterItemDeleteSlice';
-import { selectMasterDrawer, toggleMasterItemDrawer } from '../app/slice/drawerToggle/masterDrawerSlice';
+import { selectMasterDrawer, toggleMasterDrawer } from '../app/slice/drawerToggle/masterDrawerSlice';
 
 const headerCell: {
     id: keyof IMaster;
@@ -183,7 +183,6 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
-        backgroundColor: '#f9f9f9',
         fontSize: 12,
         fontWeight: 700,
         color: theme.palette.common.black,
@@ -215,15 +214,15 @@ const MasterCardItem = ({
 
     const handleEditAction = (masterItem: IMaster) => {
         dispatch(
-            toggleMasterItemDrawer({
-                toggleType: 'MASTER_UPDATE',
+            toggleMasterDrawer({
+                drawerType: 'UPDATE_MASTER_ITEM',
                 masterItem: masterItem
             })
         );
     };
 
     const handleAssign = () => {
-        dispatch(toggleMasterItemDrawer({ toggleType: 'MASTER_ASSIGN', masterItem: masterItem }));
+        dispatch(toggleMasterDrawer({ drawerType: 'ASSIGN_MASTER_ITEM', masterItem: masterItem }));
     };
 
     return (
@@ -322,15 +321,15 @@ const Master = (): JSX.Element => {
 
     const handleAddClick = () => {
         dispatch(
-            toggleMasterItemDrawer({
-                toggleType: 'MASTER_ADD',
+            toggleMasterDrawer({
+                drawerType: 'ADD_MASTER_ITEM',
                 masterItem: null
             })
         );
     };
 
     const handleEditClick = () => {
-        dispatch(toggleMasterItemDrawer({ toggleType: 'MASTER_UPDATE', masterItem: null }));
+        dispatch(toggleMasterDrawer({ drawerType: 'UPDATE_MASTER_ITEM', masterItem: null }));
     };
 
     const handleDownloadClick = () => {
@@ -397,6 +396,10 @@ const Master = (): JSX.Element => {
     };
 
     const handleSort = (field: string) => {
+        if (orderBy !== 'id' && field !== orderBy) {
+            setOrder('asc');
+            setOrderBy(field);
+        }
         if (order === 'asc' && orderBy === 'id') {
             setOrder('asc');
             setOrderBy(field);
@@ -491,23 +494,84 @@ const Master = (): JSX.Element => {
                                     icon={<AddBoxIcon color="primary" sx={{ fontSize: 40 }} />}
                                 />
                             </Grid>
-                            <Grid item paddingTop={3}>
-                                {headerCell.map((cell) => (
-                                    <TableSortLabel
-                                        active={orderBy === cell.id}
-                                        direction={orderBy === cell.id ? order : 'asc'}
-                                        onClick={() => handleSort(cell.id)}>
-                                        <Button size="small" sx={{ margin: 0, padding: 0 }}>
-                                            {cell.label}
-                                        </Button>
+                            <Grid item sx={{ display: 'flex', alignItems: 'center' }}>
+                                <AppBar position="static" elevation={0}>
+                                    <Toolbar variant="dense" sx={{}}>
+                                        <TableSortLabel
+                                            sx={{
+                                                '&.MuiTableSortLabel-root': {
+                                                    color: 'white'
+                                                },
+                                                '&.MuiTableSortLabel-root:hover': {
+                                                    color: 'white'
+                                                },
+                                                '&.Mui-active': {
+                                                    color: 'white'
+                                                },
+                                                '& .MuiTableSortLabel-icon': {
+                                                    color: 'white !important'
+                                                }
+                                            }}
+                                            active={orderBy === 'item'}
+                                            direction={orderBy === 'item' ? order : 'asc'}
+                                            onClick={() => handleSort('item')}>
+                                            <Button
+                                                sx={{
+                                                    margin: 0,
+                                                    padding: 0,
+                                                    fontSize: 10,
+                                                    fontWeight: 900,
+                                                    color: 'white'
+                                                }}>
+                                                ITEM
+                                            </Button>
 
-                                        {orderBy === cell.id ? (
-                                            <Box component="span" sx={visuallyHidden}>
-                                                {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                                            </Box>
-                                        ) : null}
-                                    </TableSortLabel>
-                                ))}
+                                            {orderBy === 'item' ? (
+                                                <Box component="span" sx={visuallyHidden}>
+                                                    {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                                                </Box>
+                                            ) : null}
+                                        </TableSortLabel>
+                                        {headerCell.map((cell) => (
+                                            <TableSortLabel
+                                                sx={{
+                                                    '&.MuiTableSortLabel-root': {
+                                                        color: 'white'
+                                                    },
+                                                    '&.MuiTableSortLabel-root:hover': {
+                                                        color: 'white'
+                                                    },
+                                                    '&.Mui-active': {
+                                                        color: 'white'
+                                                    },
+                                                    '& .MuiTableSortLabel-icon': {
+                                                        color: 'white !important'
+                                                    }
+                                                }}
+                                                active={orderBy === cell.id}
+                                                direction={orderBy === cell.id ? order : 'asc'}
+                                                onClick={() => handleSort(cell.id)}>
+                                                <Button
+                                                    variant="text"
+                                                    sx={{
+                                                        margin: 0,
+                                                        padding: 0,
+                                                        fontSize: 10,
+                                                        fontWeight: 900,
+                                                        color: 'white'
+                                                    }}>
+                                                    {cell.label}
+                                                </Button>
+
+                                                {orderBy === cell.id ? (
+                                                    <Box component="span" sx={visuallyHidden}>
+                                                        {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                                                    </Box>
+                                                ) : null}
+                                            </TableSortLabel>
+                                        ))}
+                                    </Toolbar>
+                                </AppBar>
                             </Grid>
                             <Grid item alignItems="center">
                                 <TablePagination

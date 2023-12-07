@@ -6,13 +6,12 @@ import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { changeStoreRoomItem, updateStoreRoomItemThunk } from '../../app/slice/storeRoom/storeRoomUpdateSlice';
 import {
     changeStoreRoomMasterItems,
-    getStoreRoomMasterItemsThunk,
     selectStoreRoomMasterItems
 } from '../../app/slice/storeRoom/storeRoomMasterItemsSlice';
-import { selectDepartmentDrawer, toggleDepartmentItemDrawer } from '../../app/slice/drawerToggle/departmentDrawerSlice';
+import { selectDepartmentDrawer, toggleDepartmentDrawer } from '../../app/slice/drawerToggle/departmentDrawerSlice';
 
-const StoreRoomItemUpdateForm = () => {
-    const { toggleType, departmentItem } = useAppSelector(selectDepartmentDrawer);
+const DepartmentItemUpdateForm = () => {
+    const { departmentItem } = useAppSelector(selectDepartmentDrawer);
     const storeRoomMasterItemsSelector = useAppSelector(selectStoreRoomMasterItems);
     const dispatch = useAppDispatch();
 
@@ -59,45 +58,45 @@ const StoreRoomItemUpdateForm = () => {
                             }))
                         )
                     );
-                    dispatch(toggleDepartmentItemDrawer({ toggleType: '', departmentItem: null }));
+                    dispatch(toggleDepartmentDrawer({ drawerType: '', departmentItem: null }));
                 })
                 .catch((error: Error) => console.error(error.message));
         }
     };
 
     const handleCancel = () => {
-        dispatch(toggleDepartmentItemDrawer({ toggleType: '', departmentItem: null }));
+        dispatch(toggleDepartmentDrawer({ drawerType: '', departmentItem: null }));
     };
 
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
         if (event.target.name === 'location' && departmentItem) {
             dispatch(
-                toggleDepartmentItemDrawer({
-                    toggleType: 'UPDATE_DEPARTMENT_ITEM',
+                toggleDepartmentDrawer({
+                    drawerType: 'UPDATE_DEPARTMENT_ITEM',
                     departmentItem: { ...departmentItem, location: event.target.value }
                 })
             );
         }
         if (event.target.name === 'usageLevel' && departmentItem) {
             dispatch(
-                toggleDepartmentItemDrawer({
-                    toggleType: 'UPDATE_DEPARTMENT_ITEM',
+                toggleDepartmentDrawer({
+                    drawerType: 'UPDATE_DEPARTMENT_ITEM',
                     departmentItem: { ...departmentItem, usageLevel: event.target.value }
                 })
             );
         }
         if (event.target.name === 'minimumQuantity' && departmentItem) {
             dispatch(
-                toggleDepartmentItemDrawer({
-                    toggleType: 'UPDATE_DEPARTMENT_ITEM',
+                toggleDepartmentDrawer({
+                    drawerType: 'UPDATE_DEPARTMENT_ITEM',
                     departmentItem: { ...departmentItem, minimumQuantity: parseInt(event.target.value) }
                 })
             );
         }
         if (event.target.name === 'maximumQuantity' && departmentItem) {
             dispatch(
-                toggleDepartmentItemDrawer({
-                    toggleType: 'UPDATE_DEPARTMENT_ITEM',
+                toggleDepartmentDrawer({
+                    drawerType: 'UPDATE_DEPARTMENT_ITEM',
                     departmentItem: { ...departmentItem, maximumQuantity: parseInt(event.target.value) }
                 })
             );
@@ -225,4 +224,4 @@ const StoreRoomItemUpdateForm = () => {
     );
 };
 
-export default StoreRoomItemUpdateForm;
+export default DepartmentItemUpdateForm;

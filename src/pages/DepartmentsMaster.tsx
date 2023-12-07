@@ -55,9 +55,10 @@ import CloseIcon from '@mui/icons-material/Close';
 import axios from 'axios';
 import { IOrderDetail } from '../app/api/properties/IOrderDetail';
 import { visuallyHidden } from '@mui/utils';
-import { toggleDepartmentItemDrawer } from '../app/slice/drawerToggle/departmentDrawerSlice';
+import { toggleDepartmentDrawer } from '../app/slice/drawerToggle/departmentDrawerSlice';
 import { getGrandTotalThunk, selectGrandTotal } from '../app/slice/grandTotalSlice';
 import { updateQuantityDepartmentItemThunk } from '../app/slice/master/masterDepartmentItemSlice';
+import { selectProfileDetail } from '../app/slice/profileDetail/profileDetailSlice';
 
 const columns: {
     id: keyof IMaster | keyof IOrderDetail;
@@ -244,6 +245,7 @@ const DepartmentRow = ({
     masterDepartmentItem: IMasterDepartment;
 }): JSX.Element => {
     const masterDepartmentItemsSelector = useAppSelector(selectMasterDepartmentItems);
+    const currentUser = useAppSelector(selectProfileDetail);
     const dispatch = useAppDispatch();
     const location = useLocation();
     const [updateAction, setUpdateAction] = useState<{
@@ -422,8 +424,8 @@ const DepartmentRow = ({
     const handleEditClick = (event: MouseEvent<HTMLElement>, masterDepartmentItem: IMasterDepartment) => {
         if (masterDepartmentItem) {
             dispatch(
-                toggleDepartmentItemDrawer({
-                    toggleType: 'UPDATE_STORE_ROOM_ITEM',
+                toggleDepartmentDrawer({
+                    drawerType: 'UPDATE_DEPARTMENT_ITEM',
                     departmentItem: {
                         id: masterDepartmentItem.id,
                         location: masterDepartmentItem.departmentItems[0].location,
@@ -570,12 +572,20 @@ const DepartmentRow = ({
                     />
                 </LocalizationProvider>
             </StyledSubTableCell>
-            <StyledTableCell width={20} align="center" padding="none">
+            <StyledTableCell
+                width={20}
+                align="center"
+                padding="none"
+                hidden={currentUser.profileDetail.role !== 'admin'}>
                 <IconButton onClick={(event: MouseEvent<HTMLElement>) => handleEditClick(event, masterDepartmentItem)}>
                     <ModeEditIcon color="primary" fontSize="small" />
                 </IconButton>
             </StyledTableCell>
-            <StyledTableCell width={20} align="center" padding="none">
+            <StyledTableCell
+                width={20}
+                align="center"
+                padding="none"
+                hidden={currentUser.profileDetail.role !== 'admin'}>
                 <IconButton
                     onClick={(event: MouseEvent<HTMLElement>) => handleDeleteClick(event, masterDepartmentItem)}>
                     <DeleteIcon color="primary" fontSize="small" />
@@ -639,13 +649,13 @@ const MasterDepartmentRow = ({
                 <StyledTableCell width={100}>{masterDepartmentItem.recentCN}</StyledTableCell>
                 <StyledTableCell width={150}>{masterDepartmentItem.recentVendor}</StyledTableCell>
                 <StyledTableCell width={70}>
-                    {masterDepartmentItem.orderDetail && masterDepartmentItem.orderDetail.totalQuantity && (
+                    {masterDepartmentItem.orderDetail && (
                         <Button
                             fullWidth
                             variant="outlined"
                             disableRipple
                             sx={{ cursor: 'default', fontWeight: '900', fontSize: 14 }}>
-                            {masterDepartmentItem.orderDetail.totalQuantity}
+                            {masterDepartmentItem.orderDetail && masterDepartmentItem.orderDetail.totalQuantity}
                         </Button>
                     )}
                 </StyledTableCell>
@@ -661,16 +671,16 @@ const MasterDepartmentRow = ({
                             {masterDepartmentItem.orderDetail && masterDepartmentItem.orderDetail.orderQuantity}
                         </Button>
                     ) : (
-                        <Typography>No</Typography>
+                        <Button
+                            fullWidth
+                            disableElevation
+                            variant="contained"
+                            color={getOrderQuantityColor(masterDepartmentItem)}
+                            disableRipple
+                            sx={{ cursor: 'default', fontWeight: 900, fontSize: 14 }}>
+                            N/A
+                        </Button>
                     )}
-
-                    {/* {(masterDepartmentItem.departmentItems[0].maximumQuantity &&
-                    masterDepartmentItem.departmentItems[0].minimumQuantity &&
-                    masterDepartmentItem.orderDetail) ? 
-                      
-                     : 
-                        <Box>NO<Box/>
-                        } */}
                 </StyledTableCell>
                 <StyledTableCell>
                     <Button

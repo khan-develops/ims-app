@@ -4,20 +4,20 @@ import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { changeDepartmentItem } from '../../app/slice/department/departmentItemUpdateSlice';
-import { selectDepartmentDrawer, toggleDepartmentItemDrawer } from '../../app/slice/drawerToggle/departmentDrawerSlice';
+import { selectDepartmentDrawer, toggleDepartmentDrawer } from '../../app/slice/drawerToggle/departmentDrawerSlice';
 
-const UpdateItemForm = () => {
+const UpdateDepartmentItemForm = () => {
     const { departmentItem } = useAppSelector(selectDepartmentDrawer);
     const dispatch = useAppDispatch();
 
     useEffect(() => {}, []);
 
     const handleSubmit = () => {
-        dispatch(toggleDepartmentItemDrawer({ toggleType: '', departmentItem: null }));
+        dispatch(toggleDepartmentDrawer({ drawerType: '', departmentItem: null }));
     };
 
     const handleCancel = () => {
-        dispatch(toggleDepartmentItemDrawer({ toggleType: '', departmentItem: null }));
+        dispatch(toggleDepartmentDrawer({ drawerType: '', departmentItem: null }));
     };
 
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -155,4 +155,4 @@ const UpdateItemForm = () => {
     );
 };
 
-export default UpdateItemForm;
+export default UpdateDepartmentItemForm;

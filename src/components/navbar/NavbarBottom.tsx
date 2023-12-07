@@ -9,7 +9,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import { selectRequestMasterItemsPendingChecked } from '../../app/slice/request/requestMasterItemsPendingCheckedSlice';
 import axios from 'axios';
 import FileSaver from 'file-saver';
-import { toggleMasterItemDrawer } from '../../app/slice/drawerToggle/masterDrawerSlice';
+import { toggleMasterDrawer } from '../../app/slice/drawerToggle/masterDrawerSlice';
 import { toggleRequestItemDrawer } from '../../app/slice/drawerToggle/requestDrawerSlice';
 
 const NavbarBottom = () => {
@@ -22,8 +22,8 @@ const NavbarBottom = () => {
 
     const handleAddClick = () => {
         dispatch(
-            toggleMasterItemDrawer({
-                toggleType: 'MASTER_ADD',
+            toggleMasterDrawer({
+                drawerType: 'ADD_MASTER_ITEM',
                 masterItem: null
             })
         );

@@ -1,28 +1,29 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { RootState } from '../../store';
 import { IDepartmentItem } from '../department/departmentItemsSlice';
-import { drawer_toggle_type } from '../../../common/types';
+import { DrawerType } from '../../../common/types';
 
 interface departmentDrawerState {
-    toggleType: drawer_toggle_type;
+    drawerType: DrawerType;
     departmentItem: IDepartmentItem | null;
 }
 
 const initialState: departmentDrawerState = {
-    toggleType: '',
+    drawerType: '',
     departmentItem: null
 };
 
 export const departmentDrawerSlice = createSlice({
-    name: 'drawerToggleSlice',
+    name: 'departmentDrawerSlice',
     initialState,
     reducers: {
-        toggleDepartmentItemDrawer: (state, action: PayloadAction<departmentDrawerState>) => {
-            state = action.payload
+        toggleDepartmentDrawer: (state, action: PayloadAction<departmentDrawerState>) => {
+            state.departmentItem = action.payload.departmentItem
+            state.drawerType = action.payload.drawerType
         }
     }
 });
 
-export const { toggleDepartmentItemDrawer } = departmentDrawerSlice.actions;
+export const { toggleDepartmentDrawer } = departmentDrawerSlice.actions;
 export const selectDepartmentDrawer = (state: RootState) => state.departmentDrawerStore;
 export default departmentDrawerSlice.reducer;

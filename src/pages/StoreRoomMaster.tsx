@@ -48,9 +48,9 @@ import {
     updateDepartmentItemQuantityThunk,
     updateDepartmentItemThunk
 } from '../app/slice/department/departmentItemUpdateSlice';
-import { toggleDepartmentItemDrawer } from '../app/slice/drawerToggle/departmentDrawerSlice';
+import { toggleDepartmentDrawer } from '../app/slice/drawerToggle/departmentDrawerSlice';
 import { toggleRequestItemDrawer } from '../app/slice/drawerToggle/requestDrawerSlice';
-import { toggleMasterItemDrawer } from '../app/slice/drawerToggle/masterDrawerSlice';
+import { toggleMasterDrawer } from '../app/slice/drawerToggle/masterDrawerSlice';
 import { getGrandTotalThunk, selectGrandTotal } from '../app/slice/grandTotalSlice';
 import SearchIcon from '@mui/icons-material/Search';
 import DownloadIcon from '@mui/icons-material/Download';
@@ -297,8 +297,8 @@ const StoreRoomMasterRow = ({
     const handleEditClick = (event: MouseEvent<HTMLElement>, masterDepartmentItem: IMasterDepartment) => {
         if (masterDepartmentItem) {
             dispatch(
-                toggleDepartmentItemDrawer({
-                    toggleType: 'UPDATE_STORE_ROOM_ITEM',
+                toggleDepartmentDrawer({
+                    drawerType: 'UPDATE_STORE_ROOM_ITEM',
                     departmentItem: {
                         id: masterDepartmentItem.id,
                         location: masterDepartmentItem.departmentItems[0].location,
@@ -627,8 +627,8 @@ const StoreRoomMaster = () => {
 
     const handleAddClick = () => {
         dispatch(
-            toggleMasterItemDrawer({
-                toggleType: 'MASTER_ADD',
+            toggleMasterDrawer({
+                drawerType: 'ADD_MASTER_ITEM',
                 masterItem: null
             })
         );

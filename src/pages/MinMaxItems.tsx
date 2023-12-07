@@ -48,7 +48,7 @@ import {
     selectRequestMasterDashboardItems,
     sortRequestMasterItemsDashboardThunk
 } from '../app/slice/request/dashboard/requestMasterItemsDashboardSlice';
-import { toggleMasterItemDrawer } from '../app/slice/drawerToggle/masterDrawerSlice';
+import { toggleMasterDrawer } from '../app/slice/drawerToggle/masterDrawerSlice';
 import { toggleRequestItemDrawer } from '../app/slice/drawerToggle/requestDrawerSlice';
 import { selectProfileDetail } from '../app/slice/profileDetail/profileDetailSlice';
 import { getMinMaxOrdersThunk, selectMinMaxOrders } from '../app/slice/orders/minMaxOrdersSlice';
@@ -367,8 +367,8 @@ const MinMaxItems = (): JSX.Element => {
 
     const handleAddClick = () => {
         dispatch(
-            toggleMasterItemDrawer({
-                toggleType: 'MASTER_ADD',
+            toggleMasterDrawer({
+                drawerType: 'ADD_MASTER_ITEM',
                 masterItem: null
             })
         );

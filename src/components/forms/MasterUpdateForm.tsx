@@ -3,7 +3,7 @@ import { ChangeEvent } from 'react';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { updateMasterItemThunk } from '../../app/slice/master/masterItemUpdateSlice';
 import { changeMasterItems, selectMasterItems } from '../../app/slice/master/masterItemsSlice';
-import { selectMasterDrawer, toggleMasterItemDrawer } from '../../app/slice/drawerToggle/masterDrawerSlice';
+import { selectMasterDrawer, toggleMasterDrawer } from '../../app/slice/drawerToggle/masterDrawerSlice';
 
 const MasterUpdateForm = () => {
     const dispatch = useAppDispatch();
@@ -23,21 +23,21 @@ const MasterUpdateForm = () => {
                             })
                         )
                     );
-                    dispatch(toggleMasterItemDrawer({ toggleType: '', masterItem: null }));
+                    dispatch(toggleMasterDrawer({ drawerType: '', masterItem: null }));
                 })
                 .catch((error: Error) => console.error(error.message));
         }
     };
 
     const handleCancel = () => {
-        dispatch(toggleMasterItemDrawer({ toggleType: '', masterItem: null }));
+        dispatch(toggleMasterDrawer({ drawerType: '', masterItem: null }));
     };
 
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
         masterItem &&
             dispatch(
-                toggleMasterItemDrawer({
-                    toggleType: 'MASTER_UPDATE',
+                toggleMasterDrawer({
+                    drawerType: 'UPDATE_MASTER_ITEM',
                     masterItem: { ...masterItem, [event.target.id]: event.target.value }
                 })
             );

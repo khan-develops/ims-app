@@ -48,7 +48,7 @@ import {
     selectRequestMasterDashboardItems,
     sortRequestMasterItemsDashboardThunk
 } from '../app/slice/request/dashboard/requestMasterItemsDashboardSlice';
-import { toggleMasterItemDrawer } from '../app/slice/drawerToggle/masterDrawerSlice';
+import { toggleMasterDrawer } from '../app/slice/drawerToggle/masterDrawerSlice';
 import { toggleRequestItemDrawer } from '../app/slice/drawerToggle/requestDrawerSlice';
 import { selectProfileDetail } from '../app/slice/profileDetail/profileDetailSlice';
 
@@ -382,8 +382,8 @@ const RequestMasterDashboard = () => {
 
     const handleAddClick = () => {
         dispatch(
-            toggleMasterItemDrawer({
-                toggleType: 'MASTER_ADD',
+            toggleMasterDrawer({
+                drawerType: 'ADD_MASTER_ITEM',
                 masterItem: null
             })
         );

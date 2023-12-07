@@ -2,7 +2,7 @@ import { Box, Button, ButtonGroup, Checkbox, Divider, FormControlLabel, FormGrou
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { selectDepartmentNames } from '../../app/slice/departmentName/departmentNamesSlice';
 import { ChangeEvent, useState } from 'react';
-import { selectMasterDrawer, toggleMasterItemDrawer } from '../../app/slice/drawerToggle/masterDrawerSlice';
+import { selectMasterDrawer, toggleMasterDrawer } from '../../app/slice/drawerToggle/masterDrawerSlice';
 import { assignMasterItemThunk } from '../../app/slice/master/masterItemAssignSlice';
 
 const MasterAssignForm = () => {
@@ -27,7 +27,7 @@ const MasterAssignForm = () => {
                     id: masterDrawerSelector.masterItem.id
                 })
             )
-                .then(() => dispatch(toggleMasterItemDrawer({ toggleType: '', masterItem: null })))
+                .then(() => dispatch(toggleMasterDrawer({ drawerType: '', masterItem: null })))
                 .catch((error: Error) => console.error(error.message));
         }
     };
@@ -54,7 +54,7 @@ const MasterAssignForm = () => {
             <Grid item>
                 <ButtonGroup variant="text" fullWidth sx={{ marginTop: 4 }}>
                     <Button onClick={handleSubmit}>Submit</Button>
-                    <Button onClick={() => dispatch(toggleMasterItemDrawer({ toggleType: '', masterItem: null }))}>
+                    <Button onClick={() => dispatch(toggleMasterDrawer({ drawerType: '', masterItem: null }))}>
                         Cancel
                     </Button>
                 </ButtonGroup>
